@@ -1,11 +1,18 @@
 <script>
-  import { createEventDispatcher } from 'svelte';
+  import { createEventDispatcher, onMount } from 'svelte';
 
   export let value;
   export let wide = false;
   export let autofocus = false;
   export let label = false;
   export let labelText = '';
+  let inputEl;
+
+onMount(() => {
+  if (autofocus) {
+    inputEl.focus();
+  }
+});
 
   const dispatch = createEventDispatcher();
 </script>
@@ -19,7 +26,7 @@
       class:wide
       bind:value
       on:change="{dispatch('change', value)}"
-      autofocus={autofocus}
+      bind:this={inputEl}
     />
   </label>
 {:else}
@@ -28,8 +35,8 @@
     class="text-input"
     class:wide
     bind:value
+    bind:this={inputEl}
     on:change="{dispatch('change', value)}"
-    autofocus={autofocus}
   />
 {/if}
 

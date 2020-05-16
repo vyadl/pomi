@@ -24,7 +24,7 @@
   function openAddingModal() {
     isAddingModalActive = true;
   }
-
+  console.log($tagsArr);
   function setCurrentTagLocal(tag) {
     setCurrentTag(tag);
     tagActive = '';

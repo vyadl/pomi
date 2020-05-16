@@ -24,47 +24,47 @@
   {#each $statArr as dayStat}
     {#if dayStat.data.length}
       <div class="day">
-        <div class="date">{dayStat.key}</div>
+        <ExpandBlock title="{dayStat.name}" center>
         <div class="main-data">
-          {#if $statTotal[dayStat.key] && $statTotal[dayStat.key].all}
+          {#if $statTotal[dayStat.name] && $statTotal[dayStat.name].all}
             <div class="total">
               <div class="total-title">{$_('total')}</div>
               <div class="total-subtitle">{$_('sum')}:</div>
-              {#if $statTotal[dayStat.key].sum.activities}
+              {#if $statTotal[dayStat.name].sum.activities}
                 <div class="total-record">
                   <div>{$_('activities').toLowerCase()}</div>
                   <div>
-                    {makeHoursAndMinutes($statTotal[dayStat.key].sum.activities)}
+                    {makeHoursAndMinutes($statTotal[dayStat.name].sum.activities)}
                   </div>
                 </div>
               {/if}
-              {#if $statTotal[dayStat.key].sum.breaks}
+              {#if $statTotal[dayStat.name].sum.breaks}
                 <div class="total-record">
                   <div>{$_('breaks').toLowerCase()}</div>
                   <div>
-                    {makeHoursAndMinutes($statTotal[dayStat.key].sum.breaks)}
+                    {makeHoursAndMinutes($statTotal[dayStat.name].sum.breaks)}
                   </div>
                 </div>
               {/if}
               <br />
-              {#if Object.keys($statTotal[dayStat.key].global).length}
+              {#if Object.keys($statTotal[dayStat.name].global).length}
                 <div class="total-subtitle">{$_('global_activities')}:</div>
-                {#each Object.keys($statTotal[dayStat.key].global) as tagKey, i}
+                {#each Object.keys($statTotal[dayStat.name].global) as tagKey, i}
                   <div class="total-record">
                     <div>{`${tagKey}`}</div>
                     <div>
-                      {$statTotal[dayStat.key].global[tagKey].quantity} ({makeHoursAndMinutes($statTotal[dayStat.key].global[tagKey].totalTime)})
+                      {$statTotal[dayStat.name].global[tagKey].quantity} ({makeHoursAndMinutes($statTotal[dayStat.name].global[tagKey].totalTime)})
                     </div>
                   </div>
                 {/each}
                 <br />
                 <div class="total-subtitle">{$_('all_activities')}:</div>
               {/if}
-              {#each Object.keys($statTotal[dayStat.key].all) as tagKey, i}
+              {#each Object.keys($statTotal[dayStat.name].all) as tagKey, i}
                 <div class="total-record">
                   <div>{`${tagKey}`}</div>
                   <div>
-                    {$statTotal[dayStat.key].all[tagKey].quantity} ({makeHoursAndMinutes($statTotal[dayStat.key].all[tagKey].totalTime)})
+                    {$statTotal[dayStat.name].all[tagKey].quantity} ({makeHoursAndMinutes($statTotal[dayStat.name].all[tagKey].totalTime)})
                   </div>
                 </div>
               {/each}
@@ -103,7 +103,7 @@
                 <div
                   class="record-remove"
                   on:click="{() => {
-                    stat.removeStat(dayStat.key, data.finishedAt);
+                    stat.removeStat(dayStat.name, data.finishedAt);
                   }}"
                 ></div>
                 {#if data.comment}
@@ -113,6 +113,7 @@
             {/each}
           </ExpandBlock>
         </div>
+        </ExpandBlock>
       </div>
     {/if}
   {/each}
@@ -180,12 +181,6 @@
   }
   .time {
     text-align: right;
-  }
-  .date {
-    color: #888;
-    margin-bottom: 8px;
-    font-size: 14px;
-    text-align: center;
   }
   .total {
     padding-top: 10px;

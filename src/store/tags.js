@@ -5,7 +5,15 @@ export const currentTag = writable({});
 export const tagsArr = derived(
   tags,
   $tags => {
-    return Object.keys($tags).reduce((result, key) => {
+    return Object.keys($tags).sort((a, b) => {
+      if ($tags[a] < $tags[b]) {
+        return -1;
+      }
+      if ($tags[a] > $tags[b]) {
+        return 1;
+      }
+      return 0;
+    }).reduce((result, key) => {
       result.push({
         key,
         text: $tags[key]

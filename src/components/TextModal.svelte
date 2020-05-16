@@ -30,7 +30,11 @@
     <slot>
       <form class="form" on:submit|preventDefault="{sendValue}">
         <div class="input-wrapper">
-          <TextInput bind:value autofocus wide />
+          <TextInput
+            bind:value
+            autofocus
+            wide
+          />
         </div>
         <div class="buttons">
           <DefaultButton type="submit">{buttontext}</DefaultButton>

@@ -6,6 +6,16 @@ import { settings } from './../store/settings.js';
 import { startedAt } from './counter.js';
 import { extraCounter } from './extraCounter.js';
 
+function getDateString(dateObj = new Date) {
+  return `${
+    dateObj.getDate().toString().padStart(2, 0)
+    }.${
+    (dateObj.getMonth() + 1).toString().padStart(2, 0)
+    }.${
+    dateObj.getFullYear()
+    }`;
+};
+
 function createStat() {
   const { subscribe, set, update } = writable({});
   let lastDay = '';
@@ -17,12 +27,12 @@ function createStat() {
     addStat: (intervalId, secondsToFinish = 0) => {
       update(stat => {
         const now = new Date();
-        const day = `${now.getDate()}.${now.getMonth() + 1}.${now.getFullYear()}`;
+        const day = getDateString();
         const plannedDuration = get(intervals)[intervalId].duration;
         const finalDuration = get(settings).subtractTimeWhenFinishing
           ? plannedDuration - Math.floor(secondsToFinish / 60)
           : plannedDuration;
-
+        debugger;
         lastDay = day;
 
         if (!stat[day]) {
@@ -90,7 +100,7 @@ function createStat() {
         const now = new Date;
 
         stat.addManualStat({
-          day: `${now.getDate()}.${now.getMonth() + 1}.${now.getFullYear()}`,
+          day: getDateString(),
           intervalId: 'break',
           duration: Math.round(seconds / 60),
           startedAt: Math.round(+now - seconds * 1000),
@@ -125,10 +135,10 @@ export const apiUpdateStat = function(obj) {
 };
 
 export const statArr = derived(stat, $stat => {
-  return Object.keys($stat).reduce((result, key) => {
+  return Object.keys($stat).reduce((result, day) => {
     result.push({
-      key: key.split('_').join(' '),
-      data: $stat[key],
+      name: day,
+      data: $stat[day],
     });
 
     return result;
@@ -139,7 +149,7 @@ export const tagDivider = writable(' - ');
 
 export const statTotal = derived(statArr, $statArr => {
   return $statArr.reduce((result, day) => {
-    result[day.key] = day.data.reduce((dayResult, record) => {
+    result[day.name] = day.data.reduce((dayResult, record) => {
       if (!dayResult.all) {
         dayResult = {
           global: {},

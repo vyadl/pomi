@@ -78,7 +78,7 @@
   }
 
   .settings {
-    position: absolute;
+    position: fixed;
     bottom: 15px;
     right: 15px;
     opacity: 0.8;
