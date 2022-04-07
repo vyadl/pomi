@@ -1,4 +1,6 @@
-/node_modules/
+node_modules
 /public/build/
-
+/public/.htaccess
+app.js
+tmp
 .DS_Store
