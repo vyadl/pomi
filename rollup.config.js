@@ -8,7 +8,6 @@ import json from '@rollup/plugin-json';
 import sveltePreprocess from 'svelte-preprocess';
 
 const production = !process.env.ROLLUP_WATCH;
-
 const preprocess = sveltePreprocess({
 	scss: {
 	  includePaths: ['src'],
