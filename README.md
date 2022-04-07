@@ -1,3 +1,4 @@
-# pomi
-tomato-timer
-developed with Svelte
+# POMI
+## Tomato-timer
+
+Build with svelte.js.
