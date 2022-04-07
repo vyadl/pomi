@@ -7,7 +7,6 @@
   import { initSettings, settings } from './store/settings';
   import { counter, timerFormattedTime } from './store/counter.js';
   import { currentTag } from './store/tags.js';
-  export let name;
 
   initSettings();
 
