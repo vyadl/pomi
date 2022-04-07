@@ -1,0 +1,29 @@
+name: CI
+
+on:
+  push:
+    branches: [ master ]
+  
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: executing remote ssh commands
+      uses: appleboy/ssh-action@master
+      env:
+       NICKNAME: vyadl
+       TOKEN: ${{ secrets.TOKEN_GITHUB }}
+      with:
+        host: server187.web-hosting.com
+        username: vyadl
+        password: ${{ secrets.PASSWORD_SERVER }}
+        port: 21098
+        envs: NICKNAME,TOKEN
+        script_stop: true
+        script: |
+          source /home/vyadl/nodevenv/pomi/14/bin/activate && cd /home/vyadl/pomi
+          git pull "https://$NICKNAME:$TOKEN@github.com/vyadl/pomi.git" master
+          npm install
+          npm run build
