@@ -83,6 +83,11 @@ export default {
 		// instead of npm run dev), minify
 		production && terser()
 	],
+	onwarn: function ({ message }) {
+		if ( /Circular dependency/.test(message)) return;
+
+		console.error(message);
+	},
 	watch: {
 		clearScreen: false
 	}
