@@ -229,19 +229,6 @@
   }
   .button-wrapper {
     position: relative;
-    &:hover {
-      .edit {
-        display: block;
-      }
-    }
-  }
-  .edit {
-    position: absolute;
-    left: 50%;
-    top: -15px;
-    z-index: 5;
-    cursor: pointer;
-    display: none;
   }
   .button {
     padding: 10px 10px;

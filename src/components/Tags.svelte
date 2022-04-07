@@ -3,7 +3,6 @@
   import TextModal from './TextModal.svelte';
   import DefaultButton from './DefaultButton.svelte';
   import {
-    tags,
     tagsArr,
     currentTag,
     addTag,
@@ -24,10 +23,14 @@
   function openAddingModal() {
     isAddingModalActive = true;
   }
-  console.log($tagsArr);
+  
   function setCurrentTagLocal(tag) {
     setCurrentTag(tag);
     tagActive = '';
+  }
+
+  function handleFocus(tag) {
+    $currentTag[tag.key] ? (tagActive = '') : (tagActive = tag.key);
   }
 </script>
 
@@ -36,9 +39,15 @@
     <div
       class="button-wrapper"
       on:mouseover="{() => {
-        $currentTag[tag.key] ? (tagActive = '') : (tagActive = tag.key);
+        handleFocus(tag);
+      }}"
+      on:focus="{() => {
+        handleFocus(tag);
       }}"
       on:mouseout="{() => {
+        tagActive = '';
+      }}"
+      on:blur="{() => {
         tagActive = '';
       }}"
     >
