@@ -2,7 +2,6 @@ import svelte from 'rollup-plugin-svelte';
 import commonjs from '@rollup/plugin-commonjs';
 import resolve from '@rollup/plugin-node-resolve';
 import livereload from 'rollup-plugin-livereload';
-import { terser } from 'rollup-plugin-terser';
 import css from 'rollup-plugin-css-only';
 import json from '@rollup/plugin-json';
 import sveltePreprocess from 'svelte-preprocess';
@@ -77,10 +76,6 @@ export default {
     // Watch the `public` directory and refresh the
     // browser on changes when not in production
     !production && livereload('public'),
-
-    // If we're building for production (npm run build
-    // instead of npm run dev), minify
-    production && terser()
   ],
   onwarn: function ({ message }) {
     if ( /Circular dependency/.test(message)) return;
