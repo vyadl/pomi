@@ -32,7 +32,7 @@ function createStat() {
         const finalDuration = get(settings).subtractTimeWhenFinishing
           ? plannedDuration - Math.floor(secondsToFinish / 60)
           : plannedDuration;
-        debugger;
+
         lastDay = day;
 
         if (!stat[day]) {

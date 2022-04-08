@@ -1,7 +1,10 @@
 <script>
   export let buttontext;
   export let title;
+  export let inputmessage;
+  export let errormessage;
   export let active = false;
+  export let customclose = false;
   import { fade } from 'svelte/transition';
   import { createEventDispatcher } from 'svelte';
   import DefaultButton from './DefaultButton.svelte';
@@ -11,14 +14,19 @@
   const dispatch = createEventDispatcher();
   let value = '';
 
+  $: if (!active) closeModal();
+
   function sendValue() {
     dispatch('message', value);
-    closeModal();
+    if (!customclose) {
+      closeModal();
+    }
   }
 
   function closeModal() {
     dispatch('close');
     value = '';
+    errormessage = ''; 
   }
 </script>
 
@@ -34,6 +42,7 @@
             bind:value
             autofocus
             wide
+            bind:errormessage
           />
         </div>
         <div class="buttons">
