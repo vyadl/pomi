@@ -6,6 +6,7 @@
   export let autofocus = false;
   export let label = false;
   export let labelText = '';
+  export let errormessage = '';
   let inputEl;
 
 onMount(() => {
@@ -14,56 +15,78 @@ onMount(() => {
   }
 });
 
-  const dispatch = createEventDispatcher();
-</script>
+const dispatch = createEventDispatcher();
 
-{#if label}
-  <label class="label">
-    <div class="label-text">{labelText}</div>
+function onChange() {
+  errormessage = '';
+  dispatch('change', value);
+}
+</script>
+<div
+  class="text-input"
+  class:wide
+>
+  {#if label}
+    <label class="label">
+      <div class="label-text">{labelText}</div>
+      <input
+        type="text"
+        class="input"
+        bind:value
+        on:input={onChange}
+        bind:this={inputEl}
+      />
+    </label>
+  {:else}
     <input
       type="text"
-      class="text-input"
-      class:wide
+      class="input"
       bind:value
-      on:change="{dispatch('change', value)}"
       bind:this={inputEl}
+      on:input={onChange}
     />
-  </label>
-{:else}
-  <input
-    type="text"
-    class="text-input"
-    class:wide
-    bind:value
-    bind:this={inputEl}
-    on:change="{dispatch('change', value)}"
-  />
-{/if}
+  {/if}
+  {#if errormessage}
+    <div class="error-message">{errormessage}</div>
+  {/if}
+</div>
 
 <style lang="scss">
-  .label {
-    display: block;
-  }
-  .label-text {
-    display: block;
-    margin-bottom: 7px;
-    font-size: 12px;
-    color: #888;
-  }
   .text-input {
-    background: none;
-    border: none;
-    border-bottom: 2px solid #444;
-    transition: border-color 0.2s;
-    color: #aaa;
-    font-size: 14px;
-    padding: 5px;
-    &.wide {
-      width: 100%;
+    .label {
+      display: block;
     }
-    &:focus {
-      outline: none;
-      border-bottom-color: #888;
+    .label-text {
+      display: block;
+      margin-bottom: 7px;
+      font-size: 12px;
+      color: #888;
+    }
+    .input {
+      background: none;
+      border: none;
+      border-bottom: 2px solid #444;
+      transition: border-color 0.2s;
+      color: #aaa;
+      font-size: 14px;
+      padding: 5px;
+      &.wide {
+        width: 100%;
+      }
+      &:focus {
+        outline: none;
+        border-bottom-color: #888;
+      }
+    }
+    &.wide {
+      .input {
+        width: 100%;
+      }
+    }
+    .error-message {
+      font-size: 12px;
+      padding-left: 5px;
+      color: #999;
     }
   }
 </style>

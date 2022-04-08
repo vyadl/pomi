@@ -38,6 +38,10 @@ export const addTag = function(tagName) {
 
     apiUpdateTags(newTags);
     tags.update(() => newTags);
+
+    return { key, name: tagName };
+  } else {
+    return false;
   }
 };
 

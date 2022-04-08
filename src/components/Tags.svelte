@@ -14,10 +14,18 @@
 
   let isAddingModalActive = false;
   let tagActive = '';
+  let errormessage = '';
   initTags();
 
   function add(event) {
-    addTag(event.detail);
+    const tag = addTag(event.detail);
+
+    if (tag) {
+      setCurrentTagLocal({ [tag.key]: tag.name });
+      isAddingModalActive = false;
+    } else {
+      errormessage = 'This tag is already exist';
+    }
   }
 
   function openAddingModal() {
@@ -79,10 +87,12 @@
 <TextModal
   buttontext="{$_('add')}"
   active="{isAddingModalActive}"
+  customclose
   on:message="{add}"
   on:close="{() => {
     isAddingModalActive = false;
   }}"
+  bind:errormessage
   title="{$_('adding_activity')}"
 />
 
