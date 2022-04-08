@@ -15,18 +15,25 @@ onMount(() => {
   }
 });
 
-  const dispatch = createEventDispatcher();
+const dispatch = createEventDispatcher();
+
+function onChange() {
+  errormessage = '';
+  dispatch('change', value);
+}
 </script>
-<div class="text-input">
+<div
+  class="text-input"
+  class:wide
+>
   {#if label}
     <label class="label">
       <div class="label-text">{labelText}</div>
       <input
         type="text"
         class="input"
-        class:wide
         bind:value
-        on:change="{dispatch('change', value)}"
+        on:input={onChange}
         bind:this={inputEl}
       />
     </label>
@@ -34,10 +41,9 @@ onMount(() => {
     <input
       type="text"
       class="input"
-      class:wide
       bind:value
       bind:this={inputEl}
-      on:change="{dispatch('change', value)}"
+      on:input={onChange}
     />
   {/if}
   {#if errormessage}
@@ -70,6 +76,11 @@ onMount(() => {
       &:focus {
         outline: none;
         border-bottom-color: #888;
+      }
+    }
+    &.wide {
+      .input {
+        width: 100%;
       }
     }
     .error-message {

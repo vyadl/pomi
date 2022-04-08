@@ -14,7 +14,7 @@
 
   let isAddingModalActive = false;
   let tagActive = '';
-  let errorMessage = '';
+  let errormessage = '';
   initTags();
 
   function add(event) {
@@ -24,7 +24,7 @@
       setCurrentTagLocal({ [tag.key]: tag.name });
       isAddingModalActive = false;
     } else {
-      errorMessage = 'This tag is already exist';
+      errormessage = 'This tag is already exist';
     }
   }
 
@@ -92,7 +92,7 @@
   on:close="{() => {
     isAddingModalActive = false;
   }}"
-  errormessage="{errorMessage}"
+  bind:errormessage
   title="{$_('adding_activity')}"
 />
 

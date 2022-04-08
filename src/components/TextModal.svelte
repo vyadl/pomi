@@ -5,7 +5,6 @@
   export let errormessage;
   export let active = false;
   export let customclose = false;
-  import { fade } from 'svelte/transition';
   import { createEventDispatcher } from 'svelte';
   import DefaultButton from './DefaultButton.svelte';
   import TextInput from './TextInput.svelte';
@@ -69,8 +68,6 @@
   }
 
   .input-wrapper {
-    display: flex;
-    justify-content: center;
     margin-bottom: 20px;
   }
 
