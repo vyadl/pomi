@@ -22,6 +22,7 @@ function createCounter() {
     },
     reset: () => {
       set(0);
+      clearInterval(timerId);
     }
   };
 }

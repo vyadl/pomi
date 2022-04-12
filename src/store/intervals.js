@@ -1,10 +1,11 @@
 import { writable, derived, get } from 'svelte/store';
+import { settings } from './../store/settings.js'
 import { sounds } from './sounds.js';
 
 let audios = {};
 
 function createIntervals() {
-  const { subscribe, set, update } = writable({});
+  const { subscribe, update } = writable({});
   return {
     subscribe,
     update,
@@ -17,6 +18,8 @@ function createIntervals() {
         apiUpdateIntervals(newIntervals);
         return newIntervals;
       });
+
+      updateFactor();
     },
     changeSound: (intervalId, opts) => {
       update(intervals => {
@@ -42,6 +45,8 @@ function createIntervals() {
 
 export const intervals = createIntervals();
 export const currentInterval = writable('');
+export const activityFactor = writable('');
+export const calculatedActivityFactor = writable('');
 export const intervalsArr = derived(
   intervals,
   $intervals => Object.entries($intervals)
@@ -94,12 +99,43 @@ export const initIntervals = function() {
     },
   });
 
+  updateFactor();
+
   ['main', 'break', 'longBreak'].forEach(intervalId => {
     audios[intervalId] = new Audio(`sounds/${get(sounds)[get(intervals)[intervalId].sound.id].fileName}`);
     audios[intervalId].volume = parseFloat(get(intervals)[intervalId].sound.volume);
     audios[intervalId].muted = get(intervals)[intervalId].sound.muted;
   });
 };
+
+export const updateFactor = () => {
+  const { 
+    useActivityFactor,
+    useCustomActivityFactor,
+    customActivityFactor,
+  } = get(settings);
+
+  calculatedActivityFactor.update(() => {
+    const {
+      main: { duration: a },
+      break: { duration: b },
+      longBreak: { duration: c },
+    } = get(intervals);
+    const factor = Math.round((a * 4 + b * 3 + c) / (a * 4) * 100) / 100;
+
+    return factor;
+  });
+
+  activityFactor.update(() => {
+    if (!useActivityFactor) {
+      return 0;
+    } else if (customActivityFactor && useCustomActivityFactor) {
+      return customActivityFactor;
+    } else {
+      return get(calculatedActivityFactor);
+    }
+  });
+}
 
 export const apiUpdateIntervals = function(obj) {
   localStorage.setItem('intervals', JSON.stringify(obj));

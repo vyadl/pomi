@@ -26,28 +26,32 @@
 
 {#if active}
   <div class="modal" transition:fade>
-    <slot />
-    <div
-      class="close"
-      on:click="{() => {
-        dispatch('close');
-      }}"
-    ></div>
+    <div class="inner">
+      <slot />
+      <div
+        class="close"
+        on:click="{() => {
+          dispatch('close');
+        }}"
+      ></div>
+    </div>
   </div>
 {/if}
 
 <style lang="scss">
   .modal {
-    position: fixed;
-    display: flex;
+    position: absolute;
     width: 100vw;
     height: 100vh;
     top: 0;
     left: 0;
     z-index: 5;
-    background-color: rgba(0, 0, 0, 0.96);
-    padding-top: 40px;
     overflow: auto;
+    background-color: rgba(0, 0, 0, 0.96);
+  }
+  .inner {
+    display: flex;
+    padding: 40px 0 60px;
   }
 
   .close {

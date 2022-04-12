@@ -58,6 +58,15 @@ function createCounter() {
         return 0;
       });
     },
+    resetPeriod: (intervalId) => {
+      update(() => {
+        clearInterval(timerId);
+
+        currentInterval.set('');
+
+        return 0;
+      });
+    },
     mute: () => {
       setMute(true);
     },

@@ -1,41 +1,48 @@
 <script>
-  import { createEventDispatcher } from 'svelte';
-  import { _, locale, locales } from 'svelte-i18n';
+  import { _, locale } from 'svelte-i18n';
   import { intervals, intervalsArr, playAudio } from './../store/intervals.js';
   import { soundsArr } from './../store/sounds.js';
-  import { settings, apiUpdateSettings } from './../store/settings.js';
+  import { settings } from './../store/settings.js';
+  import { calculatedActivityFactor } from './../store/intervals.js';
   import DefaultButton from './DefaultButton.svelte';
   import DefaultCheckbox from './DefaultCheckbox.svelte';
   import BasicModal from './BasicModal.svelte';
 
   export let active = false;
 
-  const dispatch = createEventDispatcher();
 
-  const localSettings = JSON.parse(JSON.stringify($settings));
+  let localSettings = JSON.parse(JSON.stringify($settings));
 
   function changeSetting(setting, value) {
     settings.update(settings => {
       settings[setting] = value || localSettings[setting];
+      localSettings = JSON.parse(JSON.stringify(settings));
 
       return settings;
     });
-  }
-
-  function changeIntervalDuration(id, duration) {
-    intervals.changeDuration(id, Math.ceil(duration));
-    target.value = Math.ceil(duration);
   }
 
   function changeLanguage(lang) {
     changeSetting('language', lang);
     locale.set(lang);
   }
+
+  function getFactorString(factor) {
+    if (!(factor % 1)) {
+      return `${factor}.00`;
+    } else {
+      return String(factor).padEnd(4, '0');
+    }
+  }
+
+  function changeInterval(target, interval) {
+    intervals.changeDuration(interval[0], Math.ceil(target.value));
+    target.value = Math.ceil(target.value);
+  }
 </script>
 
 <BasicModal bind:active on:close>
   <div class="settings">
-
     <div class="section">
       <div class="settings-title">{$_('intervals')}</div>
       <div class="intervals">
@@ -51,10 +58,9 @@
                 step="1"
                 class="settings-input"
                 value="{interval[1].duration}"
-                on:change="{event => {
-                  intervals.changeDuration(interval[0], Math.ceil(event.target.value));
-                  event.target.value = Math.ceil(event.target.value);
-                }}"
+                on:change="{(event) => {
+                    changeInterval(event.target, interval);
+                  }}"
               />
             </label>
             <label class="settings-label">
@@ -122,7 +128,17 @@
       </div>
     </div>
     <div class="section">
-    <div class="checkbox-setting">
+      <div class="checkbox-setting">
+        <DefaultCheckbox
+          text="{$_('settings.show_activity_near_timer')}"
+          bind:checked="{localSettings.showActivityNearTimer}"
+          on:change="{() => {
+            changeSetting('showActivityNearTimer');
+          }}"
+          label
+        />
+      </div>
+      <div class="checkbox-setting">
         <DefaultCheckbox
           text="{$_('settings.time_title')}"
           bind:checked="{localSettings.showTimeInTitle}"
@@ -172,6 +188,53 @@
           label
         />
       </div>
+      <div class="checkbox-setting">
+        <DefaultCheckbox
+          text="{$_('settings.use_activity_factor')}"
+          bind:checked="{localSettings.useActivityFactor}"
+          on:change="{() => {
+            changeSetting('useActivityFactor');
+          }}"
+          label
+        />
+      </div>
+      
+      {#if localSettings.useActivityFactor}
+        <div class="factor-description">
+          {$_('settings.basic_factor')} <br>
+          {$_('settings.formula_factor_sentence')} <br>
+          {$_('settings.formula_factor')} <br>
+          {$_('settings.current_counted_factor')}: {$calculatedActivityFactor}
+        </div>
+        <div class="checkbox-setting">
+          <DefaultCheckbox
+            text="{$_('settings.use_custom_activity_factor')}"
+            bind:checked="{localSettings.useCustomActivityFactor}"
+            on:change="{() => {
+              changeSetting('useCustomActivityFactor');
+            }}"
+            label
+          />
+        </div>
+        {#if localSettings.useCustomActivityFactor}
+          <label class="settings-label">
+            <div class="settings-label-text bigger">
+              {getFactorString(localSettings.customActivityFactor)}
+            </div>
+            <input
+                type="range"
+                min="0.1"
+                max="3"
+                step="0.05"
+                class="settings-range"
+                value="{localSettings.customActivityFactor}"
+                on:input="{event => {
+                  changeSetting('customActivityFactor', event.target.value);
+                }}"
+              />
+          </label>
+        {/if}
+      {/if}
     </div>
   </div>
 </BasicModal>
@@ -278,6 +341,15 @@
   .settings-label-text {
     margin-bottom: 2px;
     font-size: 12px;
+    &.bigger {
+      text-align: center;
+      font-size: 14px;
+      color: #aaa;
+    }
+  }
+  .factor-description {
+    font-size: 13px;
+    color: #aaa;
   }
   .checkbox-setting {
     padding: 7px 0;

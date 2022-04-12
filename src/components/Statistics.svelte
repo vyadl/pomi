@@ -1,23 +1,18 @@
 <script>
   import { _ } from 'svelte-i18n';
-  import { stat, statArr, initStat, statTotal } from './../store/statistics.js';
+  import {
+    stat,
+    statArr,
+    initStat,
+    statTotal,
+    makeHoursAndMinutes,
+  } from './../store/statistics.js';
   import { makeAbsoluteTimeString } from './../utils.js';
   import { settings } from './../store/settings.js';
-  import DefaultButton from './DefaultButton.svelte';
-  import TextInput from './TextInput.svelte';
-  import TextModal from './TextModal.svelte';
+  import { activityFactor } from './../store/intervals.js';
   import ExpandBlock from './ExpandBlock.svelte';
-
+  
   initStat();
-
-  function makeHoursAndMinutes(allMinutes) {
-    const hours = Math.floor(allMinutes / 60);
-    const minutes = allMinutes % 60;
-
-    return `${hours ? hours + (minutes ? ' hr, ' : '') : ''}${
-      minutes ? minutes + ' min' : ''
-    }`;
-  }
 </script>
 
 <div class="stat">
@@ -31,10 +26,18 @@
               <div class="total-title">{$_('total')}</div>
               <div class="total-subtitle">{$_('sum')}:</div>
               {#if $statTotal[dayStat.name].sum.activities}
-                <div class="total-record">
+                <div class="total-record activities">
                   <div>{$_('activities').toLowerCase()}</div>
-                  <div>
-                    {makeHoursAndMinutes($statTotal[dayStat.name].sum.activities)}
+                  <div class="activity-sum">
+                    <div>
+                      {makeHoursAndMinutes($statTotal[dayStat.name].sum.activities * $activityFactor)}
+                    </div>
+                    <div class={$activityFactor ? 'pure' : ''}>
+                      {#if $activityFactor}
+                        {$_('pure_time')} -
+                      {/if}
+                      {makeHoursAndMinutes($statTotal[dayStat.name].sum.activities)}
+                    </div>
                   </div>
                 </div>
               {/if}
@@ -146,6 +149,17 @@
   .record-comment {
     padding-top: 5px;
   }
+  .activities {
+    font-size: 16px;
+    padding: 25px 0;
+  }
+  .activity-sum {
+    text-align: right;
+  }
+  .pure {
+    font-size: 12px;
+    color: #555;
+  }
   .record-remove {
     position: absolute;
     right: 0;
@@ -192,6 +206,11 @@
     justify-content: space-between;
     transition: background-color 0.2s;
     padding: 2px 0;
+    &.activities {
+      font-size: 17px;
+      color: #aaa;
+      padding: 25px 0 45px;
+    }
     &:hover {
       background-color: rgba(255, 255, 255, 0.03);
     }

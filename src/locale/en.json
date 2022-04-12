@@ -1,4 +1,5 @@
 {
+  "extra_time": "extra time",
   "app_name": "pomi",
   "activity": "activity",
   "general": "General",
@@ -9,7 +10,7 @@
   "play": "play",
   "activities": "Activities",
   "history": "History",
-  "add_time": "add time to the",
+  "add_time": "add time",
   "last_period": "last period",
   "new_break": "new brake",
   "comment_for_period": "comment for the period",
@@ -27,10 +28,17 @@
   "adding_activity": "Adding activity",
   "mute": "mute",
   "unmute": "unmute",
-  "finish": "finish",
+  "finish": "finish earlier",
+  "reset": "reset",
   "remove": "remove",
   "language": "Language",
   "breaks": "breaks",
+  "main": "activity",
+  "break": "short break",
+  "longBreak": "long break",
+  "pure_time": "pure time",
+  "done_today": "activity today",
+  "nothing_yet": "nothing yet",
   "languages": {
     "en": "English",
     "ru": "Русский"
@@ -46,7 +54,14 @@
     "subtract_time": "Subtract time when finishing mannualy",
     "time_title": "Show time in the title",
     "time_favicon": "Show time in the favicon",
-    "colorful_favicon": "Show last time seconds in the favicon in color"
+    "colorful_favicon": "Show last time seconds in the favicon in color",
+    "use_activity_factor": "Show activity using factor",
+    "use_custom_activity_factor": "Use custom activity factor",
+    "basic_factor": "Basic factor is calculated by your intervals, using basic pomodoro rule that after 4-th pomodoro yo take long break.",
+    "formula_factor_sentence": "The formula for counting activity factor is",
+    "formula_factor": "(activity_time * 4 + short_break * 3 + long_break) / (activity_time * 4)",
+    "current_counted_factor": "Current calculated activity factor is",
+    "show_activity_near_timer": "Show today's activity near timer"
   },
   "sounds": {
     "market": "Market atmoshpere",

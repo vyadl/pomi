@@ -1,6 +1,6 @@
 import { writable, derived, get } from 'svelte/store';
 import { currentTag } from './tags.js';
-import { comment } from './../store/counter.js'
+import { comment } from './../store/counter.js';
 import { intervals, currentInterval } from './intervals.js';
 import { settings } from './../store/settings.js';
 import { startedAt } from './counter.js';
@@ -208,4 +208,22 @@ export const statTotal = derived(statArr, $statArr => {
 
     return result;
   }, {});
+});
+
+export const makeHoursAndMinutes = (allMinutes) => {
+  const hours = Math.floor(allMinutes / 60);
+  const minutes = Math.floor(allMinutes % 60);
+
+  return `${hours ? hours + (minutes ? ' hr, ' : '') : ''}${
+    minutes ? minutes + ' min' : ''
+  }`;
+}
+
+export const currentDayStat = derived(statTotal, $statTotal => {
+  return $statTotal[getDateString()];
+});
+export const lastTime = derived(stat, $stat => {
+  const lastDay = getDateString();
+
+  return $stat[lastDay]?.[$stat[lastDay]?.length - 1];
 });
