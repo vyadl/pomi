@@ -1,4 +1,5 @@
-import { writable, derived, get } from 'svelte/store';
+import { writable, get } from 'svelte/store';
+import { updateFactor, intervals } from './intervals';
 let isFirstSubscribe = true;
 const defaultSettings = {
   subtractTimeWhenFinishing: 1,
@@ -6,7 +7,11 @@ const defaultSettings = {
   showTimeInTitle: 1,
   showTimeInFavicon: 1,
   showLastSecondsColorful: 1,
-  language: 'en'
+  language: 'en',
+  useActivityFactor: 1,
+  useCustomActivityFactor: 0,
+  customActivityFactor: 1,
+  showActivityNearTimer: 1,
 };
 
 export const settings = writable(defaultSettings);
@@ -25,11 +30,14 @@ export const apiUpdateSettings = function() {
   localStorage.setItem('settings', JSON.stringify(get(settings)));
 }
 
-settings.subscribe(settings => {
+settings.subscribe(() => {
   if (isFirstSubscribe) {
     isFirstSubscribe = false;
     return false;
   }
 
+  if (get(intervals)?.main?.duration) {
+    updateFactor();
+  }
   apiUpdateSettings();
 })
