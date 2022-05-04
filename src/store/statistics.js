@@ -5,8 +5,9 @@ import { intervals, currentInterval } from './intervals.js';
 import { settings } from './../store/settings.js';
 import { startedAt } from './counter.js';
 import { extraCounter } from './extraCounter.js';
+import { _ } from './../lang-utils.js';
 
-function getDateString(dateObj = new Date) {
+export const getDateString = (dateObj = new Date) => {
   return `${
     dateObj.getDate().toString().padStart(2, 0)
     }.${
@@ -44,7 +45,7 @@ function createStat() {
           secondsToFinish,
           startedAt: get(startedAt),
           finishedAt: +now,
-          tag: Object.entries(get(currentTag)),
+          tag: get(currentTag),
           duration: finalDuration,
           plannedDuration,
           comment: get(comment),
@@ -59,7 +60,7 @@ function createStat() {
       intervalId,
       duration,
       comment = '',
-      tag = Object.entries(get(currentTag)),
+      tag = get(currentTag),
       startedAt = '',
       finishedAt = '',
     }) => {
@@ -168,13 +169,13 @@ export const statTotal = derived(statArr, $statArr => {
       }
 
       if (record.intervalId === 'main') {
-        const tagName = record.tag[0][1];
+        const tagName = record.tag.title;
         const tagParts = tagName.split(get(tagDivider));
         const isSubTask = tagParts.length > 1;
 
         if (dayResult.all[tagName]) {
           dayResult.all[tagName].quantity += 1;
-          dayResult.all[tagName].totalTime = Math.round(dayResult.all[tagName].totalTime + record.duration);
+          dayResult.all[tagName].totalTime = Math.round(dayResult.all[tagName].totalTime + +record.duration);
         } else {
           dayResult.all[tagName] = {
             quantity: 1,
@@ -214,14 +215,17 @@ export const makeHoursAndMinutes = (allMinutes) => {
   const hours = Math.floor(allMinutes / 60);
   const minutes = Math.floor(allMinutes % 60);
 
-  return `${hours ? hours + (minutes ? ' hr, ' : '') : ''}${
-    minutes ? minutes + ' min' : ''
+  return `${hours ? hours + `${_('hours_short')}${minutes ? ' ' : ''}` : ''}${
+    minutes ? minutes + _('minutes_short') : ''
   }`;
 }
 
-export const currentDayStat = derived(statTotal, $statTotal => {
-  return $statTotal[getDateString()];
+export const todayStat = derived(stat, $stat => {
+  const lastDay = getDateString();
+
+  return $stat[lastDay];
 });
+
 export const lastTime = derived(stat, $stat => {
   const lastDay = getDateString();
 

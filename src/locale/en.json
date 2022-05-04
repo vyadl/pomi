@@ -1,6 +1,7 @@
 {
-  "extra_time": "extra time",
   "app_name": "pomi",
+  "hours_short": "h",
+  "minutes_short": "m",
   "activity": "activity",
   "general": "General",
   "intervals": "Intervals",
@@ -11,8 +12,6 @@
   "activities": "Activities",
   "history": "History",
   "add_time": "add time",
-  "last_period": "last period",
-  "new_break": "new brake",
   "comment_for_period": "comment for the period",
   "total": "Total",
   "sum": "Sum",
@@ -28,25 +27,35 @@
   "adding_activity": "Adding activity",
   "mute": "mute",
   "unmute": "unmute",
-  "finish": "finish earlier",
+  "finish_earlier": "finish earlier",
   "reset": "reset",
   "remove": "remove",
   "language": "Language",
   "breaks": "breaks",
-  "main": "activity",
-  "break": "short break",
-  "longBreak": "long break",
   "pure_time": "pure time",
   "done_today": "activity today",
   "nothing_yet": "nothing yet",
+  "extra_time": "extra time",
+  "last": "last",
+  "use": "use",
+  "tooltip_reset_extra": "It will reset just extra-time. The main time of the last interval is already saved in statistics.",
+  "tooltip_add_extra": "It will add an extra-time to the last interval in statistics.",
+  "tooltip_reset": "It will reset timer, without adding anything in statistics.",
+  "tooltip_add": "It will add passed time into statistics (rounded to minutes).",
+  "tooltip_add_all": "It will add all planed time for this interval into statistics.",
+  "tooltip_about_settings": "You can change this behaviour in settings.",
+  "now": "Сейчас",
   "languages": {
     "en": "English",
-    "ru": "Русский"
+    "ru": "Русский",
+    "ua": "Українська"
   },
   "interval_labels": {
     "activity": "Activity",
     "break": "Break",
-    "long_break": "Long break"
+    "long_break": "Long break",
+    "longBreak": "Long break",
+    "main": "Activity"
   },
   "settings": {
     "title": "settings",
@@ -61,7 +70,10 @@
     "formula_factor_sentence": "The formula for counting activity factor is",
     "formula_factor": "(activity_time * 4 + short_break * 3 + long_break) / (activity_time * 4)",
     "current_counted_factor": "Current calculated activity factor is",
-    "show_activity_near_timer": "Show today's activity near timer"
+    "show_activity_near_timer": "Show today's activity near timer",
+    "show_notifications": "Show notifications",
+    "change_notifications_permission": "You need to make changes in you browser settings for activating notifications",
+    "details_on_main_screen": "Details on main screen"
   },
   "sounds": {
     "market": "Market atmoshpere",
@@ -95,5 +107,12 @@
     "surprise": "Archaic surprise",
     "ringing": "Ringing",
     "sparks": "Sparks"
+  },
+  "notifications": {
+    "is_end": "is end",
+    "planned_period_ended": "Planned period has ended",
+    "test": "Test notification",
+    "test_body": "There is body of test notification",
+    "warning": "If you don't see the test notification – check your browser or/and system settings – they need to allow them for this site and browser at all"
   }
 }

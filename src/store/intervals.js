@@ -13,13 +13,22 @@ function createIntervals() {
       update(intervals => {
         const newIntervals = JSON.parse(JSON.stringify(intervals));
 
-        newIntervals[intervalId].duration = duration;
+        newIntervals[intervalId].duration = +duration;
 
         apiUpdateIntervals(newIntervals);
         return newIntervals;
       });
 
       updateFactor();
+    },
+    changeActivity: (intervalId, value) => {
+      update(intervals => {
+        intervals[intervalId].isActive = +value;
+
+        apiUpdateIntervals(intervals);
+
+        return intervals;
+      });
     },
     changeSound: (intervalId, opts) => {
       update(intervals => {
@@ -32,6 +41,7 @@ function createIntervals() {
 
       if (typeof opts.id !== 'undefined') {
         audios[intervalId].src = `sounds/${get(sounds)[opts.id].fileName}`;
+        audios[intervalId].load();
       } else if (typeof opts.volume !== 'undefined') {
         audios[intervalId].volume = +opts.volume;
       }
@@ -50,6 +60,10 @@ export const calculatedActivityFactor = writable('');
 export const intervalsArr = derived(
   intervals,
   $intervals => Object.entries($intervals)
+);
+export const activeIntervals = derived(
+  intervalsArr,
+  $intervalsArr => $intervalsArr.filter(interval => interval[1].isActive)
 );
 
 export const initIntervals = function() {
@@ -73,6 +87,7 @@ export const initIntervals = function() {
     main: {
       label: 'interval_labels.activity',
       duration: 25,
+      isActive: 1,
       sound: {
         id: defaultIdForSound,
         muted: localMuted,
@@ -82,6 +97,7 @@ export const initIntervals = function() {
     break: {
       label: 'interval_labels.break',
       duration: 5,
+      isActive: 1,
       sound: {
         id: defaultIdForSound,
         muted: localMuted,
@@ -91,6 +107,7 @@ export const initIntervals = function() {
     longBreak: {
       label: 'interval_labels.long_break',
       duration: 15,
+      isActive: 1,
       sound: {
         id: defaultIdForSound,
         muted: localMuted,
@@ -105,7 +122,10 @@ export const initIntervals = function() {
     audios[intervalId] = new Audio(`sounds/${get(sounds)[get(intervals)[intervalId].sound.id].fileName}`);
     audios[intervalId].volume = parseFloat(get(intervals)[intervalId].sound.volume);
     audios[intervalId].muted = get(intervals)[intervalId].sound.muted;
+    audios[intervalId].load();
   });
+
+  apiUpdateIntervals(get(intervals));
 };
 
 export const updateFactor = () => {
@@ -145,6 +165,13 @@ export const apiUpdateIntervals = function(obj) {
 export const playAudio = function(intervalId) {
   audios[intervalId].play();
 };
+
+export const stopAudio = function() {
+  ['main', 'break', 'longBreak'].forEach(intervalId => {
+    audios[intervalId].pause();
+    audios[intervalId].currentTime = 0;
+  });
+}
 
 export const setMute = function(isMute) {
   ['main', 'break', 'longBreak'].forEach(intervalId => {

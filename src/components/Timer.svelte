@@ -1,5 +1,6 @@
 <script>
   import { _ } from 'svelte-i18n';
+  import { fade } from 'svelte/transition';
   import {
     counter,
     timerFormattedTime,
@@ -11,21 +12,17 @@
     timerTime as extraTimerTime,
   } from './../store/extraCounter.js';
   import {
-    intervalsArr,
+    activeIntervals,
     currentInterval,
     initIntervals,
+    stopAudio,
   } from './../store/intervals.js';
   import { stat, lastTime } from './../store/statistics.js';
   import { settings } from './../store/settings.js';
+  import { currentTag } from './../store/tags.js';
   import { makeTwoDigitsCifer, getRandomColor } from './../utils.js';
   import { initTags } from './../store/tags.js';
-  import Tags from './Tags.svelte';
-  import Statistics from './Statistics.svelte';
-  import ExpandBlock from './ExpandBlock.svelte';
   import Comment from './Comment.svelte';
-  import TotalStat from './TotalStat.svelte';
-
-  const MIN_EXTRA_TIME_FOR_ADDING_IN_SECS = 30;
 
   const faviconEl = document.querySelector('link[rel="icon"]');
   const faviconHref = faviconEl.getAttribute('href');
@@ -37,7 +34,6 @@
   initTags();
   initIntervals();
   initAnimateFavicon();
-  
 
   function initAnimateFavicon() {
     const canvas = document.createElement('canvas');
@@ -49,22 +45,33 @@
     context.fillStyle = '#fff';
 
     faviconTimer = setInterval(() => {
-      const currentCounter =
-        $timerTime.mins > 0 ? $timerTime.mins : $timerTime.secs;
+      const currentCounter = $counter
+        ? $timerTime.mins > 0
+          ? $timerTime.mins 
+          : $timerTime.secs
+        : $extraCounter
+          ? $extraTimerTime.mins > 0
+            ? $extraTimerTime.mins
+            : $extraTimerTime.secs + 1
+          : 0;
+
 
       if ((currentCifer !== currentCounter && $settings.showTimeInFavicon)
         || ($settings.showTimeInFavicon && faviconEl.getAttribute('href') === faviconHref)) {
+        const currentTime = $counter ? $timerTime : $extraTimerTime + 5;
         const bgcolor =
-          $timerTime.mins < 1 && $timerTime.secs < 10 && $settings.showLastSecondsColorful
+          currentTime.mins < 1 && currentTime.secs < 10 && $settings.showLastSecondsColorful
             ? getRandomColor()
-            : '#000';
+            : $counter
+              ? '#000'
+              : '#fff';
 
         currentCifer = currentCounter;
 
         context.clearRect(0, 0, 64, 64);
         context.fillStyle = bgcolor;
         context.fillRect(0, 0, 64, 64);
-        context.fillStyle = '#fff';
+        context.fillStyle = $counter ? '#fff' : '#000';
         context.fillText(makeTwoDigitsCifer(currentCifer), 8, 48, 48);    
         faviconEl.setAttribute('href', canvas.toDataURL('image/png'));
       }
@@ -79,12 +86,12 @@
     }, 1000);
   }
 
-  function startPeriod(interval) {
+  function startPeriod(intervalId, options) {
     isCommentActive = false;
     clearInterval(faviconTimer);
-    counter.set(interval[1].duration * 60);
-    counter.start(interval[0]);
-    currentInterval.set(interval[0]);
+    counter.set(options.duration * 60);
+    counter.start(intervalId);
+    currentInterval.set(intervalId);
     initAnimateFavicon();
   }
 
@@ -93,16 +100,20 @@
   }
 
   function resetPeriod() {
-    counter.resetPeriod($currentInterval)
+    counter.resetPeriod($currentInterval);
+    stopAudio();
   }
 
   function addExtraTime() {
     stat.addTime($extraCounter);
     resetExtraTime();
+    stopAudio();
   }
+
   function resetExtraTime() {
     extraCounter.finish();
     currentInterval.set('');
+    stopAudio();
   }
 </script>
 
@@ -112,10 +123,16 @@
       class="cifers"
       class:summed="{$extraCounter}"
     >
+      <div class="cifers-desc">
+        {#if $counter}
+          {$_('now').toLowerCase()}:
+          {$_(`interval_labels.${$currentInterval}`).toLowerCase()}
+          {$currentInterval === 'main' ? $currentTag.title : ''}
+        {:else if $extraCounter}
+          {$_('last')} {$_(`interval_labels.${$currentInterval}`).toLowerCase()} + {$_('extra_time')}
+        {/if}
+      </div>
       {#if $extraCounter}
-        <div class="cifers-desc">
-          {$_('last')} {$_($currentInterval)} + {$_('extra_time')}
-        </div>
         {makeTwoDigitsCifer(+$lastTime.duration + $extraTimerTime.mins)}
         <span class="cifers-divider">:</span>
         {makeTwoDigitsCifer($timerTime.secs + $extraTimerTime.secs)}
@@ -125,60 +142,75 @@
         {$timerFormattedTime.secs}
       {/if}
     </div>
-    <div class="extra-counter-wrapper">
+    <div class="timer-controls">
       {#if $extraCounter}
-        {#if $extraCounter > MIN_EXTRA_TIME_FOR_ADDING_IN_SECS}
+        <div class="extra-counter-wrapper" transition:fade>
+          <button
+            class="button control reset"
+            data-title="{$_('tooltip_reset_extra')}"
+            on:click="{resetExtraTime}"
+          >
+            {$_('reset')}
+          </button>
           <div class="extra-counter-buttons">
             <button
-              class="button control extra-counter-button"
+              class="button control"
+              data-title="{$_('tooltip_add_extra')}"
               on:click="{addExtraTime}"
             >
             {$_('add_time')}
             </button>
-            <button
-              class="button control extra-counter-button"
-              on:click="{resetExtraTime}"
-            >
-              {$_('reset')}
-            </button>
           </div>
-        {/if}
-        <div class="extra-counter">
-          <div class="extra-counter-desc">
-            {$_('extra_time')}
+          <div class="extra-counter">
+            <div class="extra-counter-desc">
+              {$_('extra_time')}
+            </div>
+            {$extraCounterFormattedTime.mins}:{$extraCounterFormattedTime.secs}
           </div>
-          {$extraCounterFormattedTime.mins}:{$extraCounterFormattedTime.secs}
+        </div>
+      {:else}
+        <div class="counter-buttons-wrapper" transition:fade>
+          <button
+            class="button control reset"
+            class:unactive="{!$counter}"
+            data-title="{$_('tooltip_reset')}"
+            on:click="{resetPeriod}"
+          >
+            {$_('reset')}
+          </button>
+          <button
+            class="button control"
+            class:unactive="{!$counter}"
+            data-title="{
+              ($settings.subtractTimeWhenFinishing
+                ? $_('tooltip_add')
+                : $_('tooltip_add_all'))
+              + $_('tooltip_about_settings')
+            }"
+            on:click="{finishPeriod}"
+          >
+            {$_('finish_earlier')}
+          </button>
         </div>
       {/if}
     </div>
-    <div class="controls">
-      <button
-        class="button control"
-        class:unactive="{!$counter}"
-        on:click="{finishPeriod}"
-      >
-        {$_('finish')}
-      </button>
-      <button
-        class="button control"
-        class:unactive="{!$counter}"
-        on:click="{resetPeriod}"
-      >
-        {$_('reset')}
-      </button>
-    </div>
-    <div class="buttons">
-      {#each $intervalsArr as interval}
+    
+    <div
+      class="buttons"
+      class:single="{ $activeIntervals.length === 1 }"
+    >
+      {#each $activeIntervals as [intervalId, options]}
         <div class="button-wrapper">
           <button
             class="button"
-            class:active="{interval[0] === $currentInterval}"
-            class:blocked="{(interval[0] !== $currentInterval) && ($counter || $extraCounter)}"
+            class:active="{intervalId === $currentInterval}"
+            class:blocked="{($counter || $extraCounter)}"
+            data-title="{$_(`interval_labels.${intervalId}`)}"
             on:click="{() => {
-              startPeriod(interval);
+              startPeriod(intervalId, options);
             }}"
           >
-            {interval[1].duration}
+            {options.duration}
           </button>
         </div>
       {/each}
@@ -190,139 +222,147 @@
         isCommentActive = !isCommentActive;
       }}"
     />
-    {#if $settings.showActivityNearTimer}
-      <TotalStat />
-    {/if}
-    <ExpandBlock title="{$_('activities')}">
-      <Tags />
-    </ExpandBlock>
-    <ExpandBlock title="{$_('history')}">
-      <Statistics />
-    </ExpandBlock>
   </div>
 </div>
 
 <style lang="scss">
   .timer {
     display: flex;
-  }
-  .inner {
-    padding: 30px 10px 40px;
-    margin: auto;
-    width: 100%;
-    max-width: 420px;
-  }
-  .cifers {
-    color: #eee;
-    font: 70px Monaco, 'Courier New', monospace;
-    letter-spacing: 5px;
-    display: flex;
-    justify-content: center;
-    transition: color 1s;
-    &.summed {
-      color: #222;
+    .inner {
+      padding: 30px 10px 40px;
+      margin: auto;
+      width: 100%;
     }
-  }
-  .cifers-desc {
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-    top: 50px;
-    font-size: 14px;
-    letter-spacing: 1px;
-    color: #333;
-  }
-  .cifers-divider {
-    position: relative;
-    top: -6px;
-  }
-  .buttons {
-    display: flex;
-    justify-content: space-between;
-    min-height: 90px;
-  }
-  .controls {
-    display: flex;
-    justify-content: center;
-  }
-  .button-wrapper {
-    position: relative;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-width: 80px;
-  }
-  .button {
-    padding: 10px 10px;
-    background-color: transparent;
-    color: #bbb;
-    opacity: .7;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    text-align: center;
-    font-size: 22px;
-    letter-spacing: 1px;
-    transition: opacity .1s, font-size .1s;
-    &.control {
-      color: #aaa;
-      font-size: 16px;
-      min-width: 100px;
-      text-align: center;
+    .cifers {
+      color: #eee;
+      font: 70px Monaco, 'Courier New', monospace;
+      letter-spacing: 5px;
+      display: flex;
+      justify-content: center;
+      transition: color 1s;
+      &.summed {
+        color: #222;
+      }
     }
-    &.extra-counter-button {
-      margin-bottom: 0;
-      white-space: nowrap;
-      width: auto;
-      padding: 2px 11px;
+    .cifers-desc {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      top: 50px;
+      font-size: 14px;
+      letter-spacing: 1px;
+      color: #333;
     }
-    &.unactive {
-      pointer-events: none;
-      opacity: 0;
+    .cifers-divider {
+      position: relative;
+      top: -6px;
     }
-
-    &:hover,
-    &:active,
-    &.active {
-      opacity: 1;
+    .buttons {
+      display: flex;
+      justify-content: space-between;
+      min-height: 90px;
+      &.single {
+        justify-content: center;
+      }
+    }
+    .button-wrapper {
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-width: 80px;
+    }
+    .button {
+      padding: 10px 15px;
       background-color: transparent;
+      color: #bbb;
+      opacity: .7;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      text-align: center;
+      font-size: 22px;
+      letter-spacing: 1px;
+      transition: opacity .1s, font-size .1s;
+      &.control {
+        color: #aaa;
+        font-size: 16px;
+        min-width: 100px;
+        text-align: center;
+      }
+      &.reset {
+        font-size: 11px;
+        color: #777;
+        text-decoration: underline;
+        margin-right: 20px;
+        padding-left: 0;
+      }
+      &.unactive {
+        pointer-events: none;
+        opacity: 0;
+      }
+
+      &:hover,
+      &:active,
+      &.active {
+        opacity: 1;
+        background-color: transparent;
+      }
+      &.blocked {
+        pointer-events: none;
+      }
+      &.active {
+        font-size: 30px;
+      }
     }
-    &.blocked {
-      pointer-events: none;
+    .timer-controls {
+      position: relative;
+      width: 100%;
+      height: 80px;
+      padding: 20px 0;
+      margin-bottom: 15px;
     }
-    &.active {
-      font-size: 30px;
+    .counter-buttons-wrapper {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: absolute;
+      width: 100%;
+      height: 100%;
     }
-  }
-  .extra-counter-buttons {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-right: 40px;
-  }
-  .extra-counter-wrapper {
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    font-size: 12px;
-    padding-top: 15px;
-    height: 50px;
-  }
-  .extra-counter {
-    position: relative;
-    text-align: center;
-    font-size: 22px;
-    color: #aaa;
-  }
-  .extra-counter-desc {
-    position: absolute;
-    top: -15px;
-    width: 200%;
-    right: 0;
-    text-align: right;
-    font-size: 12px;
-    letter-spacing: 1px;
-    margin-bottom: 5px;
-    color: #333;
+    .extra-counter-buttons {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-right: 40px;
+    }
+    .extra-counter-wrapper {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      position: absolute;
+      width: 100%;
+      height: 100%;
+    }
+    .extra-counter {
+      position: relative;
+      font-size: 22px;
+      width: 80px;
+
+      text-align: right;
+      color: #aaa;
+    }
+    .extra-counter-desc {
+      position: absolute;
+      top: -15px;
+      width: 200%;
+      right: 0;
+      text-align: right;
+      font-size: 12px;
+      letter-spacing: 1px;
+      margin-bottom: 5px;
+      color: #333;
+    }
   }
 </style>

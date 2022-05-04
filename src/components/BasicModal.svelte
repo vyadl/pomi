@@ -40,11 +40,13 @@
 
 <style lang="scss">
   .modal {
-    position: absolute;
+    position: fixed;
     width: 100vw;
     height: 100vh;
     top: 0;
     left: 0;
+    bottom: 0;
+    right: 0;
     z-index: 5;
     overflow: auto;
     background-color: rgba(0, 0, 0, 0.96);

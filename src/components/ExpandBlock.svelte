@@ -21,9 +21,7 @@
   {title}
 </div>
 {#if active}
-  <div transition:slide>
-    <slot />
-  </div>
+  <slot />
 {/if}
 
 <style lang="scss">

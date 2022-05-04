@@ -5,6 +5,7 @@
   export let label;
   export let text;
   export let right;
+  export let disabled;
 
   const dispatch = createEventDispatcher();
 </script>
@@ -15,9 +16,10 @@
     <input
       class="checkbox"
       type="checkbox"
+      disabled="{disabled}"
       bind:checked
-      on:change="{() => {
-        dispatch('change');
+      on:change="{event => {
+        dispatch('change', event.target.checked);
       }}"
     />
   </label>
@@ -25,9 +27,10 @@
   <input
     class="checkbox unwrapped"
     type="checkbox"
+    disabled="{disabled}"
     bind:checked
-    on:change="{() => {
-      dispatch('change');
+    on:change="{event => {
+      dispatch('change', event.target.checked);
     }}"
   />
 {/if}

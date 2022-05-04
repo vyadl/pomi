@@ -1,8 +1,11 @@
 import { writable, derived, get } from 'svelte/store';
 import { stat } from './statistics.js';
-import { extraCounter } from './../store/extraCounter.js';
+import { extraCounter } from './extraCounter.js';
+import { settings } from './settings.js';
+import { currentTag } from './tags.js';
 import { makeTwoDigitsCifer } from './../utils.js';
-import { currentInterval, playAudio, setMute } from './intervals.js';
+import { currentInterval, intervals, playAudio, setMute } from './intervals.js';
+import { _ } from './../lang-utils.js';
 
 function createCounter() {
   const { subscribe, set, update } = writable(0);
@@ -27,22 +30,22 @@ function createCounter() {
         update(counter => {
           const newCounter = Math.ceil((endTime - +new Date) / 1000);
 
-          if (counter > 0) {
+          if (counter > 1) {
             return newCounter;
-          } else {
-            if (counter < 0) {
-              extraCounter.start(+new Date - Math.abs(newCounter) * 1000);
-              counter = 0;
-            } else {
-              extraCounter.start();
-            }
-
-            playAudio(intervalId);
-            stat.addStat(intervalId, counter);
-            clearInterval(timerId);
-
-            return counter;
           }
+
+          if (counter === 1 || counter === 0) {
+            extraCounter.start();
+          } else if (counter < 0) {
+            extraCounter.start(+new Date - Math.abs(newCounter) * 1000);
+          }
+
+          playAudio(intervalId);
+          stat.addStat(intervalId, counter);
+          clearInterval(timerId);
+          handleNotification();
+          
+          return 0;
         });
 
       }, 1000);
@@ -51,7 +54,6 @@ function createCounter() {
       update(counter => {
         clearInterval(timerId);
 
-        playAudio(intervalId);
         stat.addStat(intervalId, counter);
         currentInterval.set('');
 
@@ -98,3 +100,15 @@ export const timerFormattedTime = derived(
     };
   }
 );
+
+function handleNotification() {
+  if (get(settings).showNotifications) {
+    const currentIntervalDuration = get(intervals)[get(currentInterval)].duration + _('minutes_short')
+    const title = `${get(currentTag).title} ${_('notifications.is_end')} (${currentIntervalDuration})`;
+
+    new Notification(title, {
+      icon: '/favicon.png',
+      body: _('notifications.planned_period_ended'),
+    });
+  }
+};

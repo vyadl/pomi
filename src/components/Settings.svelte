@@ -1,5 +1,5 @@
 <script>
-  import { _, locale } from 'svelte-i18n';
+  import { _, locale, locales } from 'svelte-i18n';
   import { intervals, intervalsArr, playAudio } from './../store/intervals.js';
   import { soundsArr } from './../store/sounds.js';
   import { settings } from './../store/settings.js';
@@ -10,12 +10,12 @@
 
   export let active = false;
 
-
   let localSettings = JSON.parse(JSON.stringify($settings));
+  let showNotificationWarning = false;
 
   function changeSetting(setting, value) {
     settings.update(settings => {
-      settings[setting] = value || localSettings[setting];
+      settings[setting] = typeof value !== 'undefined' ? value : localSettings[setting];
       localSettings = JSON.parse(JSON.stringify(settings));
 
       return settings;
@@ -27,6 +27,32 @@
     locale.set(lang);
   }
 
+  function changeNotificationSetting(value) {
+    if (value && Notification.permission === 'default') {
+      const permission = Notification.requestPermission();
+
+      permission.then(answer => {
+        if (answer === 'granted') {
+          changeSetting('showNotifications', 1);
+          showTestNotification();
+        } else {
+          changeSetting('showNotifications', 0);
+        }
+      })
+    } else {
+      changeSetting('showNotifications', value);
+    }
+
+    if (value && Notification.permission === 'granted') {
+      showTestNotification();
+    }
+  }
+
+  function showTestNotification() {
+    new Notification($_('notifications.test'), { body: $_('notifications.test_body') });
+    showNotificationWarning = true;
+  }
+
   function getFactorString(factor) {
     if (!(factor % 1)) {
       return `${factor}.00`;
@@ -35,9 +61,11 @@
     }
   }
 
-  function changeInterval(target, interval) {
-    intervals.changeDuration(interval[0], Math.ceil(target.value));
-    target.value = Math.ceil(target.value);
+  function changeInterval(target, interval, isRound = false) {
+    const correctValue = isRound ? Math.ceil(target.value) : target.value;
+
+    intervals.changeDuration(intervalId, correctValue);
+    target.value = correctValue;
   }
 </script>
 
@@ -46,9 +74,9 @@
     <div class="section">
       <div class="settings-title">{$_('intervals')}</div>
       <div class="intervals">
-        {#each $intervalsArr as interval}
+        {#each $intervalsArr as [intervalId, options]}
           <div class="interval-settings">
-            <div class="settings-subtitle">{$_(interval[1].label)}</div>
+            <div class="settings-subtitle">{$_(options.label)}</div>
             <label class="settings-label">
               <div class="settings-label-text">{$_('duration')}:</div>
               <input
@@ -57,7 +85,7 @@
                 max="100"
                 step="1"
                 class="settings-input"
-                value="{interval[1].duration}"
+                value="{options.duration}"
                 on:change="{(event) => {
                     changeInterval(event.target, interval);
                   }}"
@@ -65,7 +93,7 @@
             </label>
             <label class="settings-label">
               <div class="settings-label-text">
-                {$_('volume')}: {Math.round(interval[1].sound.volume * 100)}%
+                {$_('volume')}: {Math.round(options.sound.volume * 100)}%
               </div>
               <input
                 type="range"
@@ -73,9 +101,9 @@
                 max="1"
                 step="0.01"
                 class="settings-range"
-                value="{interval[1].sound.volume}"
+                value="{options.sound.volume}"
                 on:change="{event => {
-                  intervals.changeSound(interval[0], {
+                  intervals.changeSound(intervalId, {
                     volume: event.target.value,
                   });
                 }}"
@@ -85,9 +113,9 @@
               <div class="settings-label-text">{$_('sound')}:</div>
               <select
                 class="interval-select"
-                value="{interval[1].sound.id}"
+                value="{options.sound.id}"
                 on:change="{event => {
-                  intervals.changeSound(interval[0], {
+                  intervals.changeSound(intervalId, {
                     id: event.target.value,
                   });
                 }}"
@@ -97,9 +125,21 @@
                 {/each}
               </select>
             </label>
-            <DefaultButton on:click="{playAudio(interval[0])}" small vertical>
+            <DefaultButton on:click="{playAudio(intervalId)}" small vertical>
               {$_('play')}
             </DefaultButton>
+            {#if intervalId !== 'main'}
+              <div class="checkbox-setting">
+                <DefaultCheckbox
+                  text="{$_('use')}"
+                  checked="{options.isActive}"
+                  on:change="{event => {
+                    intervals.changeActivity(intervalId, event.detail);
+                  }}"
+                  label
+                />
+              </div>
+            {/if}
           </div>
         {/each}
       </div>
@@ -108,22 +148,16 @@
       <div class="settings-title">{$_('language')}</div>
       <div class="languages">
         <div class="language-buttons">
-          <DefaultButton
-            on:click="{() => {
-              changeLanguage('en');
-            }}"
-            active="{$settings.language === 'en'}"
-          >
-            {$_('languages.en')}
-          </DefaultButton>
-          <DefaultButton
-            on:click="{() => {
-              changeLanguage('ru');
-            }}"
-            active="{$settings.language === 'ru'}"
-          >
-            {$_('languages.ru')}
-          </DefaultButton>
+          {#each $locales as lang}
+            <DefaultButton
+              on:click="{() => {
+                changeLanguage(lang);
+              }}"
+              active="{$settings.language === lang}"
+            >
+              {$_(`languages.${lang}`)}
+            </DefaultButton>
+          {/each}
         </div>
       </div>
     </div>
@@ -134,6 +168,16 @@
           bind:checked="{localSettings.showActivityNearTimer}"
           on:change="{() => {
             changeSetting('showActivityNearTimer');
+          }}"
+          label
+        />
+      </div>
+      <div class="checkbox-setting">
+        <DefaultCheckbox
+          text="{$_('settings.details_on_main_screen')}"
+          bind:checked="{localSettings.showDetailsOnMainScreen}"
+          on:change="{() => {
+            changeSetting('showDetailsOnMainScreen');
           }}"
           label
         />
@@ -190,6 +234,27 @@
       </div>
       <div class="checkbox-setting">
         <DefaultCheckbox
+          text="{$_('settings.show_notifications')}"
+          disabled="{Notification.permission === 'denied'}"
+          bind:checked="{localSettings.showNotifications}"
+          on:change="{(value) => {
+            changeNotificationSetting(value.detail);
+          }}"
+          label
+        />
+        {#if localSettings && Notification.permission === 'denied'}
+          <div class="setting-description">
+            {$_('settings.change_notifications_permission')}
+          </div>
+        {/if}
+        {#if showNotificationWarning}
+        <div class="setting-description">
+          {$_('notifications.warning')}
+        </div>
+        {/if}
+      </div>
+      <div class="checkbox-setting">
+        <DefaultCheckbox
           text="{$_('settings.use_activity_factor')}"
           bind:checked="{localSettings.useActivityFactor}"
           on:change="{() => {
@@ -200,7 +265,7 @@
       </div>
       
       {#if localSettings.useActivityFactor}
-        <div class="factor-description">
+        <div class="setting-description">
           {$_('settings.basic_factor')} <br>
           {$_('settings.formula_factor_sentence')} <br>
           {$_('settings.formula_factor')} <br>
@@ -347,7 +412,8 @@
       color: #aaa;
     }
   }
-  .factor-description {
+  .setting-description {
+    padding-top: 10px;
     font-size: 13px;
     color: #aaa;
   }

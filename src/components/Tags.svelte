@@ -61,9 +61,12 @@
     >
       <DefaultButton
         on:click="{() => {
-          setCurrentTagLocal({ [tag.key]: tag.text });
+          setCurrentTagLocal({
+            id: tag.key,
+            title: tag.text,
+          });
         }}"
-        active="{Boolean($currentTag[tag.key])}"
+        active="{Boolean($currentTag.id === tag.key)}"
       >
         {tag.text}
       </DefaultButton>

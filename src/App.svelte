@@ -2,16 +2,21 @@
   import { init, addMessages, _ } from 'svelte-i18n';
   import en from './locale/en.json';
   import ru from './locale/ru.json';
+  import ua from './locale/ua.json';
   import Timer from './components/Timer.svelte';
   import Settings from './components/Settings.svelte';
   import { initSettings, settings } from './store/settings';
   import { counter, timerFormattedTime } from './store/counter.js';
+  import { extraCounter, extraCounterFormattedTime } from './store/extraCounter.js';
   import { currentTag } from './store/tags.js';
+  import DayStat from './components/statistics/DayStat.svelte';
+  import Tabs from './components/Tabs.svelte';
 
   initSettings();
 
   addMessages('en', en);
   addMessages('ru', ru);
+  addMessages('ua', ua);
 
   init({
     fallbackLocale: 'en',
@@ -23,27 +28,35 @@
 
 <svelte:head>
   <title>
-    {$counter && $settings.showTimeInTitle
-      ? `${$timerFormattedTime.mins}:${$timerFormattedTime.secs}`
+    {$counter || $extraCounter && $settings.showTimeInTitle
+      ? $counter
+        ? `${$timerFormattedTime.mins}:${$timerFormattedTime.secs}`
+        : `${$extraCounterFormattedTime.mins}:${$extraCounterFormattedTime.secs}`
       : 'pomi'}
   </title>
 </svelte:head>
 <main class="wrapper">
-  <div class="top-line">
+  <section class="top-line">
     <div class="title"></div>
     <div class="current-tag">
-      {$_('activity')}: {Object.values($currentTag)[0]}
+      {$_('activity')}: {$currentTag.title}
     </div>
-  </div>
-  <div
+  </section>
+  <section
     class="settings"
     on:click="{() => {
       activeSettings = true;
     }}"
   >
     {$_('settings.title')}
-  </div>
-  <Timer />
+  </section>
+  <section class="central-wrapper">
+    <Timer />
+    {#if $settings.showActivityNearTimer}
+      <DayStat isToday />
+    {/if}
+    <Tabs />
+  </section>
   <Settings
     active="{activeSettings}"
     on:close="{() => {
@@ -61,6 +74,7 @@
     padding: 0;
     margin: 0;
   }
+
   .top-line {
     padding: 15px;
     color: #333;
@@ -69,11 +83,18 @@
     display: flex;
     justify-content: space-between;
   }
+
   .current-tag,
   .settings {
     color: #666;
     font: 12px Verdana, sans-serif;
     letter-spacing: 2px;
+  }
+
+  .central-wrapper {
+    width: 450px;
+    margin: 0 auto;
+    padding-bottom: 100px;
   }
 
   .settings {

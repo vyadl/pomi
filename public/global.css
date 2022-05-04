@@ -65,3 +65,30 @@ button:not(:disabled):active {
 button:focus {
   border-color: #666;
 }
+
+[data-title]:hover:after {
+  opacity: 1;
+  transition: all .1s ease .7s;
+  visibility: visible;
+}
+/* box for title text */
+[data-title]:after {
+  content: attr(data-title);
+  position: absolute;
+  left: 20%;
+  top: 80%;
+  z-index: 100;
+  visibility: hidden;
+  background-color: #111;
+  color: #aaa;
+  font-size: 11px;
+  width: 150%;
+  text-align: left;
+  padding: 8px 10px;
+  opacity: 0;
+  border: 1px solid #000;
+  border-radius: 2px;
+}
+[data-title] {
+  position: relative;
+}

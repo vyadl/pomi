@@ -2,6 +2,8 @@ import { writable, get } from 'svelte/store';
 import { updateFactor, intervals } from './intervals';
 let isFirstSubscribe = true;
 const defaultSettings = {
+  isUserOnPage: 1,
+  // shown in settings
   subtractTimeWhenFinishing: 1,
   showPlannedDuration: 1,
   showTimeInTitle: 1,
@@ -12,6 +14,8 @@ const defaultSettings = {
   useCustomActivityFactor: 0,
   customActivityFactor: 1,
   showActivityNearTimer: 1,
+  showNotifications: 0,
+  showDetailsOnMainScreen: 1,
 };
 
 export const settings = writable(defaultSettings);
@@ -22,11 +26,20 @@ export const initSettings = function() {
   if (localSettings) {
     settings.set(localSettings);
   }
+
+  initCheckingPresence();
 };
 
-export const apiUpdateSettings = function() {
-  const t = get(settings);
+function initCheckingPresence() {
+  document.addEventListener('visibilitychange', () => {
+    settings.update(settings => ({
+      ...settings,
+      isUserOnPage: +document.hidden,
+    }));
+  });
+}
 
+export const apiUpdateSettings = function() {
   localStorage.setItem('settings', JSON.stringify(get(settings)));
 }
 
@@ -39,5 +52,6 @@ settings.subscribe(() => {
   if (get(intervals)?.main?.duration) {
     updateFactor();
   }
+
   apiUpdateSettings();
 })

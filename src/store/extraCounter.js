@@ -12,6 +12,8 @@ function createCounter() {
       set(number);
     },
     start: (startTime = +new Date) => {
+      set(Math.floor((+new Date - startTime + 1000) / 1000));
+
       timerId = setInterval(() => {
         set(Math.floor((+new Date - startTime) / 1000));
       }, 1000);
@@ -20,10 +22,6 @@ function createCounter() {
       set(0);
       clearInterval(timerId);
     },
-    reset: () => {
-      set(0);
-      clearInterval(timerId);
-    }
   };
 }
 
