@@ -205,12 +205,12 @@
             class="button"
             class:active="{intervalId === $currentInterval}"
             class:blocked="{($counter || $extraCounter)}"
-            data-title="{$_(`interval_labels.${intervalId}`)}"
+            data-title="{`${options.duration}${$_('minutes_short')} - ${$_('interval_labels.' + intervalId)}`}"
             on:click="{() => {
               startPeriod(intervalId, options);
             }}"
           >
-            {options.duration}
+            {options.title || options.duration}
           </button>
         </div>
       {/each}

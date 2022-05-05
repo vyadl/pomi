@@ -4,7 +4,7 @@
     initStat,
     makeHoursAndMinutes,
     statTotal,
-    todayStat,
+    stat,
     getDateString,
   } from './../../store/statistics.js';
   import { activityFactor } from './../../store/intervals.js';
@@ -33,7 +33,7 @@
     makeHoursAndMinutes(currentStat.sum.activities);
 </script>
 
-<div class="total-stat">
+<div class="day-stat">
   <div
     class="activity-sum"
     on:click="{ () => { isDetailsActive = !isDetailsActive } }"
@@ -58,8 +58,8 @@
   {#if $settings.showDetailsOnMainScreen && currentStat}
     <ExpandBlock
       title="{isToday ? '' : $_('details')}"
-      center
       bind:active="{isDetailsActive}"
+      center
     >
       <div class="details">
         <div class="total">
@@ -109,16 +109,19 @@
         center
       >
         <AllDayRecords
-          dayStat="{$todayStat}"
+          dayStat="{$stat[dayStatTitle]}"
           date="{dayStatTitle}"
         />
       </ExpandBlock>
+      {#if !isToday}
+        <div class="bottom-divider"></div>
+      {/if}
     </ExpandBlock>
   {/if}
 </div>
 
 <style lang="scss">
-.total-stat {
+.day-stat {
   padding: 15px 0 35px;
 
   .activity-sum {
@@ -146,6 +149,14 @@
   .details-title {
     color: #888;
     font-size: 15px;
+  }
+  .total {
+    margin-bottom: 20px;
+  }
+  .bottom-divider {
+    padding: 15px 0;
+    margin-bottom: 20px;
+    border-bottom: 1px dashed #888;
   }
 }
 </style>

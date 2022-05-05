@@ -73,7 +73,8 @@
     "show_activity_near_timer": "Show today's activity near timer",
     "show_notifications": "Show notifications",
     "change_notifications_permission": "You need to make changes in you browser settings for activating notifications",
-    "details_on_main_screen": "Details on main screen"
+    "details_on_main_screen": "Details on main screen",
+    "title_interval": "Title instead of duration"
   },
   "sounds": {
     "market": "Market atmoshpere",

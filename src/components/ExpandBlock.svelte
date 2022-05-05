@@ -4,6 +4,7 @@
   export let active = false;
   export let title = false;
   export let small = false;
+  export let big = false;
   export let right = false;
   export let center = false;
 </script>
@@ -12,6 +13,7 @@
   class="title"
   class:active
   class:small
+  class:big
   class:right
   class:center
   on:click="{() => {
@@ -68,8 +70,22 @@
         }
       }
     }
+    &.big {
+      font-size: 16px;
+
+      &::before {
+        width: 10px;
+        height: 10px;
+        transform: rotate(45deg) translateY(-85%);
+      }
+      &.active {
+        &::before {
+          transform: rotate(-135deg) translateY(10%);
+        }
+      }
+    }
     &.right {
-      padding-right: 15px;
+      padding-right: 25px;
       text-align: right;
     }
     &.center {

@@ -1,9 +1,14 @@
 <script>
   import { _, locale, locales } from 'svelte-i18n';
-  import { intervals, intervalsArr, playAudio } from './../store/intervals.js';
+  import {
+    intervals,
+    intervalsArr,
+    playAudio,
+    calculatedActivityFactor,
+    updateFactor,
+  } from './../store/intervals.js';
   import { soundsArr } from './../store/sounds.js';
   import { settings } from './../store/settings.js';
-  import { calculatedActivityFactor } from './../store/intervals.js';
   import DefaultButton from './DefaultButton.svelte';
   import DefaultCheckbox from './DefaultCheckbox.svelte';
   import BasicModal from './BasicModal.svelte';
@@ -61,10 +66,11 @@
     }
   }
 
-  function changeInterval(target, interval, isRound = false) {
+  function changeDuration(intervalId, target, isRound = false) {
     const correctValue = isRound ? Math.ceil(target.value) : target.value;
 
-    intervals.changeDuration(intervalId, correctValue);
+    intervals.changeIntervalProp(intervalId, 'duration', correctValue);
+    updateFactor();
     target.value = correctValue;
   }
 </script>
@@ -87,8 +93,19 @@
                 class="settings-input"
                 value="{options.duration}"
                 on:change="{(event) => {
-                    changeInterval(event.target, interval);
-                  }}"
+                  changeDuration(intervalId, event.target);
+                }}"
+              />
+            </label>
+            <label class="settings-label">
+              <div class="settings-label-text">{$_('settings.title_interval')}:</div>
+              <input
+                type="text"
+                class="settings-input"
+                value="{options.title}"
+                on:change="{event => {
+                  intervals.changeIntervalProp(intervalId, 'title', event.target.value);
+                }}"
               />
             </label>
             <label class="settings-label">
@@ -134,7 +151,7 @@
                   text="{$_('use')}"
                   checked="{options.isActive}"
                   on:change="{event => {
-                    intervals.changeActivity(intervalId, event.detail);
+                    intervals.changeIntervalProp(intervalId, 'isActive', +event.detail);
                   }}"
                   label
                 />

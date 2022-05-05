@@ -9,21 +9,9 @@ function createIntervals() {
   return {
     subscribe,
     update,
-    changeDuration: (intervalId, duration) => {
+    changeIntervalProp(intervalId, prop, value) {
       update(intervals => {
-        const newIntervals = JSON.parse(JSON.stringify(intervals));
-
-        newIntervals[intervalId].duration = +duration;
-
-        apiUpdateIntervals(newIntervals);
-        return newIntervals;
-      });
-
-      updateFactor();
-    },
-    changeActivity: (intervalId, value) => {
-      update(intervals => {
-        intervals[intervalId].isActive = +value;
+        intervals[intervalId][prop] = value;
 
         apiUpdateIntervals(intervals);
 
@@ -49,7 +37,7 @@ function createIntervals() {
         apiUpdateIntervals(newIntervals);
         return newIntervals;
       });
-    }
+    },
   };
 };
 
@@ -87,6 +75,7 @@ export const initIntervals = function() {
     main: {
       label: 'interval_labels.activity',
       duration: 25,
+      title: '',
       isActive: 1,
       sound: {
         id: defaultIdForSound,
@@ -97,6 +86,7 @@ export const initIntervals = function() {
     break: {
       label: 'interval_labels.break',
       duration: 5,
+      title: '',
       isActive: 1,
       sound: {
         id: defaultIdForSound,
@@ -107,6 +97,7 @@ export const initIntervals = function() {
     longBreak: {
       label: 'interval_labels.long_break',
       duration: 15,
+      title: '',
       isActive: 1,
       sound: {
         id: defaultIdForSound,

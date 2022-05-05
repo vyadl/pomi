@@ -19,6 +19,7 @@
         <ExpandBlock
           title="{dayStat.name}"
           center
+          big
         >
           <div class="main-data">
             {#if $statTotal[dayStat.name] && $statTotal[dayStat.name].all}

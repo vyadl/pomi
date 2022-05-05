@@ -12,7 +12,7 @@
 <div class="all-day-records">
   {#each dayStat as record}
     <div
-      class="all-day-record"
+      class="record"
       class:activity="{record.intervalId === 'main'}"
     >
       <div class="record-main">
@@ -58,16 +58,18 @@
 
 
 <style lang="scss">
-.all-day-record {
-  padding: 4px 20px 4px 0;
-  transition: background-color 0.2s;
-  position: relative;
-  font-size: 12px;
-  &.activity {
-    color: #555;
-  }
-  &:hover {
-    background-color: rgba(255, 255, 255, 0.03);
+.all-day-records {
+  .record {
+    padding: 4px 20px 4px 0;
+    transition: background-color 0.2s;
+    position: relative;
+    font-size: 12px;
+    &.activity {
+      color: #555;
+    }
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.03);
+    }
   }
 
   .record-main {
