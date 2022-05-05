@@ -195,10 +195,7 @@
       {/if}
     </div>
     
-    <div
-      class="buttons"
-      class:single="{ $activeIntervals.length === 1 }"
-    >
+    <div class="buttons">
       {#each $activeIntervals as [intervalId, options]}
         <div class="button-wrapper">
           <button
@@ -258,21 +255,22 @@
       top: -6px;
     }
     .buttons {
+      position: relative;
       display: flex;
-      justify-content: space-between;
+      justify-content: center;
       min-height: 90px;
-      &.single {
-        justify-content: center;
-      }
     }
     .button-wrapper {
       position: relative;
       display: flex;
+      flex-grow: 1;
       justify-content: center;
       align-items: center;
       min-width: 80px;
+      padding: 0 15px;
     }
     .button {
+      width: 100%;
       padding: 10px 15px;
       background-color: transparent;
       color: #bbb;
@@ -283,7 +281,8 @@
       text-align: center;
       font-size: 22px;
       letter-spacing: 1px;
-      transition: opacity .1s, font-size .1s;
+      transition: opacity .1s, transform .1s;
+      word-wrap: break-word;
       &.control {
         color: #aaa;
         font-size: 16px;
@@ -312,7 +311,7 @@
         pointer-events: none;
       }
       &.active {
-        font-size: 30px;
+        transform: scale(1.3);
       }
     }
     .timer-controls {
