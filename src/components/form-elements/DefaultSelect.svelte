@@ -9,7 +9,6 @@
   export let pure = false;
   export let nomargin = false;
   export let right = false;
-  export let datatitle = '';
   export let fontinherit = false;
 
 const dispatch = createEventDispatcher();
@@ -26,7 +25,6 @@ function onChange() {
   class:nomargin
   class:right
   class:fontinherit
-  data-title="{datatitle}"
 >
   {#if label}
     <label class="label">

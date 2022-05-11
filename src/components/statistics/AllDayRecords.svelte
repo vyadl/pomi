@@ -38,7 +38,7 @@
       on:click="{() => { openEditModal(record, recordIndex) }}"
     >
       <div class="record-main">
-        <div class="activity">
+        <div class="activity-part">
           {record.activityTitle} ({record.duration} {$_('min')}{
             $settings.showPlannedDuration
               && record.plannedDuration !== record.duration
@@ -106,7 +106,7 @@
     padding-top: 5px;
   }
 
-  .activity {
+  .activity-part {
     width: 50%;
     margin-right: 15px;
   }

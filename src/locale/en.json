@@ -96,7 +96,7 @@
     "show_comment": "Show comment",
     "show_current_activity_main_screen": "Current activity in top right corner",
     "show_current_activity_label_main_screen": "Show label 'current activity' above",
-    "show_current_period_above_timer": "Show current period above timer"
+    "show_current_period_above_timer": "Current period above timer"
   },
   "sounds": {
     "market": "Market atmoshpere",
@@ -139,7 +139,11 @@
     "warning": "If you don't see the test notification – check your browser or/and system settings – they need to allow them for this site and browser at all"
   },
   "validation": {
-    "deprecated_activity": "This activity is removed. You can keep it like that or choose the existed one"
+    "deprecated_activity": "This activity is removed. You can keep it like that or choose the existed one",
+    "number_is_required": "Number is rewuired",
+    "duration_intersect": "That duration make this record intersect with the next one",
+    "duration_next_day": "There is no possibility to set end time in next day",
+    "duration_more_than_current": "You couldn't set time more than current time"
   },
   "modals": {
     "edit_record": "Edit record",

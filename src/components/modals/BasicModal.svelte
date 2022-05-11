@@ -28,7 +28,7 @@
 {#if active}
   <div
     class="modal"
-    transition:fade
+    transition:fade={{ duration: 200 }}
   >
     <div class="inner">
       {#if title}

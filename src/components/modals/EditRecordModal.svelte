@@ -42,7 +42,7 @@
     const endTime = +localRecord.duration * 60 * 1000 + localRecord.startedAt;
 
     if (Number.isNaN(+localRecord.duration)) {
-      durationErrorMessage = 'Number is required';
+      durationErrorMessage = $_('validation.number_is_required');
       return false;
     }
 
@@ -50,17 +50,17 @@
       nextRecord &&
       +localRecord.duration * 60 * 1000 + localRecord.startedAt > nextRecord.startedAt
     ) {
-      durationErrorMessage = 'That duration make this record intersect with the next one';
+      durationErrorMessage = $_('validation.duration_intersect');
       return false;
     }
 
     if ((new Date(endTime)).getDate() !== (new Date(record.startedAt)).getDate()) {
-      durationErrorMessage = 'There is no possibility to set end time in next day';
+      durationErrorMessage = $_('validation.duration_next_day');
       return false;
     }
 
     if (endTime > +(new Date)) {
-      durationErrorMessage = 'You couldn\'t set time more than current time';
+      durationErrorMessage = $_('validation.duration_more_than_current');
       return false;
     }
 
