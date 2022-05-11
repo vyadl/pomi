@@ -3,12 +3,13 @@
   import en from './locale/en.json';
   import ru from './locale/ru.json';
   import ua from './locale/ua.json';
+  import DefaultSelect from './components/form-elements/DefaultSelect.svelte';
   import Timer from './components/Timer.svelte';
   import Settings from './components/Settings.svelte';
   import { initSettings, settings } from './store/settings';
   import { counter, timerFormattedTime } from './store/counter.js';
   import { extraCounter, extraCounterFormattedTime } from './store/extraCounter.js';
-  import { currentTag } from './store/tags.js';
+  import { setCurrentActivityId, activityOptionsForSelect, currentActivityId } from './store/activities.js';
   import DayStat from './components/statistics/DayStat.svelte';
   import Tabs from './components/Tabs.svelte';
 
@@ -36,12 +37,26 @@
   </title>
 </svelte:head>
 <main class="wrapper">
-  <section class="top-line">
-    <div class="title"></div>
+  {#if $settings.showCurrentActivityOnMainScreen}
     <div class="current-tag">
-      {$_('activity')}: {$currentTag.title}
+      {#if $settings.showCurrentActivityLabelOnMainScreen}
+        <div class="current-activity-label">
+          {$_('current_activity').toLowerCase()}
+        </div>
+      {/if}
+      <DefaultSelect
+        pure
+        nomargin
+        right
+        options="{$activityOptionsForSelect}"
+        value={$currentActivityId}
+        fontinherit
+        on:change="{event => {
+          setCurrentActivityId(event.detail);
+        }}"
+      />
     </div>
-  </section>
+  {/if}
   <section
     class="settings"
     on:click="{() => {
@@ -55,7 +70,9 @@
     {#if $settings.showActivityNearTimer}
       <DayStat isToday />
     {/if}
-    <Tabs />
+    {#if $settings.showMainTabs}
+      <Tabs />
+    {/if}
   </section>
   <Settings
     active="{activeSettings}"
@@ -68,27 +85,30 @@
 <style lang="scss">
   .wrapper {
     position: relative;
-    background-color: #111;
+    background-color: var(--color-main-bg);
     min-width: 100vw;
     min-height: 100vh;
     padding: 0;
     margin: 0;
   }
 
-  .top-line {
-    padding: 15px;
-    color: #333;
-    font: 12px Verdana, sans-serif;
-    letter-spacing: 2px;
-    display: flex;
-    justify-content: space-between;
-  }
-
   .current-tag,
   .settings {
-    color: #666;
-    font: 12px Verdana, sans-serif;
+    color: var(--color-text-softest);
+    font: 13px Verdana, sans-serif;
     letter-spacing: 2px;
+  }
+
+  .current-tag {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    text-align: right;
+  }
+
+  .current-activity-label {
+    font-size: 10px;
+    padding-right: 5px;
   }
 
   .central-wrapper {
@@ -99,10 +119,10 @@
 
   .settings {
     position: fixed;
-    bottom: 15px;
-    right: 15px;
+    bottom: 20px;
+    right: 20px;
     opacity: 0.8;
-    transition: opacity 0.2s;
+    transition: opacity .2s;
     cursor: pointer;
     &:hover {
       opacity: 1;

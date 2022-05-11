@@ -19,9 +19,9 @@
   } from './../store/intervals.js';
   import { stat, lastTime } from './../store/statistics.js';
   import { settings } from './../store/settings.js';
-  import { currentTag } from './../store/tags.js';
+  import { currentActivityTitle } from '../store/activities.js';
   import { makeTwoDigitsCifer, getRandomColor } from './../utils.js';
-  import { initTags } from './../store/tags.js';
+  import { initActivities } from '../store/activities.js';
   import Comment from './Comment.svelte';
 
   const faviconEl = document.querySelector('link[rel="icon"]');
@@ -31,7 +31,7 @@
   let isCommentActive = false;
 
   counter.set(0);
-  initTags();
+  initActivities();
   initIntervals();
   initAnimateFavicon();
 
@@ -124,10 +124,10 @@
       class:summed="{$extraCounter}"
     >
       <div class="cifers-desc">
-        {#if $counter}
+        {#if $counter && $settings.showCurrentPeriodAboveTimer}
           {$_('now').toLowerCase()}:
           {$_(`interval_labels.${$currentInterval}`).toLowerCase()}
-          {$currentInterval === 'main' ? $currentTag.title : ''}
+          {$currentInterval === 'main' ? $currentActivityTitle : ''}
         {:else if $extraCounter}
           {$_('last')} {$_(`interval_labels.${$currentInterval}`).toLowerCase()} + {$_('extra_time')}
         {/if}
@@ -212,13 +212,15 @@
         </div>
       {/each}
     </div>
-    <Comment
-      active="{isCommentActive}"
-      visible="{$currentInterval}"
-      on:switch="{() => {
-        isCommentActive = !isCommentActive;
-      }}"
-    />
+    {#if $settings.showComment}
+      <Comment
+        active="{isCommentActive}"
+        visible="{$currentInterval}"
+        on:switch="{() => {
+          isCommentActive = !isCommentActive;
+        }}"
+      />
+    {/if}
   </div>
 </div>
 
@@ -226,7 +228,7 @@
   .timer {
     display: flex;
     .inner {
-      padding: 30px 10px 40px;
+      padding: 90px 10px 40px;
       margin: auto;
       width: 100%;
     }
@@ -261,7 +263,6 @@
       min-height: 90px;
     }
     .button-wrapper {
-      position: relative;
       display: flex;
       flex-grow: 1;
       justify-content: center;
@@ -270,7 +271,6 @@
       padding: 0 15px;
     }
     .button {
-      width: 100%;
       padding: 10px 15px;
       background-color: transparent;
       color: #bbb;

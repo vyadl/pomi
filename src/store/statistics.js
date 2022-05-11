@@ -1,5 +1,5 @@
 import { writable, derived, get } from 'svelte/store';
-import { currentTag } from './tags.js';
+import { currentActivityId, currentActivityTitle, activities } from './activities.js';
 import { comment } from './../store/counter.js';
 import { intervals, currentInterval } from './intervals.js';
 import { settings } from './../store/settings.js';
@@ -45,13 +45,14 @@ function createStat() {
           secondsToFinish,
           startedAt: get(startedAt),
           finishedAt: +now,
-          tag: get(currentTag),
+          activityId: get(currentActivityId),
+          activityTitle: get(currentActivityTitle),
           duration: finalDuration,
           plannedDuration,
           comment: get(comment),
         });
 
-        apiUpdateStat(stat);
+        apiUpdateStat();
         return stat;
       });
     },
@@ -60,7 +61,7 @@ function createStat() {
       intervalId,
       duration,
       comment = '',
-      tag = get(currentTag),
+      activityId = get(currentActivityId),
       startedAt = '',
       finishedAt = '',
     }) => {
@@ -71,25 +72,26 @@ function createStat() {
 
         stat[day].push({
           intervalId,
-          tag,
+          activityId,
           duration,
           comment,
           startedAt,
           finishedAt,
         });
 
-        apiUpdateStat(stat);
+        apiUpdateStat();
         return stat;
       });
     },
-    removeStat: (day, finishedAt) => {
+    removeStat: (day, startedAt) => {
       update(stat => {
-        if (stat[day][stat[day].length - 1].finishedAt === finishedAt) {
+        if (stat[day][stat[day].length - 1].startedAt === startedAt) {
           extraCounter.finish();
         }
 
-        stat[day] = stat[day].filter(record => record.finishedAt !== finishedAt);
-        apiUpdateStat(stat);
+        stat[day] = stat[day].filter(record => record.startedAt !== startedAt);
+
+        apiUpdateStat();
 
         return stat;
       });
@@ -115,10 +117,25 @@ function createStat() {
           lastRecord.finishedAt = +(new Date());
           lastRecord.comment = get(comment);
 
-          apiUpdateStat(stat);
+          apiUpdateStat();
+
           return stat;
         })
       }
+    },
+    changeRecord: (dayTitle, recordIndex, record, withUpdatingLocal = true) => {
+      update(stat => {
+        stat[dayTitle][recordIndex] = {
+          ...stat[dayTitle][recordIndex],
+          ...record,
+        };
+
+        if (withUpdatingLocal) {
+          apiUpdateStat(stat);
+        }
+
+        return stat;
+      })
     },
   };
 }
@@ -131,8 +148,8 @@ export const initStat = function() {
   stat.update(() => (localStat ? JSON.parse(localStat) : {}));
 };
 
-export const apiUpdateStat = function(obj) {
-  localStorage.setItem('stat', JSON.stringify(obj));
+export const apiUpdateStat = function() {
+  localStorage.setItem('stat', JSON.stringify(get(stat)));
 };
 
 export const statArr = derived(stat, $stat => {
@@ -146,7 +163,7 @@ export const statArr = derived(stat, $stat => {
   }, []).reverse();
 });
 
-export const tagDivider = writable(' - ');
+export const activityDivider = writable(' - ');
 
 export const statTotal = derived(statArr, $statArr => {
   return $statArr.reduce((result, day) => {
@@ -169,34 +186,34 @@ export const statTotal = derived(statArr, $statArr => {
       }
 
       if (record.intervalId === 'main') {
-        const tagName = record.tag.title;
-        const tagParts = tagName.split(get(tagDivider));
-        const isSubTask = tagParts.length > 1;
+        const activityName = record.activityTitle;
+        const activityParts = activityName.split(get(activityDivider));
+        const isSubTask = activityParts.length > 1;
 
-        if (dayResult.all[tagName]) {
-          dayResult.all[tagName].quantity += 1;
-          dayResult.all[tagName].totalTime = Math.round(dayResult.all[tagName].totalTime + +record.duration);
+        if (dayResult.all[activityName]) {
+          dayResult.all[activityName].quantity += 1;
+          dayResult.all[activityName].totalTime = Math.round(dayResult.all[activityName].totalTime + +record.duration);
         } else {
-          dayResult.all[tagName] = {
+          dayResult.all[activityName] = {
             quantity: 1,
             totalTime: record.duration
           };
         }
 
-        if (isSubTask || dayResult.global[tagName]) {
-          if (dayResult.global[tagParts[0]]) {
-            dayResult.global[tagParts[0]].quantity += 1;
-            dayResult.global[tagParts[0]].totalTime = Math.round(dayResult.global[tagParts[0]].totalTime + record.duration);
+        if (isSubTask || dayResult.global[activityName]) {
+          if (dayResult.global[activityParts[0]]) {
+            dayResult.global[activityParts[0]].quantity += 1;
+            dayResult.global[activityParts[0]].totalTime = Math.round(dayResult.global[activityParts[0]].totalTime + record.duration);
           } else {
-            const wasGlobalTaskBefore = typeof dayResult.all[tagParts[0]] !== 'undefined';
+            const wasGlobalTaskBefore = typeof dayResult.all[activityParts[0]] !== 'undefined';
             const quantity = wasGlobalTaskBefore
-              ? dayResult.all[tagParts[0]].quantity + 1
+              ? dayResult.all[activityParts[0]].quantity + 1
               : 1;
             const totalTime = wasGlobalTaskBefore
-              ? dayResult.all[tagParts[0]].totalTime + record.duration
+              ? dayResult.all[activityParts[0]].totalTime + record.duration
               : record.duration;
 
-            dayResult.global[tagParts[0]] = {
+            dayResult.global[activityParts[0]] = {
               quantity,
               totalTime,
             };
@@ -231,3 +248,15 @@ export const lastTime = derived(stat, $stat => {
 
   return $stat[lastDay]?.[$stat[lastDay]?.length - 1];
 });
+
+export const changeActivityTitlesForDay = function(date) {
+  get(stat)[date].forEach((record, recordIndex) => {
+    if (get(activities)[record.activityId] && record.activityTitle !== get(activities)[record.activityId]) {
+      stat.changeRecord(date, recordIndex, {
+        activityTitle: get(activities)[record.activityId],
+      }, false);
+    }
+  });
+  
+  apiUpdateStat();
+}

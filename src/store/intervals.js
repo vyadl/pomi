@@ -56,7 +56,6 @@ export const activeIntervals = derived(
 
 export const initIntervals = function() {
   const localIntervals = localStorage.getItem('intervals');
-  const localMuted = !!+localStorage.getItem('muted');
   let defaultIdForSound;
 
   if (!localIntervals) {
@@ -79,7 +78,6 @@ export const initIntervals = function() {
       isActive: 1,
       sound: {
         id: defaultIdForSound,
-        muted: localMuted,
         volume: 0.3,
       },
     },
@@ -90,7 +88,6 @@ export const initIntervals = function() {
       isActive: 1,
       sound: {
         id: defaultIdForSound,
-        muted: localMuted,
         volume: 0.5,
       },
     },
@@ -101,7 +98,6 @@ export const initIntervals = function() {
       isActive: 1,
       sound: {
         id: defaultIdForSound,
-        muted: localMuted,
         volume: 1,
       },
     },
@@ -112,7 +108,6 @@ export const initIntervals = function() {
   ['main', 'break', 'longBreak'].forEach(intervalId => {
     audios[intervalId] = new Audio(`sounds/${get(sounds)[get(intervals)[intervalId].sound.id].fileName}`);
     audios[intervalId].volume = parseFloat(get(intervals)[intervalId].sound.volume);
-    audios[intervalId].muted = get(intervals)[intervalId].sound.muted;
     audios[intervalId].load();
   });
 
@@ -163,15 +158,3 @@ export const stopAudio = function() {
     audios[intervalId].currentTime = 0;
   });
 }
-
-export const setMute = function(isMute) {
-  ['main', 'break', 'longBreak'].forEach(intervalId => {
-    audios[intervalId].muted = isMute;
-  });
-
-  apiUpdateMuting(isMute);
-};
-
-const apiUpdateMuting = (isMuted) => {
-  localStorage.setItem('muted', +isMuted);
-};

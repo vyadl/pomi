@@ -2,9 +2,9 @@ import { writable, derived, get } from 'svelte/store';
 import { stat } from './statistics.js';
 import { extraCounter } from './extraCounter.js';
 import { settings } from './settings.js';
-import { currentTag } from './tags.js';
+import { currentActivityTitle } from './activities.js';
 import { makeTwoDigitsCifer } from './../utils.js';
-import { currentInterval, intervals, playAudio, setMute } from './intervals.js';
+import { currentInterval, intervals, playAudio } from './intervals.js';
 import { _ } from './../lang-utils.js';
 
 function createCounter() {
@@ -69,12 +69,6 @@ function createCounter() {
         return 0;
       });
     },
-    mute: () => {
-      setMute(true);
-    },
-    unmute: () => {
-      setMute(false);
-    }
   };
 }
 
@@ -104,7 +98,7 @@ export const timerFormattedTime = derived(
 function handleNotification() {
   if (get(settings).showNotifications) {
     const currentIntervalDuration = get(intervals)[get(currentInterval)].duration + _('minutes_short')
-    const title = `${get(currentTag).title} ${_('notifications.is_end')} (${currentIntervalDuration})`;
+    const title = `${get(currentActivityTitle)} ${_('notifications.is_end')} (${currentIntervalDuration})`;
 
     new Notification(title, {
       icon: '/favicon.png',

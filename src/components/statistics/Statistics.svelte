@@ -7,7 +7,6 @@
   } from './../../store/statistics.js';
   import ExpandBlock from './../ExpandBlock.svelte';
   import DayStat from './DayStat.svelte';
-  import AllDayRecords from './AllDayRecords.svelte';
   
   initStat();
 </script>

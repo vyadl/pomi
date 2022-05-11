@@ -8,12 +8,20 @@
     updateFactor,
   } from './../store/intervals.js';
   import { soundsArr } from './../store/sounds.js';
-  import { settings } from './../store/settings.js';
-  import DefaultButton from './DefaultButton.svelte';
-  import DefaultCheckbox from './DefaultCheckbox.svelte';
-  import BasicModal from './BasicModal.svelte';
+  import {
+    settings,
+    resetSettings,
+    resetHistory,
+    resetActivities,
+    resetAll,
+  } from './../store/settings.js';
+  import DefaultButton from './form-elements/DefaultButton.svelte';
+  import DefaultCheckbox from './form-elements/DefaultCheckbox.svelte';
+  import BasicModal from './modals/BasicModal.svelte';
+  import ExpandBlock from './ExpandBlock.svelte';
 
   export let active = false;
+  let isExpand = false;
 
   let localSettings = JSON.parse(JSON.stringify($settings));
   let showNotificationWarning = false;
@@ -73,12 +81,23 @@
     updateFactor();
     target.value = correctValue;
   }
+
 </script>
 
 <BasicModal bind:active on:close>
   <div class="settings">
-    <div class="section">
-      <div class="settings-title">{$_('intervals')}</div>
+    <div class="actions">
+      <DefaultButton
+        small
+        on:click="{() => { isExpand = !isExpand }}"
+      >
+        {isExpand ? $_('settings.hide_all') : $_('settings.expand_all')}
+      </DefaultButton>
+    </div>
+    <ExpandBlock
+      title="{$_('intervals')}"
+      active="{isExpand}"
+    >
       <div class="intervals">
         {#each $intervalsArr as [intervalId, options]}
           <div class="interval-settings">
@@ -160,9 +179,11 @@
           </div>
         {/each}
       </div>
-    </div>
-    <div class="section">
-      <div class="settings-title">{$_('language')}</div>
+    </ExpandBlock>
+    <ExpandBlock
+      title="{$_('language')}"
+      active="{isExpand}"
+    >
       <div class="languages">
         <div class="language-buttons">
           {#each $locales as lang}
@@ -177,8 +198,56 @@
           {/each}
         </div>
       </div>
-    </div>
-    <div class="section">
+    </ExpandBlock>
+    <ExpandBlock
+      title="{$_('settings.general_interface')}"
+      active="{isExpand}"
+    >
+        <div class="checkbox-setting">
+          <DefaultCheckbox
+            text="{$_('settings.time_title')}"
+            bind:checked="{localSettings.showTimeInTitle}"
+            on:change="{() => {
+              changeSetting('showTimeInTitle');
+            }}"
+            label
+          />
+        </div>
+        <div class="checkbox-setting">
+          <DefaultCheckbox
+            text="{$_('settings.time_favicon')}"
+            bind:checked="{localSettings.showTimeInFavicon}"
+            on:change="{() => {
+              changeSetting('showTimeInFavicon');
+            }}"
+            label
+          />
+        </div>
+        <div class="checkbox-setting">
+          <DefaultCheckbox
+            text="{$_('settings.colorful_favicon')}"
+            bind:checked="{localSettings.showLastSecondsColorful}"
+            on:change="{() => {
+              changeSetting('showLastSecondsColorful');
+            }}"
+            label
+          />
+        </div>
+        <div class="checkbox-setting">
+          <DefaultCheckbox
+            text="{$_('settings.show_planned_duration')}"
+            bind:checked="{localSettings.showPlannedDuration}"
+            on:change="{() => {
+              changeSetting('showPlannedDuration');
+            }}"
+            label
+          />
+        </div>
+    </ExpandBlock>
+    <ExpandBlock
+      title="{$_('settings.main_screen')}"
+      active="{isExpand}"
+    >
       <div class="checkbox-setting">
         <DefaultCheckbox
           text="{$_('settings.show_activity_near_timer')}"
@@ -201,50 +270,67 @@
       </div>
       <div class="checkbox-setting">
         <DefaultCheckbox
-          text="{$_('settings.time_title')}"
-          bind:checked="{localSettings.showTimeInTitle}"
+          text="{$_('settings.show_main_tabs')}"
+          bind:checked="{localSettings.showMainTabs}"
           on:change="{() => {
-            changeSetting('showTimeInTitle');
+            changeSetting('showMainTabs');
           }}"
           label
         />
       </div>
       <div class="checkbox-setting">
         <DefaultCheckbox
-          text="{$_('settings.time_favicon')}"
-          bind:checked="{localSettings.showTimeInFavicon}"
+          text="{$_('settings.show_comment')}"
+          bind:checked="{localSettings.showComment}"
           on:change="{() => {
-            changeSetting('showTimeInFavicon');
+            changeSetting('showComment');
           }}"
           label
         />
       </div>
       <div class="checkbox-setting">
         <DefaultCheckbox
-          text="{$_('settings.colorful_favicon')}"
-          bind:checked="{localSettings.showLastSecondsColorful}"
+          text="{$_('settings.show_current_activity_main_screen')}"
+          bind:checked="{localSettings.showCurrentActivityOnMainScreen}"
           on:change="{() => {
-            changeSetting('showLastSecondsColorful');
+            changeSetting('showCurrentActivityOnMainScreen');
           }}"
           label
         />
       </div>
+      {#if localSettings.showCurrentActivityOnMainScreen}
+        <div class="checkbox-setting nested">
+          <DefaultCheckbox
+            text="{$_('settings.show_current_activity_label_main_screen')}"
+            bind:checked="{localSettings.showCurrentActivityLabelOnMainScreen}"
+            on:change="{() => {
+              changeSetting('showCurrentActivityLabelOnMainScreen');
+            }}"
+            label
+          />
+        </div>
+      {/if}
+      <div class="checkbox-setting">
+        <DefaultCheckbox
+          text="{$_('settings.show_current_period_above_timer')}"
+          bind:checked="{localSettings.showCurrentPeriodAboveTimer}"
+          on:change="{() => {
+            changeSetting('showCurrentPeriodAboveTimer');
+          }}"
+          label
+        />
+      </div>
+    </ExpandBlock>
+    <ExpandBlock
+      title="{$_('settings.behaviour')}"
+      active="{isExpand}"
+    >
       <div class="checkbox-setting">
         <DefaultCheckbox
           text="{$_('settings.subtract_time')}"
           bind:checked="{localSettings.subtractTimeWhenFinishing}"
           on:change="{() => {
             changeSetting('subtractTimeWhenFinishing');
-          }}"
-          label
-        />
-      </div>
-      <div class="checkbox-setting">
-        <DefaultCheckbox
-          text="{$_('settings.show_planned_duration')}"
-          bind:checked="{localSettings.showPlannedDuration}"
-          on:change="{() => {
-            changeSetting('showPlannedDuration');
           }}"
           label
         />
@@ -270,6 +356,11 @@
         </div>
         {/if}
       </div>
+    </ExpandBlock>
+    <ExpandBlock
+      title="{$_('settings.activity_factor')}"
+      active="{isExpand}"
+    >
       <div class="checkbox-setting">
         <DefaultCheckbox
           text="{$_('settings.use_activity_factor')}"
@@ -280,7 +371,6 @@
           label
         />
       </div>
-      
       {#if localSettings.useActivityFactor}
         <div class="setting-description">
           {$_('settings.basic_factor')} <br>
@@ -317,7 +407,43 @@
           </label>
         {/if}
       {/if}
-    </div>
+    </ExpandBlock>
+    <ExpandBlock
+      title="{$_('settings.reset')}"
+      active="{isExpand}"
+    >
+      <p class="setting-descr">
+        {$_('settings.reset_warning')}
+      </p>
+      <DefaultButton
+        on:click="{resetSettings}"
+        small
+        bordered
+      >
+        {$_('settings.reset_to_default')}
+      </DefaultButton>
+      <DefaultButton
+        on:click="{resetHistory}"
+        small
+        bordered
+      >
+        {$_('settings.clear_history')}
+      </DefaultButton>
+      <DefaultButton
+        on:click="{resetActivities}"
+        small
+        bordered
+      >
+        {$_('settings.remove_all_activities')}
+      </DefaultButton>
+      <DefaultButton
+        on:click="{resetAll}"
+        small
+        bordered
+      >
+        {$_('settings.reset_all')}
+      </DefaultButton>
+    </ExpandBlock>
   </div>
 </BasicModal>
 
@@ -327,16 +453,10 @@
     width: 100%;
     max-width: 400px;
     padding: 0 10px;
+    color: var(--color-text-softer);
   }
-  .section {
-    padding: 10px 0;
-    border-bottom: 1px solid #222;
-    &:last-child {
-      border: none;
-    }
-  }
-  .settings-title {
-    margin-bottom: 10px;
+  .actions {
+    text-align: right;
   }
   .intervals {
     display: flex;
@@ -344,7 +464,7 @@
     margin-bottom: 15px;
   }
   .languages {
-    margin-bottom: 15px;
+    padding: 30px 0;
   }
   .interval-settings {
     width: 28%;
@@ -436,5 +556,8 @@
   }
   .checkbox-setting {
     padding: 7px 0;
+    &.nested {
+      margin-left: 15px;
+    }
   }
 </style>

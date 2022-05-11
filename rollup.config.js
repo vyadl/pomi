@@ -10,6 +10,7 @@ const production = !process.env.ROLLUP_WATCH;
 const preprocess = sveltePreprocess({
   scss: {
     includePaths: ['src'],
+    prependData: `@import 'src/scss/main.scss';`,
   },
   postcss: {
     plugins: [require('autoprefixer')],

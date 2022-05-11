@@ -3,21 +3,43 @@
   import { stat } from './../../store/statistics.js';
   import { makeAbsoluteTimeString } from './../../utils.js';
   import { settings } from './../../store/settings.js';
+  import EditRecordModal from './../modals/EditRecordModal.svelte';
 
   export let dayStat = [];
   export let date = '';
+  
+  let currentRecord = null;
+  let nextRecord = null;
+  let currentRecordIndex = null;
+  let dayTitle = null;
+  
+  function openEditModal(record, recordIndex) {
+    currentRecord = JSON.parse(JSON.stringify(record));
+    currentRecordIndex = recordIndex;
+    dayTitle = date;
+    nextRecord = dayStat[recordIndex + 1]
+      ? JSON.parse(JSON.stringify(dayStat[recordIndex + 1]))
+      : null;
+  }
 
+  function resetEditing() {
+    currentRecordIndex = null;
+    dayTitle = null;
+    nextRecord = null;
+    currentRecord = null;
+  }
 </script>
 
 <div class="all-day-records">
-  {#each dayStat as record}
+  {#each dayStat as record, recordIndex}
     <div
       class="record"
       class:activity="{record.intervalId === 'main'}"
+      on:click="{() => { openEditModal(record, recordIndex) }}"
     >
       <div class="record-main">
-        <div class="tag">
-          {record.tag.title} ({record.duration} {$_('min')}{
+        <div class="activity">
+          {record.activityTitle} ({record.duration} {$_('min')}{
             $settings.showPlannedDuration
               && record.plannedDuration !== record.duration
                 ? `, ${record.plannedDuration} ${$_('planned')}` 
@@ -43,27 +65,29 @@
           {/if}
         </div>
       </div>
-      <div
-        class="record-remove"
-        on:click="{() => {
-          stat.removeStat(date, record.finishedAt);
-        }}"
-      ></div>
       {#if record.comment}
         <div class="record-comment">{$_('comment')}: {record.comment}</div>
       {/if}
     </div>
   {/each}
+  <EditRecordModal
+    bind:record="{currentRecord}"
+    bind:recordIndex="{currentRecordIndex}"
+    bind:dayTitle="{dayTitle}"
+    bind:nextRecord="{nextRecord}"
+    on:close={resetEditing}
+  />
 </div>
 
 
 <style lang="scss">
 .all-day-records {
   .record {
-    padding: 4px 20px 4px 0;
-    transition: background-color 0.2s;
+    padding: 4px 0;
+    transition: background-color .2s;
     position: relative;
     font-size: 12px;
+    cursor: pointer;
     &.activity {
       color: #555;
     }
@@ -82,37 +106,7 @@
     padding-top: 5px;
   }
 
-  .record-remove {
-    position: absolute;
-    right: 0;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 17px;
-    height: 17px;
-    cursor: pointer;
-    font-size: 12px;
-    opacity: 0.8;
-    transition: opacity 0.2s;
-    &::before,
-    &::after {
-      content: '';
-      position: absolute;
-      right: 0;
-      top: 50%;
-      width: 9px;
-      height: 1px;
-      background-color: #bbb;
-      transform: translateY(-50%) rotate(45deg);
-    }
-    &::after {
-      transform: translateY(-50%) rotate(-45deg);
-    }
-    &:hover {
-      opacity: 1;
-    }
-  }
-
-  .tag {
+  .activity {
     width: 50%;
     margin-right: 15px;
   }

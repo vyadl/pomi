@@ -63,9 +63,10 @@
     height: 20px;
     width: 35px;
     margin-bottom: 0;
-    background-color: #666;
+    background-color: #333;
     border-radius: 50px;
-    transition: 0.3s;
+    border: 2px solid #111;
+    transition: .2s;
     border: none;
     &.unwrapped {
       position: relative;
@@ -78,7 +79,7 @@
       position: absolute;
       height: 16px;
       width: 16px;
-      background-color: #888;
+      background-color: #555;
       border-radius: 50%;
       left: 3px;
       top: 2px;

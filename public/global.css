@@ -72,7 +72,7 @@ button:focus {
   visibility: visible;
 }
 /* box for title text */
-[data-title]:after {
+[data-title]::after {
   content: attr(data-title);
   position: absolute;
   left: 20%;
@@ -91,4 +91,11 @@ button:focus {
 }
 [data-title] {
   position: relative;
+}
+[title-left]::after {
+  left: auto;
+  right: 20%;
+}
+[title-width]::after {
+  width: attr(title-width px);
 }

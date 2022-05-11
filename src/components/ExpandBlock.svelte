@@ -1,6 +1,4 @@
 <script>
-  import { slide } from 'svelte/transition';
-
   export let active = false;
   export let title = false;
   export let small = false;

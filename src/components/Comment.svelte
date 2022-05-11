@@ -3,7 +3,7 @@
   import { slide } from 'svelte/transition';
   import { _ } from 'svelte-i18n';
   import { comment } from './../store/counter.js';
-  import TextInput from './TextInput.svelte';
+  import TextInput from './form-elements/TextInput.svelte';
 
   export let active = false;
   export let visible = false;

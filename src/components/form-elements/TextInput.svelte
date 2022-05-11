@@ -4,8 +4,7 @@
   export let value;
   export let wide = false;
   export let autofocus = false;
-  export let label = false;
-  export let labelText = '';
+  export let label = '';
   export let errormessage = '';
   let inputEl;
 
@@ -19,7 +18,7 @@ const dispatch = createEventDispatcher();
 
 function onChange() {
   errormessage = '';
-  dispatch('change', value);
+  dispatch('input', value);
 }
 </script>
 <div
@@ -28,7 +27,7 @@ function onChange() {
 >
   {#if label}
     <label class="label">
-      <div class="label-text">{labelText}</div>
+      <div class="label-text">{label}</div>
       <input
         type="text"
         class="input"

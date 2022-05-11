@@ -9,6 +9,8 @@
   } from './../../store/statistics.js';
   import { activityFactor } from './../../store/intervals.js';
   import { settings } from './../../store/settings.js';
+  import { activities } from '../../store/activities';
+  import { changeActivityTitlesForDay } from './../../store/statistics';
   import ExpandBlock from './../ExpandBlock.svelte';
   import AllDayRecords from './AllDayRecords.svelte';
 
@@ -19,9 +21,7 @@
   let isDetailsActive = expanded;
 
   initStat();
-
   $: currentStat = $statTotal[dayStatTitle];
-
   $: formattedTimeWithFactor = $settings &&
     $locale &&
     currentStat?.sum?.activities &&
@@ -31,6 +31,18 @@
     $locale &&
     currentStat?.sum?.activities &&
     makeHoursAndMinutes(currentStat.sum.activities);
+
+  $: $activities, checkActivities(), currentStat = $statTotal[dayStatTitle];
+
+  function checkActivities() {
+    if ($stat[dayStatTitle]) {
+      $stat[dayStatTitle].some(record => {
+        if ($activities[record.activityId] && record.activityTitle !== $activities[record.activityId]) {
+          changeActivityTitlesForDay(dayStatTitle);
+        }
+      });
+    }
+  }
 </script>
 
 <div class="day-stat">
@@ -63,20 +75,20 @@
     >
       <div class="details">
         <div class="total">
-          {#if Object.keys(currentStat.global).length}
+          {#if currentStat?.global && Object.keys(currentStat.global).length}
             <div class="details-title">{$_('global_activities')}:</div>
-            {#each Object.keys(currentStat.global) as tagKey, i}
+            {#each Object.keys(currentStat.global) as activityKey}
               <div class="activity-sum in-details">
-                <div>{`${tagKey}`}</div>
+                <div>{`${activityKey}`}</div>
                 <div class="activity-sum-inner">
                   <div>
-                    {$locale && makeHoursAndMinutes(currentStat.global[tagKey].totalTime * $activityFactor)}
+                    {$locale && makeHoursAndMinutes(currentStat.global[activityKey].totalTime * $activityFactor)}
                   </div>
                   <div class={$activityFactor ? 'pure' : ''}>
                     {#if $activityFactor}
                       {$_('pure_time')} -
                     {/if}
-                    {$locale && makeHoursAndMinutes(currentStat.global[tagKey].totalTime)}
+                    {$locale && makeHoursAndMinutes(currentStat.global[activityKey].totalTime)}
                   </div>
                 </div>
               </div>
@@ -84,22 +96,24 @@
             <br />
             <div class="details-title">{$_('all_activities')}:</div>
           {/if}
-          {#each Object.keys(currentStat.all) as tagKey}
-            <div class="activity-sum in-details">
-              <div>{`${tagKey}`}</div>
-              <div class="activity-sum-inner">
-                <div>
-                  {$locale && makeHoursAndMinutes(currentStat.all[tagKey].totalTime * $activityFactor)}
-                </div>
-                <div class={$activityFactor ? 'pure' : ''}>
-                  {#if $activityFactor}
-                    {$_('pure_time')} -
-                  {/if}
-                  {$locale && makeHoursAndMinutes(currentStat.all[tagKey].totalTime)}
+          {#if currentStat?.all}
+            {#each Object.keys(currentStat.all) as activityKey}
+              <div class="activity-sum in-details">
+                <div>{`${activityKey}`}</div>
+                <div class="activity-sum-inner">
+                  <div>
+                    {$locale && makeHoursAndMinutes(currentStat.all[activityKey].totalTime * $activityFactor)}
+                  </div>
+                  <div class={$activityFactor ? 'pure' : ''}>
+                    {#if $activityFactor}
+                      {$_('pure_time')} -
+                    {/if}
+                    {$locale && makeHoursAndMinutes(currentStat.all[activityKey].totalTime)}
+                  </div>
                 </div>
               </div>
-            </div>
-          {/each}
+            {/each}
+          {/if}
         </div>
       </div>
       <ExpandBlock
@@ -113,9 +127,6 @@
           date="{dayStatTitle}"
         />
       </ExpandBlock>
-      {#if !isToday}
-        <div class="bottom-divider"></div>
-      {/if}
     </ExpandBlock>
   {/if}
 </div>
@@ -128,7 +139,7 @@
     display: flex;
     cursor: pointer;
     justify-content: space-between;
-    transition: background-color 0.2s;
+    transition: background-color .2s;
     font-size: 17px;
     color: #aaa;
     letter-spacing: 1px;
@@ -152,11 +163,6 @@
   }
   .total {
     margin-bottom: 20px;
-  }
-  .bottom-divider {
-    padding: 15px 0;
-    margin-bottom: 20px;
-    border-bottom: 1px dashed #888;
   }
 }
 </style>

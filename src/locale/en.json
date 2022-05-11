@@ -2,7 +2,7 @@
   "app_name": "pomi",
   "hours_short": "h",
   "minutes_short": "m",
-  "activity": "activity",
+  "activity": "Activity",
   "general": "General",
   "intervals": "Intervals",
   "duration": "Duration",
@@ -19,8 +19,9 @@
   "all_activities": "All activities",
   "started_at": "started",
   "finished_at": "finished",
-  "comment": "comment",
+  "comment": "Comment",
   "min": "min",
+  "minutes": "minutes",
   "planned": "planned",
   "all_day_records": "all day records",
   "add": "add",
@@ -45,6 +46,10 @@
   "tooltip_add_all": "It will add all planed time for this interval into statistics.",
   "tooltip_about_settings": "You can change this behaviour in settings.",
   "now": "Сейчас",
+  "removed": "removed",
+  "save": "Save",
+  "type": "Type",
+  "current_activity": "Current activity",
   "languages": {
     "en": "English",
     "ru": "Русский",
@@ -70,11 +75,28 @@
     "formula_factor_sentence": "The formula for counting activity factor is",
     "formula_factor": "(activity_time * 4 + short_break * 3 + long_break) / (activity_time * 4)",
     "current_counted_factor": "Current calculated activity factor is",
-    "show_activity_near_timer": "Show today's activity near timer",
+    "show_activity_near_timer": "Show today's statistics near timer",
     "show_notifications": "Show notifications",
     "change_notifications_permission": "You need to make changes in you browser settings for activating notifications",
     "details_on_main_screen": "Details on main screen",
-    "title_interval": "Title instead of duration"
+    "title_interval": "Title instead of duration",
+    "general_interface": "General interface",
+    "main_screen": "Main screen",
+    "behaviour": "Behaviour",
+    "activity_factor": "Activity factor",
+    "expand_all": "Expand all",
+    "hide_all": "Hide all",
+    "reset_to_default": "Reset settings to default",
+    "clear_history": "Clear history",
+    "remove_all_activities": "Remove all activities",
+    "reset_all": "Reset all",
+    "reset": "Reset",
+    "reset_warning": "After each reset action the page will reload",
+    "show_main_tabs": "Show main tabs",
+    "show_comment": "Show comment",
+    "show_current_activity_main_screen": "Current activity in top right corner",
+    "show_current_activity_label_main_screen": "Show label 'current activity' above",
+    "show_current_period_above_timer": "Show current period above timer"
   },
   "sounds": {
     "market": "Market atmoshpere",
@@ -115,5 +137,12 @@
     "test": "Test notification",
     "test_body": "There is body of test notification",
     "warning": "If you don't see the test notification – check your browser or/and system settings – they need to allow them for this site and browser at all"
+  },
+  "validation": {
+    "deprecated_activity": "This activity is removed. You can keep it like that or choose the existed one"
+  },
+  "modals": {
+    "edit_record": "Edit record",
+    "delete_record": "Delete record"
   }
 }

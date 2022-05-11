@@ -6,17 +6,20 @@
   export let active = false;
   export let customclose = false;
   import { createEventDispatcher } from 'svelte';
-  import DefaultButton from './DefaultButton.svelte';
-  import TextInput from './TextInput.svelte';
-  import BasicModal from './BasicModal.svelte';
+  import DefaultButton from './../form-elements/DefaultButton.svelte';
+  import TextInput from './../form-elements/TextInput.svelte';
+  import BasicModal from './../modals/BasicModal.svelte';
 
   const dispatch = createEventDispatcher();
   let value = '';
+
+  $: if (inputmessage && active) { value = inputmessage; };
 
   $: if (!active) closeModal();
 
   function sendValue() {
     dispatch('message', value);
+
     if (!customclose) {
       closeModal();
     }
@@ -29,11 +32,12 @@
   }
 </script>
 
-<BasicModal bind:active on:close="{closeModal}">
+<BasicModal
+  bind:active
+  on:close="{closeModal}"
+  title="{title}"
+>
   <div class="inner">
-    {#if title}
-      <div class="title">{title}</div>
-    {/if}
     <slot>
       <form class="form" on:submit|preventDefault="{sendValue}">
         <div class="input-wrapper">
@@ -53,13 +57,6 @@
 </BasicModal>
 
 <style lang="scss">
-  .title {
-    font-size: 18px;
-    color: #eee;
-    margin-bottom: 30px;
-    text-align: center;
-  }
-
   .inner {
     padding: 15px;
     width: 300px;

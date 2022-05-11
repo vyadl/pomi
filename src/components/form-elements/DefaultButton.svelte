@@ -2,6 +2,8 @@
   export let active = false;
   export let small = false;
   export let vertical = false;
+  export let bordered = false;
+  export let type = 'button';
 </script>
 
 <button
@@ -9,6 +11,8 @@
   class:active
   class:small
   class:vertical
+  class:bordered
+  type="{type}"
   on:click
 >
   <slot />
@@ -47,6 +51,9 @@
     &.vertical {
       padding-left: 0;
       padding-right: 0;
+    }
+    &.bordered {
+      border: 2px solid currentColor;
     }
   }
 </style>

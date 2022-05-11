@@ -1,9 +1,8 @@
 <script>
 import { _ } from 'svelte-i18n';
-import { fade } from 'svelte/transition';
-import Tags from './Tags.svelte';
+import Activities from './Activities.svelte';
 import Statistics from './statistics/Statistics.svelte';
-import DefaultButton from './DefaultButton.svelte';
+import DefaultButton from './form-elements/DefaultButton.svelte';
 
 let activeTab = '';
 
@@ -13,8 +12,8 @@ let activeTab = '';
   <div class="tabs-controls">
     <DefaultButton
       class="tab"
-      active={activeTab === 'tags'}
-      on:click="{() => {activeTab = activeTab === 'tags' ? '' : 'tags'}}"
+      active={activeTab === 'activities'}
+      on:click="{() => {activeTab = activeTab === 'activities' ? '' : 'activities'}}"
     >
       {$_('activities')}
     </DefaultButton>
@@ -27,8 +26,8 @@ let activeTab = '';
     </DefaultButton>
   </div>
   <div class="components">
-    {#if activeTab === 'tags'}
-      <Tags />
+    {#if activeTab === 'activities'}
+      <Activities />
     {:else if activeTab === 'statistics'}
       <Statistics />
     {/if}
