@@ -105,7 +105,7 @@
   }
 
   function addExtraTime() {
-    stat.addTime($extraCounter);
+    stat.addTime();
     resetExtraTime();
     stopAudio();
   }

@@ -38,7 +38,7 @@
 </svelte:head>
 <main class="wrapper">
   {#if $settings.showCurrentActivityOnMainScreen}
-    <div class="current-tag">
+    <div class="current-activity">
       {#if $settings.showCurrentActivityLabelOnMainScreen}
         <div class="current-activity-label">
           {$_('current_activity').toLowerCase()}
@@ -92,14 +92,14 @@
     margin: 0;
   }
 
-  .current-tag,
+  .current-activity,
   .settings {
     color: var(--color-text-softest);
     font: 13px Verdana, sans-serif;
     letter-spacing: 2px;
   }
 
-  .current-tag {
+  .current-activity {
     position: absolute;
     top: 15px;
     right: 15px;

@@ -13,7 +13,7 @@ function createIntervals() {
       update(intervals => {
         intervals[intervalId][prop] = value;
 
-        apiUpdateIntervals(intervals);
+        localStorageUpdateIntervals(intervals);
 
         return intervals;
       });
@@ -34,7 +34,7 @@ function createIntervals() {
         audios[intervalId].volume = +opts.volume;
       }
 
-        apiUpdateIntervals(newIntervals);
+        localStorageUpdateIntervals(newIntervals);
         return newIntervals;
       });
     },
@@ -111,7 +111,7 @@ export const initIntervals = function() {
     audios[intervalId].load();
   });
 
-  apiUpdateIntervals(get(intervals));
+  localStorageUpdateIntervals(get(intervals));
 };
 
 export const updateFactor = () => {
@@ -143,7 +143,7 @@ export const updateFactor = () => {
   });
 }
 
-export const apiUpdateIntervals = function(obj) {
+export const localStorageUpdateIntervals = function(obj) {
   localStorage.setItem('intervals', JSON.stringify(obj));
 };
 

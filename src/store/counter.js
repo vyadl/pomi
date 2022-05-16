@@ -26,7 +26,6 @@ function createCounter() {
       comment.set('');
 
       timerId = setInterval(() => {
-        
         update(counter => {
           const newCounter = Math.ceil((endTime - +new Date) / 1000);
 
@@ -41,7 +40,8 @@ function createCounter() {
           }
 
           playAudio(intervalId);
-          stat.addStat(intervalId, counter);
+
+          stat.addStat(intervalId);
           clearInterval(timerId);
           handleNotification();
           
@@ -51,16 +51,15 @@ function createCounter() {
       }, 1000);
     },
     finishPeriod: (intervalId) => {
-      update(counter => {
+      update(() => {
         clearInterval(timerId);
-
-        stat.addStat(intervalId, counter);
+        stat.addStat(intervalId);
         currentInterval.set('');
 
         return 0;
       });
     },
-    resetPeriod: (intervalId) => {
+    resetPeriod: () => {
       update(() => {
         clearInterval(timerId);
 

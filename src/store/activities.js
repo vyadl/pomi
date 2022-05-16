@@ -47,7 +47,7 @@ export const addActivity = function(activityName) {
 
     
     activities.update(() => newActivities);
-    apiUpdateActivities();
+    localStorageUpdateActivities();
 
     return { id, title: activityName };
   } else {
@@ -64,7 +64,7 @@ export const removeActivity = function(activityKey) {
   }, {});
 
   activities.update(() => newActivities);
-  apiUpdateActivities();
+  localStorageUpdateActivities();
 };
 
 export const editActivity = function(activityId, activityTitle) {
@@ -76,12 +76,12 @@ export const editActivity = function(activityId, activityTitle) {
     return activities;
   });
 
-  apiUpdateActivities();
+  localStorageUpdateActivities();
 }
 
 export const setCurrentActivityId = function(id) {
   currentActivityId.update(() => id);
-  apiUpdateCurrentActivityId();
+  localStorageUpdateCurrentActivityId();
 };
 
 export const initActivities = function() {
@@ -92,15 +92,15 @@ export const initActivities = function() {
   activities.update(() => localActivities ? JSON.parse(localActivities) : { [idForDefault]: 'default' });
   currentActivityId.update(() => localCurrentActivityId || idForDefault);
 
-  apiUpdateActivities();
-  apiUpdateCurrentActivityId();
+  localStorageUpdateActivities();
+  localStorageUpdateCurrentActivityId();
 };
 
-export const apiUpdateActivities = function() {
+export const localStorageUpdateActivities = function() {
   localStorage.setItem('activities', JSON.stringify(get(activities)));
 };
 
-export const apiUpdateCurrentActivityId = function() {
+export const localStorageUpdateCurrentActivityId = function() {
   localStorage.setItem('currentActivityId', get(currentActivityId));
 };
 

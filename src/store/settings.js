@@ -48,7 +48,7 @@ function initCheckingPresence() {
   });
 }
 
-export const apiUpdateSettings = function() {
+export const localStorageUpdateSettings = function() {
   localStorage.setItem('settings', JSON.stringify(get(settings)));
 }
 
@@ -62,7 +62,7 @@ settings.subscribe(() => {
     updateFactor();
   }
 
-  apiUpdateSettings();
+  localStorageUpdateSettings();
 });
 
 export const resetSettings = function(isReload = true) {

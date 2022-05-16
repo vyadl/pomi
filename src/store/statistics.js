@@ -25,63 +25,76 @@ function createStat() {
     subscribe,
     set,
     update,
-    addStat: (intervalId, secondsToFinish = 0) => {
+    addStat: (intervalId, startDate = new Date(get(startedAt)), endDate = new Date()) => {
       update(stat => {
-        const now = new Date();
         const day = getDateString();
         const plannedDuration = get(intervals)[intervalId].duration;
         const finalDuration = get(settings).subtractTimeWhenFinishing
-          ? plannedDuration - Math.floor(secondsToFinish / 60)
+          ? Math.ceil((+endDate - +startDate) / (1000 * 60))
           : plannedDuration;
+        const isActivityInOneDay = endDate.getDate() === startDate.getDate();
 
         lastDay = day;
 
-        if (!stat[day]) {
-          stat[day] = [];
+        if (isActivityInOneDay) {
+          if (!stat[day]) {
+            stat[day] = [];
+          }
+
+          stat[day].push({
+            intervalId,
+            startedAt: +startDate,
+            finishedAt: +endDate,
+            activityId: get(currentActivityId),
+            activityTitle: get(currentActivityTitle),
+            duration: finalDuration,
+            plannedDuration,
+            comment: get(comment),
+          });
+        } else {
+
+          const firstDay = startDate;
+          const firstDayStartedAt = +startDate;
+          const nextDayFinishedAt = +endDate;
+          const firstDayStr = getDateString(firstDay);
+          const nextDayStr = getDateString(endDate);
+          const firstDayFinishedAt = +firstDay.setHours(23, 59, 59, 999);
+          const nextDayStartedAt = +endDate.setHours(0, 0, 0, 0);
+
+          if (!stat[firstDayStr]) {
+            stat[firstDayStr] = [];
+          }
+          if (!stat[nextDayStr]) {
+            stat[nextDayStr] = [];
+          }
+
+          stat[firstDayStr].push({
+            intervalId,
+            startedAt: firstDayStartedAt,
+            finishedAt: +firstDay.setHours(23, 59, 59, 999),
+            activityId: get(currentActivityId),
+            activityTitle: get(currentActivityTitle),
+            duration: Math.ceil((firstDayFinishedAt - firstDayStartedAt) / (1000 * 60)),
+            plannedDuration,
+            comment: get(comment),
+          });
+
+          stat[nextDayStr].push({
+            intervalId,
+            startedAt: nextDayStartedAt,
+            finishedAt: nextDayFinishedAt,
+            activityId: get(currentActivityId),
+            activityTitle: get(currentActivityTitle),
+            duration: Math.ceil((nextDayFinishedAt - nextDayStartedAt) / (1000 * 60)),
+            plannedDuration,
+            comment: get(comment),
+          });
         }
 
-        stat[day].push({
-          intervalId,
-          secondsToFinish,
-          startedAt: get(startedAt),
-          finishedAt: +now,
-          activityId: get(currentActivityId),
-          activityTitle: get(currentActivityTitle),
-          duration: finalDuration,
-          plannedDuration,
-          comment: get(comment),
-        });
-
-        apiUpdateStat();
         return stat;
       });
-    },
-    addManualStat: ({
-      day,
-      intervalId,
-      duration,
-      comment = '',
-      activityId = get(currentActivityId),
-      startedAt = '',
-      finishedAt = '',
-    }) => {
-      update(stat => {
-        if (!stat[day]) {
-          stat[day] = [];
-        }
 
-        stat[day].push({
-          intervalId,
-          activityId,
-          duration,
-          comment,
-          startedAt,
-          finishedAt,
-        });
-
-        apiUpdateStat();
-        return stat;
-      });
+      localStorageUpdateStat();
     },
     removeStat: (day, startedAt) => {
       update(stat => {
@@ -91,37 +104,22 @@ function createStat() {
 
         stat[day] = stat[day].filter(record => record.startedAt !== startedAt);
 
-        apiUpdateStat();
-
         return stat;
       });
+
+      localStorageUpdateStat();
     },
-    addTime: (seconds, isNewBreak) => {
+    addTime: () => {
       extraCounter.finish();
       currentInterval.set('');
-      if (isNewBreak) {
-        const now = new Date;
+      const lastRecordCopied = {...get(stat)[lastDay][get(stat)[lastDay].length - 1]};
 
-        stat.addManualStat({
-          day: getDateString(),
-          intervalId: 'break',
-          duration: Math.round(seconds / 60),
-          startedAt: Math.round(+now - seconds * 1000),
-          finishedAt: +now,
-        });
-      } else {
-        update(stat => {
-          const lastRecord = stat[lastDay][stat[lastDay].length - 1];
+      stat.removeStat(lastDay, lastRecordCopied.startedAt);
 
-          lastRecord.duration += Math.round(seconds / 60);
-          lastRecord.finishedAt = +(new Date());
-          lastRecord.comment = get(comment);
-
-          apiUpdateStat();
-
-          return stat;
-        })
-      }
+      stat.addStat(
+        lastRecordCopied.intervalId,
+        new Date(lastRecordCopied.startedAt),
+      );
     },
     changeRecord: (dayTitle, recordIndex, record, withUpdatingLocal = true) => {
       update(stat => {
@@ -130,12 +128,12 @@ function createStat() {
           ...record,
         };
 
-        if (withUpdatingLocal) {
-          apiUpdateStat(stat);
-        }
-
         return stat;
-      })
+      });
+
+      if (withUpdatingLocal) {
+        localStorageUpdateStat();
+      }
     },
   };
 }
@@ -148,7 +146,7 @@ export const initStat = function() {
   stat.update(() => (localStat ? JSON.parse(localStat) : {}));
 };
 
-export const apiUpdateStat = function() {
+export const localStorageUpdateStat = function() {
   localStorage.setItem('stat', JSON.stringify(get(stat)));
 };
 
@@ -258,5 +256,5 @@ export const changeActivityTitlesForDay = function(date) {
     }
   });
   
-  apiUpdateStat();
+  localStorageUpdateStat();
 }
