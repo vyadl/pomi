@@ -1,8 +1,11 @@
 import { writable, derived, get } from 'svelte/store';
 import { stat } from './statistics.js';
-import { extraCounter } from './../store/extraCounter.js';
+import { extraCounter } from './extraCounter.js';
+import { settings } from './settings.js';
+import { currentActivityTitle } from './activities.js';
 import { makeTwoDigitsCifer } from './../utils.js';
-import { currentInterval, playAudio, setMute } from './intervals.js';
+import { currentInterval, intervals, playAudio } from './intervals.js';
+import { _ } from './../lang-utils.js';
 
 function createCounter() {
   const { subscribe, set, update } = writable(0);
@@ -23,42 +26,40 @@ function createCounter() {
       comment.set('');
 
       timerId = setInterval(() => {
-        
         update(counter => {
           const newCounter = Math.ceil((endTime - +new Date) / 1000);
 
-          if (counter > 0) {
+          if (counter > 1) {
             return newCounter;
-          } else {
-            if (counter < 0) {
-              extraCounter.start(+new Date - Math.abs(newCounter) * 1000);
-              counter = 0;
-            } else {
-              extraCounter.start();
-            }
-
-            playAudio(intervalId);
-            stat.addStat(intervalId, counter);
-            clearInterval(timerId);
-
-            return counter;
           }
+
+          if (counter === 1 || counter === 0) {
+            extraCounter.start();
+          } else if (counter < 0) {
+            extraCounter.start(+new Date - Math.abs(newCounter) * 1000);
+          }
+
+          playAudio(intervalId);
+
+          stat.addStat(intervalId);
+          clearInterval(timerId);
+          handleNotification();
+          
+          return 0;
         });
 
       }, 1000);
     },
     finishPeriod: (intervalId) => {
-      update(counter => {
+      update(() => {
         clearInterval(timerId);
-
-        playAudio(intervalId);
-        stat.addStat(intervalId, counter);
+        stat.addStat(intervalId);
         currentInterval.set('');
 
         return 0;
       });
     },
-    resetPeriod: (intervalId) => {
+    resetPeriod: () => {
       update(() => {
         clearInterval(timerId);
 
@@ -67,12 +68,6 @@ function createCounter() {
         return 0;
       });
     },
-    mute: () => {
-      setMute(true);
-    },
-    unmute: () => {
-      setMute(false);
-    }
   };
 }
 
@@ -98,3 +93,15 @@ export const timerFormattedTime = derived(
     };
   }
 );
+
+function handleNotification() {
+  if (get(settings).showNotifications) {
+    const currentIntervalDuration = get(intervals)[get(currentInterval)].duration + _('minutes_short')
+    const title = `${get(currentActivityTitle)} ${_('notifications.is_end')} (${currentIntervalDuration})`;
+
+    new Notification(title, {
+      icon: '/favicon.png',
+      body: _('notifications.planned_period_ended'),
+    });
+  }
+};

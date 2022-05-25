@@ -1,9 +1,8 @@
 <script>
-  import { slide } from 'svelte/transition';
-
   export let active = false;
   export let title = false;
   export let small = false;
+  export let big = false;
   export let right = false;
   export let center = false;
 </script>
@@ -12,6 +11,7 @@
   class="title"
   class:active
   class:small
+  class:big
   class:right
   class:center
   on:click="{() => {
@@ -21,15 +21,13 @@
   {title}
 </div>
 {#if active}
-  <div transition:slide>
-    <slot />
-  </div>
+  <slot />
 {/if}
 
 <style lang="scss">
   .title {
-    transition: opacity 0.2s;
-    opacity: 0.5;
+    transition: opacity .2s;
+    opacity: .5;
     color: #aaa;
     position: relative;
     cursor: pointer;
@@ -45,7 +43,7 @@
       border-right: 1px solid #888;
       border-bottom: 1px solid #888;
       transform: rotate(45deg) translateY(-40%);
-      transition: transform 0.2s, right 0.2s;
+      transition: transform .2s, right .2s;
     }
     &.active {
       opacity: 1;
@@ -55,7 +53,7 @@
       }
     }
     &:hover {
-      opacity: 0.8;
+      opacity: .8;
     }
     &.small {
       &::before {
@@ -70,8 +68,22 @@
         }
       }
     }
+    &.big {
+      font-size: 18px;
+
+      &::before {
+        width: 10px;
+        height: 10px;
+        transform: rotate(45deg) translateY(-55%);
+      }
+      &.active {
+        &::before {
+          transform: rotate(-135deg) translate(-10%, 10%);
+        }
+      }
+    }
     &.right {
-      padding-right: 15px;
+      padding-right: 25px;
       text-align: right;
     }
     &.center {
