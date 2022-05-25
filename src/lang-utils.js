@@ -12,4 +12,4 @@ export const getDeepProperty = (obj, arrPath) => {
   return arrPath.reduce((result, item) => {
     return result[item];
   }, obj);
-}
+};

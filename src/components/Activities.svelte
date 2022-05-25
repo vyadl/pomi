@@ -34,7 +34,10 @@
   function edit(event) {
     const activityTitle = event.detail;
     const isSameActivityNameExist =
-      $activitiesArr.find(activity => (activity.title == activityTitle) && activity.id != $currentActivityId);
+      $activitiesArr
+        .find(activity => (
+          activity.title == activityTitle) && activity.id != $currentActivityId
+        );
 
     if (activityTitle && !isSameActivityNameExist) {
       editActivity($currentActivityId, activityTitle);
@@ -42,10 +45,6 @@
     } else {
       errormessage = 'This activity is already exist';
     }
-  }
-
-  function openAddingModal() {
-    isAddingModalActive = true;
   }
   
   function handleActivityClick(activity) {
@@ -62,7 +61,9 @@
   }
 
   function handleFocus(activity) {
-    $currentActivityId === activity.id ? (activityActiveId = '') : (activityActiveId = activity.id);
+    $currentActivityId === activity.id
+      ? (activityActiveId = '')
+      : (activityActiveId = activity.id);
   }
 </script>
 
@@ -105,7 +106,13 @@
     </div>
   {/each}
   <div class="button-wrapper">
-    <DefaultButton on:click="{openAddingModal}">+</DefaultButton>
+    <DefaultButton
+      on:click="{() => {
+        isAddingModalActive = true;
+      }}"
+    >
+      +
+    </DefaultButton>
   </div>
 </div>
 <TextModal

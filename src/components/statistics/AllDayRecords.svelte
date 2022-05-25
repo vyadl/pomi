@@ -45,11 +45,11 @@
     >
       <div class="record-main">
         <div class="activity-part">
-          {record.activityTitle} ({getHoursAndMinutesFromMinutes(record.duration)} {
+          {record.activityTitle} ({getHoursAndMinutesFromMinutes(record.duration)}{
             $settings.showPlannedDuration &&
             record.plannedDuration &&
             record.plannedDuration !== record.duration
-                ? `, ${record.plannedDuration} ${$_('planned')}` 
+                ? `, ${getHoursAndMinutesFromMinutes(record.plannedDuration)} ${$_('planned')}`
                 : ''})
           {record.intervalId !== 'main' ? $_('interval_labels.' + record.intervalId) : ''}
         </div>

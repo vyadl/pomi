@@ -36,14 +36,16 @@ function createStat() {
         const day = getDateString();
         const plannedDuration = get(intervals)[intervalId].duration;
 
+        if (!get(settings).subtractTimeWhenFinishing) {
+          endDate = +startDate + +plannedDuration * (1000 * 60);
+        }
+
         if (+endDate - +startDate > MAXIMUM_TIME_FOR_ONE_ACTIVITY) {
           endDate = new Date(+startDate + MAXIMUM_TIME_FOR_ONE_ACTIVITY);
           addMessage('tooBigActivity', _('validation.activity_more_than'), 10000);
         }
 
-        const finalDuration = get(settings).subtractTimeWhenFinishing
-          ? Math.ceil((+endDate - +startDate) / (1000 * 60))
-          : plannedDuration;
+        const finalDuration = Math.ceil((+endDate - +startDate) / (1000 * 60));
         const isActivityInOneDay = endDate.getDate() === startDate.getDate();
 
         lastDay = day;

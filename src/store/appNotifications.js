@@ -32,7 +32,14 @@ function createValidationMessages() {
 export const appNotifications = createValidationMessages();
 
 export const notificationsArr = derived(appNotifications, $appNotifications => {
-  return Object.entries($appNotifications);
+  return Object.keys($appNotifications).reduce((result, item) => {
+    result.push({
+      key: item,
+      message: $appNotifications[item],
+    })
+
+    return result;
+  }, []);
 })
 
 export const addMessage = appNotifications.addMessage;

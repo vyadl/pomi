@@ -37,7 +37,10 @@
   function checkActivities() {
     if ($stat[dayStatTitle]) {
       $stat[dayStatTitle].some(record => {
-        if ($activities[record.activityId] && record.activityTitle !== $activities[record.activityId]) {
+        if (
+          $activities[record.activityId] &&
+          record.activityTitle !== $activities[record.activityId]
+        ) {
           changeActivityTitlesForDay(dayStatTitle);
         }
       });
@@ -82,13 +85,23 @@
                 <div>{`${activityKey}`}</div>
                 <div class="activity-sum-inner">
                   <div>
-                    {$locale && getHoursAndMinutesFromMinutes(currentStat.global[activityKey].totalTime * $activityFactor)}
+                    { 
+                      $locale &&
+                      getHoursAndMinutesFromMinutes(
+                        currentStat.global[activityKey].totalTime * $activityFactor
+                      )
+                    }
                   </div>
                   <div class={$activityFactor ? 'pure' : ''}>
                     {#if $activityFactor}
                       {$_('pure_time')} -
                     {/if}
-                    {$locale && getHoursAndMinutesFromMinutes(currentStat.global[activityKey].totalTime)}
+                    {
+                      $locale &&
+                      getHoursAndMinutesFromMinutes(
+                        currentStat.global[activityKey].totalTime
+                      )
+                    }
                   </div>
                 </div>
               </div>
@@ -102,13 +115,23 @@
                 <div>{`${activityKey}`}</div>
                 <div class="activity-sum-inner">
                   <div>
-                    {$locale && getHoursAndMinutesFromMinutes(currentStat.all[activityKey].totalTime * $activityFactor)}
+                    { 
+                      $locale &&
+                      getHoursAndMinutesFromMinutes(
+                        currentStat.all[activityKey].totalTime * $activityFactor
+                      )
+                    }
                   </div>
                   <div class={$activityFactor ? 'pure' : ''}>
                     {#if $activityFactor}
                       {$_('pure_time')} -
                     {/if}
-                    {$locale && getHoursAndMinutesFromMinutes(currentStat.all[activityKey].totalTime)}
+                    {
+                      $locale &&
+                      getHoursAndMinutesFromMinutes(
+                        currentStat.all[activityKey].totalTime
+                      )
+                    }
                   </div>
                 </div>
               </div>

@@ -4,15 +4,15 @@
 </script>
 
 <div class="messages">
-  {#each $notificationsArr as message}
+  {#each $notificationsArr as notification}
     <div
       class="message"
       transition:fade
     >
-      {message[1]}
+      { notification.message }
       <div
         class="close"
-        on:click="{ removeMessage(message[0]) }"
+        on:click="{ removeMessage(notification.key) }"
       ></div>
     </div>  
   {/each}
