@@ -6,6 +6,11 @@
   export let autofocus = false;
   export let label = '';
   export let errormessage = '';
+  export let readonly = false;
+  export let required = false;
+  export let pure = false;
+  export let central = false;  
+  export let type = 'text';
   let inputEl;
 
 onMount(() => {
@@ -24,27 +29,47 @@ function onChange() {
 <div
   class="text-input"
   class:wide
+  class:pure
+  class:central
 >
-  {#if label}
-    <label class="label">
-      <div class="label-text">{label}</div>
+  <label class="label">
+    {#if label}
+      <div class="label-text">{label}{required ? '*' : ''}</div>
+    {/if}
+    {#if type === 'text'}
       <input
         type="text"
         class="input"
+        readonly="{readonly}"
+        required="{required}"
         bind:value
         on:input={onChange}
         bind:this={inputEl}
       />
-    </label>
-  {:else}
-    <input
-      type="text"
-      class="input"
-      bind:value
-      bind:this={inputEl}
-      on:input={onChange}
-    />
-  {/if}
+    {/if}
+    {#if type === 'time'}
+      <input
+        type="time"
+        class="input"
+        readonly="{readonly}"
+        required="{required}"
+        bind:value
+        on:input={onChange}
+        bind:this={inputEl}
+      />
+    {/if}
+    {#if type === 'date'}
+      <input
+        type="date"
+        class="input"
+        readonly="{readonly}"
+        required="{required}"
+        bind:value
+        on:input={onChange}
+        bind:this={inputEl}
+      />
+    {/if}
+  </label>
   {#if errormessage}
     <div class="error-message">{errormessage}</div>
   {/if}
@@ -52,6 +77,23 @@ function onChange() {
 
 <style lang="scss">
   .text-input {
+    &.wide {
+      .input {
+        width: 100%;
+      }
+    }
+    &.pure {
+      .input {
+        padding-left: 0;
+        border: none;
+      }
+    }
+    &.central {
+      text-align: center;
+      .input {
+        text-align: center;
+      }
+    }
     .label {
       display: block;
     }
@@ -65,7 +107,7 @@ function onChange() {
       background: none;
       border: none;
       border-bottom: 2px solid #444;
-      transition: border-color 0.2s;
+      transition: border-color .2s;
       color: #aaa;
       font-size: 14px;
       padding: 5px;
@@ -74,12 +116,12 @@ function onChange() {
       }
       &:focus {
         outline: none;
-        border-bottom-color: #888;
+        &:not(:read-only) {
+          border-bottom-color: #888;
+        }
       }
-    }
-    &.wide {
-      .input {
-        width: 100%;
+      &::-webkit-calendar-picker-indicator {
+        filter: invert(1);
       }
     }
     .error-message {

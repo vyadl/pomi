@@ -26,8 +26,8 @@
 
 <style lang="scss">
   .title {
-    transition: opacity 0.2s;
-    opacity: 0.5;
+    transition: opacity .2s;
+    opacity: .5;
     color: #aaa;
     position: relative;
     cursor: pointer;
@@ -43,7 +43,7 @@
       border-right: 1px solid #888;
       border-bottom: 1px solid #888;
       transform: rotate(45deg) translateY(-40%);
-      transition: transform 0.2s, right 0.2s;
+      transition: transform .2s, right .2s;
     }
     &.active {
       opacity: 1;
@@ -53,7 +53,7 @@
       }
     }
     &:hover {
-      opacity: 0.8;
+      opacity: .8;
     }
     &.small {
       &::before {
@@ -69,16 +69,16 @@
       }
     }
     &.big {
-      font-size: 16px;
+      font-size: 18px;
 
       &::before {
         width: 10px;
         height: 10px;
-        transform: rotate(45deg) translateY(-85%);
+        transform: rotate(45deg) translateY(-55%);
       }
       &.active {
         &::before {
-          transform: rotate(-135deg) translateY(10%);
+          transform: rotate(-135deg) translate(-10%, 10%);
         }
       }
     }

@@ -12,6 +12,7 @@
   import { setCurrentActivityId, activityOptionsForSelect, currentActivityId } from './store/activities.js';
   import DayStat from './components/statistics/DayStat.svelte';
   import Tabs from './components/Tabs.svelte';
+  import Messages from './components/Messages.svelte';
 
   initSettings();
 
@@ -80,6 +81,7 @@
       activeSettings = false;
     }}"
   />
+  <Messages />
 </main>
 
 <style lang="scss">
@@ -121,7 +123,7 @@
     position: fixed;
     bottom: 20px;
     right: 20px;
-    opacity: 0.8;
+    opacity: .8;
     transition: opacity .2s;
     cursor: pointer;
     &:hover {

@@ -147,7 +147,7 @@
         <div class="extra-counter-wrapper" transition:fade>
           <button
             class="button control reset"
-            data-title="{$_('tooltip_reset_extra')}"
+            title="{$_('tooltip_reset_extra')}"
             on:click="{resetExtraTime}"
           >
             {$_('reset')}
@@ -155,7 +155,7 @@
           <div class="extra-counter-buttons">
             <button
               class="button control"
-              data-title="{$_('tooltip_add_extra')}"
+              title="{$_('tooltip_add_extra')}"
               on:click="{addExtraTime}"
             >
             {$_('add_time')}
@@ -173,7 +173,7 @@
           <button
             class="button control reset"
             class:unactive="{!$counter}"
-            data-title="{$_('tooltip_reset')}"
+            title="{$_('tooltip_reset')}"
             on:click="{resetPeriod}"
           >
             {$_('reset')}
@@ -181,7 +181,7 @@
           <button
             class="button control"
             class:unactive="{!$counter}"
-            data-title="{
+            title="{
               ($settings.subtractTimeWhenFinishing
                 ? $_('tooltip_add')
                 : $_('tooltip_add_all'))
@@ -202,7 +202,7 @@
             class="button"
             class:active="{intervalId === $currentInterval}"
             class:blocked="{($counter || $extraCounter)}"
-            data-title="{`${options.duration}${$_('minutes_short')} - ${$_('interval_labels.' + intervalId)}`}"
+            title="{`${options.duration}${$_('minutes_short')} - ${$_('interval_labels.' + intervalId)}`}"
             on:click="{() => {
               startPeriod(intervalId, options);
             }}"
@@ -263,6 +263,7 @@
       min-height: 90px;
     }
     .button-wrapper {
+      position: relative;
       display: flex;
       flex-grow: 1;
       justify-content: center;

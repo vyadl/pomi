@@ -23,11 +23,11 @@
     padding: 10px 30px;
     background-color: transparent;
     color: #bbb;
-    opacity: 0.5;
+    opacity: .5;
     border: none;
     border-radius: 5px;
     cursor: pointer;
-    transition: 0.2s opacity, background-color 0.2s;
+    transition: .2s opacity, background-color .2s;
     text-align: center;
     &:hover,
     &:active {

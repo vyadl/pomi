@@ -5,6 +5,8 @@
   export let errormessage;
   export let active = false;
   export let customclose = false;
+  export let wide = true;
+  export let inputType = 'text';
   import { createEventDispatcher } from 'svelte';
   import DefaultButton from './../form-elements/DefaultButton.svelte';
   import TextInput from './../form-elements/TextInput.svelte';
@@ -42,9 +44,10 @@
       <form class="form" on:submit|preventDefault="{sendValue}">
         <div class="input-wrapper">
           <TextInput
+            type="{inputType}"
             bind:value
             autofocus
-            wide
+            wide="{wide}"
             bind:errormessage
           />
         </div>

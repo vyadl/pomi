@@ -5,7 +5,9 @@ import { intervals, currentInterval } from './intervals.js';
 import { settings } from './../store/settings.js';
 import { startedAt } from './counter.js';
 import { extraCounter } from './extraCounter.js';
+import { addMessage } from './appNotifications.js';
 import { _ } from './../lang-utils.js';
+const MAXIMUM_TIME_FOR_ONE_ACTIVITY = 1000 * 60 * 60 * 24; // 24 hours
 
 export const getDateString = (dateObj = new Date) => {
   return `${
@@ -25,10 +27,20 @@ function createStat() {
     subscribe,
     set,
     update,
-    addStat: (intervalId, startDate = new Date(get(startedAt)), endDate = new Date()) => {
+    addStat: (
+      intervalId,
+      startDate = new Date(get(startedAt)),
+      endDate = new Date()
+    ) => {
       update(stat => {
         const day = getDateString();
         const plannedDuration = get(intervals)[intervalId].duration;
+
+        if (+endDate - +startDate > MAXIMUM_TIME_FOR_ONE_ACTIVITY) {
+          endDate = new Date(+startDate + MAXIMUM_TIME_FOR_ONE_ACTIVITY);
+          addMessage('tooBigActivity', _('validation.activity_more_than'), 10000);
+        }
+
         const finalDuration = get(settings).subtractTimeWhenFinishing
           ? Math.ceil((+endDate - +startDate) / (1000 * 60))
           : plannedDuration;
@@ -52,7 +64,6 @@ function createStat() {
             comment: get(comment),
           });
         } else {
-
           const firstDay = startDate;
           const firstDayStartedAt = +startDate;
           const nextDayFinishedAt = +endDate;
@@ -112,7 +123,9 @@ function createStat() {
     addTime: () => {
       extraCounter.finish();
       currentInterval.set('');
-      const lastRecordCopied = {...get(stat)[lastDay][get(stat)[lastDay].length - 1]};
+
+      const lastDayStat = get(stat)[lastDay];
+      const lastRecordCopied = {...lastDayStat[lastDayStat.length - 1]};
 
       stat.removeStat(lastDay, lastRecordCopied.startedAt);
 
@@ -120,6 +133,14 @@ function createStat() {
         lastRecordCopied.intervalId,
         new Date(lastRecordCopied.startedAt),
       );
+    },
+    addDay: (day) => {
+      update(stat => {
+        stat[day] = [];
+
+        return stat;
+      });
+      localStorageUpdateStat();
     },
     changeRecord: (dayTitle, recordIndex, record, withUpdatingLocal = true) => {
       update(stat => {
@@ -135,6 +156,15 @@ function createStat() {
         localStorageUpdateStat();
       }
     },
+    addRecordManually: (dayTitle, record) => {
+      update(stat => {
+        stat[dayTitle].push({...record});
+
+        return stat;
+      });
+
+      localStorageUpdateStat();
+    }
   };
 }
 
@@ -150,6 +180,7 @@ export const localStorageUpdateStat = function() {
   localStorage.setItem('stat', JSON.stringify(get(stat)));
 };
 
+
 export const statArr = derived(stat, $stat => {
   return Object.keys($stat).reduce((result, day) => {
     result.push({
@@ -158,7 +189,42 @@ export const statArr = derived(stat, $stat => {
     });
 
     return result;
-  }, []).reverse();
+  }, []).sort((a, b) => {
+    return parseInt(b.name.split('.').reverse().join(''))
+      - parseInt(a.name.split('.').reverse().join(''));
+  });
+});
+
+export const statArrByMonth = derived(statArr, $statArr => {
+  return $statArr.reduce((result, day) => {
+    const monthYear = day.name.slice(3);
+    
+
+    if (!(result[result.length - 1]?.title === monthYear)) {
+      result.push({
+        title: monthYear,
+        list: [],
+      });
+    } 
+
+    result[result.length - 1].list.push(day);
+
+    return result;
+  }, []);
+});
+
+export const dayRanges = derived(stat, $stat => {
+  return (dayTitle, excludeStartedAt = null) => {
+    return $stat[dayTitle]?.reduce((result, record) => {
+      if (excludeStartedAt && record.startedAt === excludeStartedAt) {
+        return result;
+      }
+
+      result.push([record.startedAt, record.finishedAt]);
+
+      return result;
+    }, []);
+  };
 });
 
 export const activityDivider = writable(' - ');
@@ -226,14 +292,6 @@ export const statTotal = derived(statArr, $statArr => {
   }, {});
 });
 
-export const makeHoursAndMinutes = (allMinutes) => {
-  const hours = Math.floor(allMinutes / 60);
-  const minutes = Math.floor(allMinutes % 60);
-
-  return `${hours ? hours + `${_('hours_short')}${minutes ? ' ' : ''}` : ''}${
-    minutes ? minutes + _('minutes_short') : ''
-  }`;
-}
 
 export const todayStat = derived(stat, $stat => {
   const lastDay = getDateString();

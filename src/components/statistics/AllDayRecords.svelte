@@ -1,31 +1,37 @@
 <script>
   import { _ } from 'svelte-i18n';
-  import { stat } from './../../store/statistics.js';
-  import { makeAbsoluteTimeString } from './../../utils.js';
+  import { makeAbsoluteTimeString, getHoursAndMinutesFromMinutes } from './../../utils.js';
   import { settings } from './../../store/settings.js';
-  import EditRecordModal from './../modals/EditRecordModal.svelte';
+  import HandleRecordModal from './../modals/HandleRecordModal.svelte';
+  import DefaultButton from './../form-elements/DefaultButton.svelte';
 
   export let dayStat = [];
   export let date = '';
   
   let currentRecord = null;
-  let nextRecord = null;
   let currentRecordIndex = null;
   let dayTitle = null;
+  let isHandleRecordActive = false;
+  let isAdding = false;
   
   function openEditModal(record, recordIndex) {
     currentRecord = JSON.parse(JSON.stringify(record));
     currentRecordIndex = recordIndex;
     dayTitle = date;
-    nextRecord = dayStat[recordIndex + 1]
-      ? JSON.parse(JSON.stringify(dayStat[recordIndex + 1]))
-      : null;
+    isAdding = false;
+    isHandleRecordActive = true;
+  }
+
+  function openAddModal() {
+    dayTitle = date;
+    isAdding = true;
+    isHandleRecordActive = true;
   }
 
   function resetEditing() {
+    isHandleRecordActive = false;
     currentRecordIndex = null;
     dayTitle = null;
-    nextRecord = null;
     currentRecord = null;
   }
 </script>
@@ -39,9 +45,10 @@
     >
       <div class="record-main">
         <div class="activity-part">
-          {record.activityTitle} ({record.duration} {$_('min')}{
-            $settings.showPlannedDuration
-              && record.plannedDuration !== record.duration
+          {record.activityTitle} ({getHoursAndMinutesFromMinutes(record.duration)} {
+            $settings.showPlannedDuration &&
+            record.plannedDuration &&
+            record.plannedDuration !== record.duration
                 ? `, ${record.plannedDuration} ${$_('planned')}` 
                 : ''})
           {record.intervalId !== 'main' ? $_('interval_labels.' + record.intervalId) : ''}
@@ -70,11 +77,19 @@
       {/if}
     </div>
   {/each}
-  <EditRecordModal
-    bind:record="{currentRecord}"
+  <div class="add-record">
+    <DefaultButton
+      on:click="{ openAddModal }"
+    >
+      {$_('add_record')}
+    </DefaultButton>
+  </div>
+  <HandleRecordModal
+    bind:isAdding="{isAdding}"
+    bind:active="{isHandleRecordActive}"
+    bind:editingRecord="{currentRecord}"
     bind:recordIndex="{currentRecordIndex}"
     bind:dayTitle="{dayTitle}"
-    bind:nextRecord="{nextRecord}"
     on:close={resetEditing}
   />
 </div>
@@ -92,7 +107,7 @@
       color: #555;
     }
     &:hover {
-      background-color: rgba(255, 255, 255, 0.03);
+      background-color: rgba(255, 255, 255, .03);
     }
   }
 
@@ -113,6 +128,11 @@
 
   .time {
     text-align: right;
+  }
+
+  .add-record {
+    text-align: center;
+    font-size: 12px;
   }
 }
 </style>

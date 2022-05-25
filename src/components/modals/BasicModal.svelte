@@ -56,7 +56,7 @@
     right: 0;
     z-index: 5;
     overflow: auto;
-    background-color: rgba(0, 0, 0, 0.96);
+    background-color: rgba(0, 0, 0, .96);
   }
   .inner {
     padding: 40px 0 60px;
@@ -75,9 +75,9 @@
     height: 30px;
     user-select: none;
     color: #aaa;
-    transition: opacity 0.2s;
+    transition: opacity .2s;
     cursor: pointer;
-    opacity: 0.6;
+    opacity: .6;
     &::before,
     &::after {
       content: '';

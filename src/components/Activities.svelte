@@ -145,8 +145,8 @@
   }
 
   .remove {
-    opacity: 0.5;
-    transition: 0.2 opacity;
+    opacity: .5;
+    transition: .2 opacity;
     cursor: pointer;
     position: absolute;
     left: 50%;
@@ -154,7 +154,7 @@
     font-size: 10px;
     transform: translateX(-50%);
     color: #ccc;
-    transition: 0.8 opacity;
+    transition: .8 opacity;
     &:hover {
       opacity: 1;
     }

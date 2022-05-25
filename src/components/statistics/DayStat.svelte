@@ -2,7 +2,6 @@
   import { _, locale } from 'svelte-i18n';
   import {
     initStat,
-    makeHoursAndMinutes,
     statTotal,
     stat,
     getDateString,
@@ -13,6 +12,7 @@
   import { changeActivityTitlesForDay } from './../../store/statistics';
   import ExpandBlock from './../ExpandBlock.svelte';
   import AllDayRecords from './AllDayRecords.svelte';
+  import { getHoursAndMinutesFromMinutes } from './../../utils.js';
 
   export let isToday = false;
   export let expanded = false;
@@ -25,12 +25,12 @@
   $: formattedTimeWithFactor = $settings &&
     $locale &&
     currentStat?.sum?.activities &&
-    makeHoursAndMinutes(currentStat.sum.activities * $activityFactor);
+    getHoursAndMinutesFromMinutes(currentStat.sum.activities * $activityFactor);
 
   $: formattedTime = $settings &&
     $locale &&
     currentStat?.sum?.activities &&
-    makeHoursAndMinutes(currentStat.sum.activities);
+    getHoursAndMinutesFromMinutes(currentStat.sum.activities);
 
   $: $activities, checkActivities(), currentStat = $statTotal[dayStatTitle];
 
@@ -82,13 +82,13 @@
                 <div>{`${activityKey}`}</div>
                 <div class="activity-sum-inner">
                   <div>
-                    {$locale && makeHoursAndMinutes(currentStat.global[activityKey].totalTime * $activityFactor)}
+                    {$locale && getHoursAndMinutesFromMinutes(currentStat.global[activityKey].totalTime * $activityFactor)}
                   </div>
                   <div class={$activityFactor ? 'pure' : ''}>
                     {#if $activityFactor}
                       {$_('pure_time')} -
                     {/if}
-                    {$locale && makeHoursAndMinutes(currentStat.global[activityKey].totalTime)}
+                    {$locale && getHoursAndMinutesFromMinutes(currentStat.global[activityKey].totalTime)}
                   </div>
                 </div>
               </div>
@@ -102,13 +102,13 @@
                 <div>{`${activityKey}`}</div>
                 <div class="activity-sum-inner">
                   <div>
-                    {$locale && makeHoursAndMinutes(currentStat.all[activityKey].totalTime * $activityFactor)}
+                    {$locale && getHoursAndMinutesFromMinutes(currentStat.all[activityKey].totalTime * $activityFactor)}
                   </div>
                   <div class={$activityFactor ? 'pure' : ''}>
                     {#if $activityFactor}
                       {$_('pure_time')} -
                     {/if}
-                    {$locale && makeHoursAndMinutes(currentStat.all[activityKey].totalTime)}
+                    {$locale && getHoursAndMinutesFromMinutes(currentStat.all[activityKey].totalTime)}
                   </div>
                 </div>
               </div>

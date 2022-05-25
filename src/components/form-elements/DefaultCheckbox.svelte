@@ -83,7 +83,7 @@
       border-radius: 50%;
       left: 3px;
       top: 2px;
-      transition: 0.3s;
+      transition: .3s;
     }
     &:checked {
       background-color: #777;

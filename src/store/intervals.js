@@ -78,7 +78,7 @@ export const initIntervals = function() {
       isActive: 1,
       sound: {
         id: defaultIdForSound,
-        volume: 0.3,
+        volume: .3,
       },
     },
     break: {
@@ -88,7 +88,7 @@ export const initIntervals = function() {
       isActive: 1,
       sound: {
         id: defaultIdForSound,
-        volume: 0.5,
+        volume: .5,
       },
     },
     longBreak: {

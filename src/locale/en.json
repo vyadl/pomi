@@ -50,10 +50,16 @@
   "save": "Save",
   "type": "Type",
   "current_activity": "Current activity",
+  "start_time": "Start time",
+  "end_time": "End time",
+  "add_record": "Add record manually",
+  "add_day": "Add day manually",
+  "day": "Day",
+  "not_correct": "Not correct",
   "languages": {
     "en": "English",
-    "ru": "Русский",
-    "ua": "Українська"
+    "ua": "Українська",
+    "ru": "Русский"
   },
   "interval_labels": {
     "activity": "Activity",
@@ -140,13 +146,30 @@
   },
   "validation": {
     "deprecated_activity": "This activity is removed. You can keep it like that or choose the existed one",
-    "number_is_required": "Number is rewuired",
+    "number_is_required": "Number is required",
     "duration_intersect": "That duration make this record intersect with the next one",
     "duration_next_day": "There is no possibility to set end time in next day",
-    "duration_more_than_current": "You couldn't set time more than current time"
+    "duration_more_than_current": "You couldn't set time more than current time",
+    "activity_more_than": "The activity couldn't be saved with the duration more than 24 hours. It is reduced to 24 hours and saved.",
+    "intersect_error": "The period with entered time intersect existed records",
+    "duration_negative_error": "End time has to be after start time"
   },
   "modals": {
     "edit_record": "Edit record",
     "delete_record": "Delete record"
+  },
+  "months": {
+    "1": "January",
+    "2": "February",
+    "3": "March",
+    "4": "April",
+    "5": "May",
+    "6": "June",
+    "7": "July",
+    "8": "August",
+    "9": "September",
+    "10": "October",
+    "11": "November",
+    "12": "December"
   }
 }

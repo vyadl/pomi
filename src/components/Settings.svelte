@@ -23,6 +23,11 @@
   export let active = false;
   let isExpand = false;
 
+  $: sortedLocales = $locales.sort((a, b) => {
+    if (b === 'ru') {
+      return -1;
+    }
+  });
   let localSettings = JSON.parse(JSON.stringify($settings));
   let showNotificationWarning = false;
 
@@ -135,7 +140,7 @@
                 type="range"
                 min="0"
                 max="1"
-                step="0.01"
+                step=".01"
                 class="settings-range"
                 value="{options.sound.volume}"
                 on:change="{event => {
@@ -186,7 +191,7 @@
     >
       <div class="languages">
         <div class="language-buttons">
-          {#each $locales as lang}
+          {#each sortedLocales as lang}
             <DefaultButton
               on:click="{() => {
                 changeLanguage(lang);
@@ -395,9 +400,9 @@
             </div>
             <input
                 type="range"
-                min="0.1"
+                min=".1"
                 max="3"
-                step="0.05"
+                step=".05"
                 class="settings-range"
                 value="{localSettings.customActivityFactor}"
                 on:input="{event => {
@@ -490,12 +495,12 @@
       width: 100%;
       height: 5px;
       cursor: pointer;
-      animate: 0.2s;
+      animate: .2s;
       box-shadow: 0px 0px 0px #999;
       background-color: #999;
       border-radius: 1px;
       border: 0px solid #999;
-      transition: background-color 0.2s;
+      transition: background-color .2s;
     }
     &::-webkit-slider-thumb {
       box-shadow: 0px 0px 0px #000;
@@ -518,7 +523,7 @@
     background: none;
     border: none;
     border-bottom: 2px solid #666;
-    transition: border-color 0.2s;
+    transition: border-color .2s;
     color: #999;
     font-size: 12px;
     width: 100%;

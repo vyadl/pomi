@@ -10,6 +10,7 @@
   export let nomargin = false;
   export let right = false;
   export let fontinherit = false;
+  export let required = false;
 
 const dispatch = createEventDispatcher();
 
@@ -26,33 +27,21 @@ function onChange() {
   class:right
   class:fontinherit
 >
-  {#if label}
-    <label class="label">
-      <div class="label-text">{label}</div>
-      <select
-        class="select"
-        bind:value
-        on:change={onChange}
-      >
-        {#each options as option}
-          <option value="{option.value}">{option.text}</option>
-        {/each}
-      </select>
-    </label>
-  {:else}
-  <select
-    class="select"
-    bind:value
-    on:change={onChange}
-  >
-    {#each options as option}
-      <option value="{option.value}">{option.text}</option>
-    {/each}
-  </select>
-  {/if}
-  {#if errormessage}
-    <div class="error-message">{errormessage}</div>
-  {/if}
+  <label class="label">
+    {#if label}
+      <div class="label-text">{label}{required ? '*' : ''}</div>
+    {/if}
+    <select
+      class="select"
+      required="{required}"
+      bind:value
+      on:change={onChange}
+    >
+      {#each options as option}
+        <option value="{option.value}">{option.text}</option>
+      {/each}
+    </select>
+  </label>
 </div>
 
 <style lang="scss">
