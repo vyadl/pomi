@@ -3,7 +3,7 @@
   import { slide } from 'svelte/transition';
   import { _ } from 'svelte-i18n';
   import { comment } from './../store/counter.js';
-  import TextInput from './TextInput.svelte';
+  import TextInput from './form-elements/TextInput.svelte';
 
   export let active = false;
   export let visible = false;
@@ -40,7 +40,7 @@
     margin-bottom: 10px;
     pointer-events: none;
     opacity: 0;
-    transition: opacity 0.2s;
+    transition: opacity .2s;
     &.visible {
       pointer-events: all;
       opacity: 1;
@@ -48,9 +48,9 @@
   }
   .control {
     cursor: pointer;
-    opacity: 0.8;
+    opacity: .8;
     color: #444;
-    transition: opacity 0.2s;
+    transition: opacity .2s;
     &:hover,
     &.active {
       opacity: 1;

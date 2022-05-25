@@ -3,6 +3,7 @@
   import { fade } from 'svelte/transition';
 
   export let active = false;
+  export let title = '';
 
   const dispatch = createEventDispatcher();
 
@@ -25,8 +26,14 @@
 </svelte:head>
 
 {#if active}
-  <div class="modal" transition:fade>
+  <div
+    class="modal"
+    transition:fade={{ duration: 200 }}
+  >
     <div class="inner">
+      {#if title}
+        <h1 class="title">{title}</h1>
+      {/if}
       <slot />
       <div
         class="close"
@@ -40,20 +47,26 @@
 
 <style lang="scss">
   .modal {
-    position: absolute;
+    position: fixed;
     width: 100vw;
     height: 100vh;
     top: 0;
     left: 0;
+    bottom: 0;
+    right: 0;
     z-index: 5;
     overflow: auto;
-    background-color: rgba(0, 0, 0, 0.96);
+    background-color: rgba(0, 0, 0, .96);
   }
   .inner {
-    display: flex;
     padding: 40px 0 60px;
   }
-
+  .title {
+    font-size: 18px;
+    color: #eee;
+    margin-bottom: 30px;
+    text-align: center;
+  }
   .close {
     position: absolute;
     top: 30px;
@@ -62,9 +75,9 @@
     height: 30px;
     user-select: none;
     color: #aaa;
-    transition: opacity 0.2s;
+    transition: opacity .2s;
     cursor: pointer;
-    opacity: 0.6;
+    opacity: .6;
     &::before,
     &::after {
       content: '';

@@ -9,17 +9,14 @@ function createIntervals() {
   return {
     subscribe,
     update,
-    changeDuration: (intervalId, duration) => {
+    changeIntervalProp(intervalId, prop, value) {
       update(intervals => {
-        const newIntervals = JSON.parse(JSON.stringify(intervals));
+        intervals[intervalId][prop] = value;
 
-        newIntervals[intervalId].duration = duration;
+        localStorageUpdateIntervals(intervals);
 
-        apiUpdateIntervals(newIntervals);
-        return newIntervals;
+        return intervals;
       });
-
-      updateFactor();
     },
     changeSound: (intervalId, opts) => {
       update(intervals => {
@@ -32,14 +29,15 @@ function createIntervals() {
 
       if (typeof opts.id !== 'undefined') {
         audios[intervalId].src = `sounds/${get(sounds)[opts.id].fileName}`;
+        audios[intervalId].load();
       } else if (typeof opts.volume !== 'undefined') {
         audios[intervalId].volume = +opts.volume;
       }
 
-        apiUpdateIntervals(newIntervals);
+        localStorageUpdateIntervals(newIntervals);
         return newIntervals;
       });
-    }
+    },
   };
 };
 
@@ -51,10 +49,13 @@ export const intervalsArr = derived(
   intervals,
   $intervals => Object.entries($intervals)
 );
+export const activeIntervals = derived(
+  intervalsArr,
+  $intervalsArr => $intervalsArr.filter(interval => interval[1].isActive)
+);
 
 export const initIntervals = function() {
   const localIntervals = localStorage.getItem('intervals');
-  const localMuted = !!+localStorage.getItem('muted');
   let defaultIdForSound;
 
   if (!localIntervals) {
@@ -73,27 +74,30 @@ export const initIntervals = function() {
     main: {
       label: 'interval_labels.activity',
       duration: 25,
+      title: '',
+      isActive: 1,
       sound: {
         id: defaultIdForSound,
-        muted: localMuted,
-        volume: 0.3,
+        volume: .3,
       },
     },
     break: {
       label: 'interval_labels.break',
       duration: 5,
+      title: '',
+      isActive: 1,
       sound: {
         id: defaultIdForSound,
-        muted: localMuted,
-        volume: 0.5,
+        volume: .5,
       },
     },
     longBreak: {
       label: 'interval_labels.long_break',
       duration: 15,
+      title: '',
+      isActive: 1,
       sound: {
         id: defaultIdForSound,
-        muted: localMuted,
         volume: 1,
       },
     },
@@ -104,8 +108,10 @@ export const initIntervals = function() {
   ['main', 'break', 'longBreak'].forEach(intervalId => {
     audios[intervalId] = new Audio(`sounds/${get(sounds)[get(intervals)[intervalId].sound.id].fileName}`);
     audios[intervalId].volume = parseFloat(get(intervals)[intervalId].sound.volume);
-    audios[intervalId].muted = get(intervals)[intervalId].sound.muted;
+    audios[intervalId].load();
   });
+
+  localStorageUpdateIntervals(get(intervals));
 };
 
 export const updateFactor = () => {
@@ -137,7 +143,7 @@ export const updateFactor = () => {
   });
 }
 
-export const apiUpdateIntervals = function(obj) {
+export const localStorageUpdateIntervals = function(obj) {
   localStorage.setItem('intervals', JSON.stringify(obj));
 };
 
@@ -146,14 +152,9 @@ export const playAudio = function(intervalId) {
   audios[intervalId].play();
 };
 
-export const setMute = function(isMute) {
+export const stopAudio = function() {
   ['main', 'break', 'longBreak'].forEach(intervalId => {
-    audios[intervalId].muted = isMute;
+    audios[intervalId].pause();
+    audios[intervalId].currentTime = 0;
   });
-
-  apiUpdateMuting(isMute);
-};
-
-const apiUpdateMuting = (isMuted) => {
-  localStorage.setItem('muted', +isMuted);
-};
+}
