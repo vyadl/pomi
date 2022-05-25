@@ -23,11 +23,6 @@
   export let active = false;
   let isExpand = false;
 
-  $: sortedLocales = $locales.sort((a, b) => {
-    if (b === 'ru') {
-      return -1;
-    }
-  });
   let localSettings = JSON.parse(JSON.stringify($settings));
   let showNotificationWarning = false;
 
@@ -191,7 +186,7 @@
     >
       <div class="languages">
         <div class="language-buttons">
-          {#each sortedLocales as lang}
+          {#each $locales as lang}
             <DefaultButton
               on:click="{() => {
                 changeLanguage(lang);

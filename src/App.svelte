@@ -17,8 +17,8 @@
   initSettings();
 
   addMessages('en', en);
-  addMessages('ru', ru);
   addMessages('ua', ua);
+  addMessages('ru', ru);
 
   init({
     fallbackLocale: 'en',
