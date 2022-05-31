@@ -42,6 +42,7 @@
       class="record"
       class:activity="{record.intervalId === 'main'}"
       on:click="{() => { openEditModal(record, recordIndex) }}"
+      title="edit"
     >
       <div class="record-main">
         <div class="activity-part">
@@ -99,15 +100,21 @@
 .all-day-records {
   .record {
     padding: 4px 0;
-    transition: background-color .2s;
+    transition: background-color .2s, transform .2s .03s;
     position: relative;
-    font-size: 12px;
+    font-size: 11px;
     cursor: pointer;
+    border: 1px solid var(--color-main-bg-softest);
+    padding: 5px 10px;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    background-color: var(--color-main-bg-soft);
     &.activity {
-      color: #555;
+      color: var(--color-text-softer);
     }
     &:hover {
-      background-color: rgba(255, 255, 255, .03);
+      background-color: var(--color-main-bg-soft-2);
+      transform: scale(1.02);
     }
   }
 
@@ -132,7 +139,8 @@
 
   .add-record {
     text-align: center;
-    font-size: 12px;
+    padding: 15px;
+    font-size: 14px;
   }
 }
 </style>

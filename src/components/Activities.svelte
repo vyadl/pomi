@@ -95,7 +95,7 @@
       {#if activityActiveId === activity.id && activity.id !== $currentActivityId}
         <div
           class="remove"
-          transition:fly="{{ y: -50, duration: 400 }}"
+          transition:fly="{{ y: -10, duration: 200 }}"
           on:click="{() => {
             removeActivity(activity.id);
           }}"
@@ -144,6 +144,7 @@
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
+    padding-bottom: 50px;
   }
 
   .button-wrapper {
@@ -160,7 +161,7 @@
     top: 2px;
     font-size: 10px;
     transform: translateX(-50%);
-    color: #ccc;
+    color: var(--color-text-soft);
     transition: .8 opacity;
     &:hover {
       opacity: 1;

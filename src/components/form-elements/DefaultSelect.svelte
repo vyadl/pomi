@@ -55,12 +55,13 @@ function onChange() {
       display: block;
       margin-bottom: 7px;
       font-size: 12px;
-      color: #888;
+      color: var(--color-text-softest);
     }
     .select {
       background: none;
       border: none;
-      border-bottom: 2px solid #444;
+      border-bottom: 2px solid var(--color-main-bg-softest);
+      border-radius: 0;
       transition: border-color .2s, color .2s;
       color: var(--color-text-softest);
       letter-spacing: .5px;
@@ -72,7 +73,7 @@ function onChange() {
       }
       &:focus {
         outline: none;
-        border-bottom-color: #888;
+        border-bottom-color: var(--color-text-softer);
       }
       &:hover {
         color: var(--color-text-softer);
@@ -108,7 +109,7 @@ function onChange() {
     .error-message {
       font-size: 12px;
       padding-left: 5px;
-      color: #999;
+      color: var(--color-text-softest);
     }
   }
 </style>

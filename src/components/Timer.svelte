@@ -233,14 +233,14 @@
       width: 100%;
     }
     .cifers {
-      color: #eee;
+      color: var(--color-text);
       font: 70px Monaco, 'Courier New', monospace;
       letter-spacing: 5px;
       display: flex;
       justify-content: center;
       transition: color 1s;
       &.summed {
-        color: #222;
+        color: var(--color-text-softest-2);
       }
     }
     .cifers-desc {
@@ -250,7 +250,7 @@
       top: 50px;
       font-size: 14px;
       letter-spacing: 1px;
-      color: #333;
+      color: var(--color-main-bg-soft);
     }
     .cifers-divider {
       position: relative;
@@ -274,7 +274,7 @@
     .button {
       padding: 10px 15px;
       background-color: transparent;
-      color: #bbb;
+      color: var(--color-text-soft);
       opacity: .7;
       border: none;
       border-radius: 5px;
@@ -285,14 +285,14 @@
       transition: opacity .1s, transform .1s;
       word-wrap: break-word;
       &.control {
-        color: #aaa;
+        color: var(--color-text-softer);
         font-size: 16px;
         min-width: 100px;
         text-align: center;
       }
       &.reset {
         font-size: 11px;
-        color: #777;
+        color: var(--color-text-softest);
         text-decoration: underline;
         margin-right: 20px;
         padding-left: 0;
@@ -351,7 +351,7 @@
       width: 80px;
 
       text-align: right;
-      color: #aaa;
+      color: var(--color-text-soft);
     }
     .extra-counter-desc {
       position: absolute;
@@ -362,7 +362,7 @@
       font-size: 12px;
       letter-spacing: 1px;
       margin-bottom: 5px;
-      color: #333;
+      color: var(--color-text-softest-2);
     }
   }
 </style>

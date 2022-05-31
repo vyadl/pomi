@@ -49,7 +49,7 @@
   .control {
     cursor: pointer;
     opacity: .8;
-    color: #444;
+    color: var(--color-text-softer);
     transition: opacity .2s;
     &:hover,
     &.active {

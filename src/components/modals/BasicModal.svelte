@@ -54,16 +54,16 @@
     left: 0;
     bottom: 0;
     right: 0;
-    z-index: 5;
+    z-index: 100;
     overflow: auto;
-    background-color: rgba(0, 0, 0, .96);
+    background-color: var(--color-main-bg-mask);
   }
   .inner {
     padding: 40px 0 60px;
   }
   .title {
     font-size: 18px;
-    color: #eee;
+    color: var(--color-text);
     margin-bottom: 30px;
     text-align: center;
   }
@@ -74,7 +74,7 @@
     width: 30px;
     height: 30px;
     user-select: none;
-    color: #aaa;
+    color: var(--color-text-softer);
     transition: opacity .2s;
     cursor: pointer;
     opacity: .6;
@@ -88,7 +88,7 @@
       top: 50%;
       transform: translate(-50%, -50%) rotate(45deg);
       rotate: 45deg;
-      background-color: #fff;
+      background-color: var(--color-text);
     }
     &::after {
       transform: translate(-50%, -50%) rotate(-45deg);

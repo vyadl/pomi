@@ -15,11 +15,11 @@ const defaultSettings = {
   customActivityFactor: 1,
   showActivityNearTimer: 1,
   showNotifications: 0,
-  showDetailsOnMainScreen: 1,
   showMainTabs: 1,
   showComment: 1,
   showCurrentPeriodAboveTimer: 0,
   showActivityInTopCorner: 0,
+  theme: 'dark',
   // main screen
   showCurrentActivityOnMainScreen: 1,
   showCurrentActivityLabelOnMainScreen: 1,

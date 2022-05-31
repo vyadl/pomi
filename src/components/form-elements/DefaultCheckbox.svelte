@@ -3,7 +3,7 @@
 
   export let checked;
   export let label;
-  export let text;
+  export let text = '';
   export let right;
   export let disabled;
 
@@ -40,9 +40,10 @@
     position: relative;
     padding-left: 45px;
     font-size: 14px;
-    color: #bbb;
+    color: var(--color-text-softer);
     cursor: pointer;
     min-height: 20px;
+    word-break: break-all;
     &.right {
       padding-right: 45px;
       padding-left: 0;
@@ -63,9 +64,8 @@
     height: 20px;
     width: 35px;
     margin-bottom: 0;
-    background-color: #333;
+    background-color: var(--color-main-bg-softer);
     border-radius: 50px;
-    border: 2px solid #111;
     transition: .2s;
     border: none;
     &.unwrapped {
@@ -79,16 +79,16 @@
       position: absolute;
       height: 16px;
       width: 16px;
-      background-color: #555;
+      background-color: var(--color-main-bg-softest);
       border-radius: 50%;
       left: 3px;
       top: 2px;
       transition: .3s;
     }
     &:checked {
-      background-color: #777;
+      background-color: var(--color-main-bg-softer);
       &::before {
-        background-color: #ccc;
+        background-color: var(--color-text-soft);
         left: 15px;
       }
     }

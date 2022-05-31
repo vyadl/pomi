@@ -44,7 +44,7 @@
       width: 10px;
       height: 10px;
       user-select: none;
-      color: #aaa;
+      color: var(--color-text-softer);
       transition: opacity .2s;
       cursor: pointer;
       opacity: .6;
@@ -58,7 +58,7 @@
         top: 50%;
         transform: translate(-50%, -50%) rotate(45deg);
         rotate: 45deg;
-        background-color: #fff;
+        background-color: var(--color-text);
       }
       &::after {
         transform: translate(-50%, -50%) rotate(-45deg);

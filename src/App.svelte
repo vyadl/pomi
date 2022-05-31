@@ -16,10 +16,13 @@
   } from './store/activities.js';
   import DayStat from './components/statistics/DayStat.svelte';
   import Tabs from './components/Tabs.svelte';
+  import Activities from './components/Activities.svelte';
+  import Statistics from './components/statistics/Statistics.svelte';
   import Messages from './components/Messages.svelte';
 
   initSettings();
 
+  document.body.classList.add($settings.theme);
   addMessages('en', en);
   addMessages('ua', ua);
   addMessages('ru', ru);
@@ -30,6 +33,19 @@
   });
 
   let activeSettings = false;
+
+  let mainTabs = [
+    {
+      id: 'activities',
+      title: $_('activities'),
+      component: Activities,
+    },
+    {
+      id: 'statistics',
+      title: $_('history'),
+      component: Statistics,
+    },
+  ];
 </script>
 
 <svelte:head>
@@ -73,10 +89,14 @@
   <section class="central-wrapper">
     <Timer />
     {#if $settings.showActivityNearTimer}
-      <DayStat isToday />
+      <div class="day-stat-wrapper">
+        <DayStat isToday />
+      </div>
     {/if}
     {#if $settings.showMainTabs}
-      <Tabs />
+      <div class="day-stat-wrapper">
+        <Tabs tabs="{mainTabs}" />
+      </div>
     {/if}
   </section>
   <Settings
@@ -96,6 +116,9 @@
     min-height: 100vh;
     padding: 0;
     margin: 0;
+  }
+  .day-stat-wrapper {
+    margin-bottom: 50px;
   }
 
   .current-activity,
