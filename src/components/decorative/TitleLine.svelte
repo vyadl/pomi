@@ -1,7 +1,7 @@
 <script>
-  export let title = '';
   export let wider = false;
   export let bigFont = false;
+  export let title = '';
 </script>
 
 <div
@@ -19,7 +19,6 @@
     position: relative;
     border-bottom: 2px solid var(--color-border-hard);
     margin-bottom: 25px;
-
     &.wider {
       margin-right: -15px;
       margin-left: -15px;
@@ -31,7 +30,6 @@
         padding: 5px 17px 5px 12px;
       }
     }
-
     .title {
       position: absolute;
       padding: 5px 12px;

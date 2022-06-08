@@ -2,44 +2,58 @@
   export let active = false;
   export let small = false;
   export let big = false;
-  export let vertical = false;
   export let bordered = false;
   export let activeBordered = false;
-  export let type = 'button';
+  export let activeBigger = false;
   export let alignLeft = false;
   export let alignRight = false;
-  export let tab = false;
-  export let pure = false;
+  export let tabLike = false;
+  export let onlyText = false;
+  export let underline = false;
+  export let dimmed = false;
+  export let disabled = false;
+  export let title = '';
+  export let type = 'button';
 </script>
 
 <button
-  class="button"
+  class="custom-button"
   class:active
   class:small
   class:big
-  class:vertical
   class:bordered
-  class:tab
-  class:pure
+  class:underline
+  class:dimmed
+  class:only-text="{onlyText}"
+  class:tab-like="{tabLike}"
   class:active-bordered="{activeBordered}"
+  class:active-bigger="{activeBigger}"
   class:align-left="{alignLeft}"
   class:align-right="{alignRight}"
   type="{type}"
+  title="{title}"
   on:click
+  {disabled}
 >
   <slot />
 </button>
 
 <style lang="scss">
-  .button {
-    padding: 10px 23px;
+  .custom-button {
+    padding: 10px 20px;
     background-color: var(--color-main-bg);
-    color: var(--color-text-softer);
     border: none;
     border-radius: 5px;
-    cursor: pointer;
-    transition: .2s color, background-color .2s, border .2s;
+    color: var(--color-text-softer);
     text-align: center;
+    cursor: pointer;
+    transition: transform .2s, color .2s, background-color .2s, border .2s;
+    &:disabled {
+      &:hover {
+        color: currentColor;
+        cursor: default;
+      }
+    }
     &:hover,
     &:active {
       color: var(--color-text);
@@ -59,11 +73,16 @@
         border: 2px solid var(--color-border-hard);
       }
     }
+    &.active-bigger {
+      &.active {
+        transform: scale(1.2);
+      }
+    }
     &.small {
       font-size: 12px;
       padding: 5px 10px;
     }
-    &.pure {
+    &.only-text {
       &.active {
         background-color: var(--color-main-bg);
         color: var(--color-text-soft);
@@ -71,10 +90,6 @@
     }
     &.big {
       font-size: 20px;
-    }
-    &.vertical {
-      padding-left: 0;
-      padding-right: 0;
     }
     &.bordered {
       border: 2px solid var(--color-main-bg-softest);
@@ -85,7 +100,18 @@
     &.align-right {
       text-align: right;
     }
-    &.tab {
+    &.underline {
+      text-decoration: underline;
+    }
+    &.dimmed {
+      color: var(--color-text-softest);
+      &:hover,
+      &.active,
+      &:active {
+        color: var(--color-text-softer);
+      }
+    }
+    &.tab-like {
       border: 3px solid var(--color-main-bg);
       padding: 6px 19px;
       letter-spacing: 1px;

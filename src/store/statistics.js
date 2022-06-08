@@ -6,7 +6,7 @@ import { settings } from './../store/settings.js';
 import { startedAt } from './counter.js';
 import { extraCounter } from './extraCounter.js';
 import { addMessage } from './appNotifications.js';
-import { _ } from './../lang-utils.js';
+import { _ } from './../utils/langUtils.js';
 const MAXIMUM_TIME_FOR_ONE_ACTIVITY = 1000 * 60 * 60 * 24; // 24 hours
 
 export const getDateString = (dateObj = new Date) => {

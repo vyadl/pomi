@@ -65,6 +65,9 @@
   "details": "Детали",
   "click_for_details": "Нажмите чтобы показать/скрыть детали за день",
   "total_activity": "Всего активности",
+  "are_you_sure": "Вы уверены?",
+  "yes": "Да",
+  "no": "Нет",
   "languages": {
     "en": "English",
     "ua": "Українська",

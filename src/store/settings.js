@@ -2,28 +2,28 @@ import { writable, get } from 'svelte/store';
 import { updateFactor, intervals } from './intervals';
 let isFirstSubscribe = true;
 const defaultSettings = {
-  isUserOnPage: 1,
+  isUserOnPage: true,
   // shown in settings
-  subtractTimeWhenFinishing: 1,
-  showPlannedDuration: 1,
-  showTimeInTitle: 1,
-  showTimeInFavicon: 1,
-  showLastSecondsColorful: 1,
+  subtractTimeWhenFinishing: true,
+  showPlannedDuration: true,
+  showTimeInTitle: true,
+  showTimeInFavicon: true,
+  showLastSecondsColorful: true,
   language: 'en',
-  useActivityFactor: 1,
-  useCustomActivityFactor: 0,
-  customActivityFactor: 1,
-  showActivityNearTimer: 1,
-  showNotifications: 0,
-  showMainTabs: 1,
-  showComment: 1,
-  showCurrentPeriodAboveTimer: 0,
-  showActivityInTopCorner: 0,
+  useActivityFactor: true,
+  useCustomActivityFactor: false,
+  customActivityFactor: true,
+  showActivityNearTimer: true,
+  showNotifications: false,
+  showMainTabs: true,
+  showComment: true,
+  showCurrentPeriodAboveTimer: false,
+  showActivityInTopCorner: false,
   theme: 'dark',
   // main screen
-  showCurrentActivityOnMainScreen: 1,
-  showCurrentActivityLabelOnMainScreen: 1,
-  showCurrentPeriodAboveTimer: 1,
+  showCurrentActivityOnMainScreen: true,
+  showCurrentActivityLabelOnMainScreen: true,
+  showCurrentPeriodAboveTimer: true,
 };
 
 export const settings = writable(defaultSettings);
@@ -89,6 +89,15 @@ export const resetActivities = function(isReload = true) {
   if (isReload) {
     window.location.reload();
   }
+}
+
+export const changeSetting = function(setting, value) {
+  console.log(setting, value);
+  settings.update(settings => {
+    settings[setting] = !!value;
+
+    return settings;
+  });
 }
 
 export const resetAll = function() {

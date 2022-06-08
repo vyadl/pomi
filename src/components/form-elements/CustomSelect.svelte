@@ -3,29 +3,29 @@
 
   export let value;
   export let wide = false;
-  export let label = '';
-  export let errormessage = '';
-  export let options = [];
   export let pure = false;
-  export let nomargin = false;
+  export let noMargin = false;
   export let right = false;
-  export let fontinherit = false;
+  export let fontInherit = false;
   export let required = false;
+  export let label = '';
+  export let errorMessage = '';
+  export let options = [];
 
 const dispatch = createEventDispatcher();
 
 function onChange() {
-  errormessage = '';
+  errorMessage = '';
   dispatch('change', value);
 }
 </script>
 <div
-  class="default-select"
+  class="custom-select"
   class:wide
   class:pure
-  class:nomargin
   class:right
-  class:fontinherit
+  class:no-margin="{noMargin}"
+  class:font-inherit="{fontInherit}"
 >
   <label class="label">
     {#if label}
@@ -42,10 +42,15 @@ function onChange() {
       {/each}
     </select>
   </label>
+  {#if errorMessage}
+    <div class="error-message">
+      {errorMessage}
+    </div>
+  {/if}
 </div>
 
 <style lang="scss">
-  .default-select {
+  .custom-select {
     position: relative;
     .label {
       display: block;
@@ -68,9 +73,6 @@ function onChange() {
       font-size: 14px;
       padding: 5px;
       cursor: pointer;
-      &.wide {
-        width: 100%;
-      }
       &:focus {
         outline: none;
         border-bottom-color: var(--color-text-softer);
@@ -90,7 +92,7 @@ function onChange() {
         appearance: none;
       }
     }
-    &.nomargin {
+    &.no-margin {
       .select {
         margin: 0;
       }
@@ -100,7 +102,7 @@ function onChange() {
         text-align: right;
       }
     }
-    &.fontinherit {
+    &.font-inherit {
       .select {
         font: inherit;
         letter-spacing: inherit;

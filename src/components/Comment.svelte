@@ -3,7 +3,7 @@
   import { slide } from 'svelte/transition';
   import { _ } from 'svelte-i18n';
   import { comment } from './../store/counter.js';
-  import TextInput from './form-elements/TextInput.svelte';
+  import CustomInput from './form-elements/CustomInput.svelte';
 
   export let active = false;
   export let visible = false;
@@ -25,7 +25,10 @@
   </div>
   {#if active}
     <div class="input-wrap" transition:slide>
-      <TextInput bind:value="{$comment}" wide />
+      <CustomInput
+        bind:value="{$comment}"
+        wide
+      />
     </div>
   {/if}
 </div>

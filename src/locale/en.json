@@ -64,6 +64,9 @@
   "details": "Details",
   "click_for_details": "Click for show/hide details for a day",
   "total_activity": "Total activity",
+  "are_you_sure": "Are you sure",
+  "yes": "Yes",
+  "no": "No",
   "languages": {
     "en": "English",
     "ua": "Українська",

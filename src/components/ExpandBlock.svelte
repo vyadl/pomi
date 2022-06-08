@@ -1,6 +1,6 @@
 <script>
   import TitleLine from './decorative/TitleLine.svelte';
-  import DefaultButton from './form-elements/DefaultButton.svelte';
+  import CustomButton from './form-elements/CustomButton.svelte';
   
   export let active = false;
   export let title = '';
@@ -42,13 +42,13 @@
           wider="{wider}"
         />
       {:else}
-      <DefaultButton
+      <CustomButton
         active="{active}"
-        pure
+        onlyText
         small
       >
         {title}
-      </DefaultButton>
+      </CustomButton>
       {/if}
     </div>
   {/if}

@@ -5,28 +5,33 @@
     statTotal,
     stat,
     getDateString,
+    changeActivityTitlesForDay,
   } from './../../store/statistics.js';
   import { activityFactor } from './../../store/intervals.js';
   import { settings } from './../../store/settings.js';
   import { activities } from '../../store/activities';
-  import { changeActivityTitlesForDay } from './../../store/statistics';
   import ExpandBlock from './../ExpandBlock.svelte';
   import AllDayRecords from './AllDayRecords.svelte';
   import TitleLine from './../decorative/TitleLine.svelte';
-  import { getHoursAndMinutesFromMinutes } from './../../utils.js';
+  import { getHoursAndMinutesFromMinutes } from './../../utils/timeUtils.js';
 
   export let isToday = false;
   export let expanded = false;
-  export let dayStatTitle = getDateString();
+  export let dayStatTitle = getDateString(new Date());
 
   let isDetailsActive = expanded;
+  let formattedTime;
+  let formattedTimeWithFactor;
 
   initStat();
+
   $: currentStat = $statTotal[dayStatTitle];
   $: formattedTimeWithFactor = $settings &&
     $locale &&
     currentStat?.sum?.activities &&
-    getHoursAndMinutesFromMinutes(currentStat.sum.activities * $activityFactor);
+    getHoursAndMinutesFromMinutes(
+      currentStat.sum.activities * $activityFactor
+    );
 
   $: formattedTime = $settings &&
     $locale &&
@@ -55,7 +60,8 @@
 >
   <div
     class="activity-sum"
-    title="{$_('click_for_details')}"
+    class:inactive="{!currentStat?.sum?.activities}"
+    title="{currentStat?.sum?.activities ? $_('click_for_details') : ''}"
     on:click="{ () => { isDetailsActive = isToday ? !isDetailsActive : true } }"
   >
     <div class="activity-sum-inner">
@@ -180,7 +186,7 @@
   padding: 15px 0 35px;
 
   &.is-today {
-    .activity-sum {
+    .activity-sum:not(.inactive) {
       opacity: .8;
       transition: opacity .2s;
       cursor: pointer;
@@ -228,11 +234,6 @@
   .pure-time {
     font-size: 12px;
     color: var(--color-text-soft);
-  }
-  .details-title {
-    color: var(--color-text);
-    font-size: 15px;
-    margin-bottom: 10px;
   }
   .total {
     margin-bottom: 20px;

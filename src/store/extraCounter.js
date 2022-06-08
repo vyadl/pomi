@@ -1,5 +1,5 @@
 import { writable, derived } from 'svelte/store';
-import { makeTwoDigitsCifer } from './../utils.js';
+import { makeTwoDigitsCifer } from './../utils/generalUtils.js';
 
 function createCounter() {
   const { subscribe, set, update } = writable(0);

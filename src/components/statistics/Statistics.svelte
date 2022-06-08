@@ -7,15 +7,16 @@
     statByMonth,
   } from './../../store/statistics.js';
   import DayStat from './DayStat.svelte';
-  import DefaultButton from './../form-elements/DefaultButton.svelte';
+  import CustomButton from './../form-elements/CustomButton.svelte';
   import TextModal from './../modals/TextModal.svelte';
   import HandleRecordModal from './../modals/HandleRecordModal.svelte';
   import TitleLine from './../decorative/TitleLine.svelte';
-  import { getReadableMonthYear } from './../../utils.js';
+  import { getReadableMonthYear } from './../../utils/timeUtils.js';
+import { askConfirmation } from '../../store/confirmation.js';
 
   let isAddDayActive = false;
   let isAddRecordActive = false;
-  let errormessage = '';
+  let errorMessage = '';
   let currentDay = null;
   let currentDateEntityTemplate = {
     title: '',
@@ -37,9 +38,11 @@
     currentDate = date;
   }
 
-  function removeCurrentDay() {
-    stat.removeDay(currentDate.title);
-    currentDate = {...currentDateEntityTemplate};
+  async function removeCurrentDay() {
+    if (await askConfirmation()) {
+      stat.removeDay(currentDate.title);
+      currentDate = {...currentDateEntityTemplate};
+    }
   }
 
   function addDay({ detail }) {
@@ -54,19 +57,19 @@
 
   function validateDay(rawDate, formatDate) {
     if (!rawDate) {
-      errormessage = 'This field is required';
+      errorMessage = 'This field is required';
 
       return false;
     }
 
     if ($stat[formatDate]) {
-      errormessage = 'This day is exist';
+      errorMessage = 'This day is exist';
 
       return false;
     }
 
     if (+new Date(rawDate) > new Date()) {
-      errormessage = 'It can\'t be a day more than now';
+      errorMessage = 'It can\'t be a day more than now';
 
       return false;
     }
@@ -86,25 +89,25 @@
       <div class="selection-list">
         {#each Object.keys($statByMonth) as month}
           <div>
-            <DefaultButton
+            <CustomButton
               alignLeft
               active="{currentMonth === month}"
               on:click={() => {setMonth(month)}}
             >
               {getReadableMonthYear(month)}
-            </DefaultButton>
+            </CustomButton>
           </div>
         {/each}
       </div>
       <div class="additional-action">
-        <DefaultButton
+        <CustomButton
           small
-          on:click="{ () => {
-            isAddDayActive = true;
-          } }"
+          on:click="{() => { 
+            isAddDayActive = true;;
+          }}"
         >
           {$_('add_day')}
-        </DefaultButton>
+        </CustomButton>
       </div>
     </div>
     {#if currentMonth}
@@ -117,12 +120,12 @@
         <div class="selection-list">
           {#each ($statByMonth[currentMonth]?.list || []) as date}
             <div>
-              <DefaultButton
+              <CustomButton
                 active="{currentDate.title === date.title}"
                 on:click={() => {setDate(date)}}
               >
                 { +date.title.slice(0, 2) }
-              </DefaultButton>
+              </CustomButton>
             </div>
           {/each}
         </div>
@@ -138,14 +141,14 @@
     {#if !areRecordsExist(currentDate)}
       <div class="no-records-message">{$_('there_is_nothing_yet')}</div>
       <div class="add-record">
-        <DefaultButton
+        <CustomButton
           on:click="{ () => {
             currentDay = currentDate.title;
             isAddRecordActive = true;
           } }"
         >
           {$_('add_record')}
-        </DefaultButton>
+        </CustomButton>
       </div>
     {/if}
     {#if areRecordsExist(currentDate)}
@@ -157,24 +160,24 @@
     </div>
     {/if}
     <div class="additional-action">
-      <DefaultButton
+      <CustomButton
         small
         on:click={removeCurrentDay}
       >
         { $_('remove_day') }
-      </DefaultButton>
+      </CustomButton>
     </div>
   {/if}
   <TextModal
     active="{isAddDayActive}"
     inputType="date"
-    buttontext="{$_('add')}"
-    customclose
+    buttonText="{$_('add')}"
+    customClose
     on:message="{addDay}"
     on:close="{() => {
       isAddDayActive = false;
     }}"
-    bind:errormessage
+    bind:errorMessage
     title="{$_('add_day')}"
   />
   <HandleRecordModal
@@ -207,10 +210,6 @@
       right: -15px;
       bottom: 0;
     }
-    .selection-title {
-      font-size: 14px;
-      margin-bottom: 10px;
-    }
     .selection-list {
       padding-top: 15px;
       display: flex;
@@ -232,25 +231,11 @@
         grid-template-columns: repeat(7, 1fr);
       }
     }
-    .dates-title {
-      position: absolute;
-      top: -10px;
-      left: 50%;
-      transform: translateX(-50%);
-      margin: 0;
-      background-color: var(--color-main-bg);
-      padding: 0 10px;
-      font-size: 12px;
-      color: var(--color-text-softest);
-    }
     .no-records-message {
       padding: 35px 10px;
       font-size: 16px;
       text-align: center;
       color: var(--color-text-softest-2);
-    }
-    .remove-day-wrapper {
-      text-align: right;
     }
     .date-selection {
       position: relative;
