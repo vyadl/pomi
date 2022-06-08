@@ -24,6 +24,7 @@ jobs:
         script_stop: true
         script: |
           source /home/vyadl/nodevenv/pomi/14/bin/activate && cd /home/vyadl/pomi
+          git checkout master
           git pull "https://$NICKNAME:$TOKEN@github.com/vyadl/pomi.git" master
           npm install
           npm run build
