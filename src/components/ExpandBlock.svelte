@@ -115,7 +115,6 @@
       }
       &.fixed-open {
         pointer-events: none;
-
         &::before {
           display: none;
         }

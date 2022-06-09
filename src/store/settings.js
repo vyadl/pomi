@@ -2,7 +2,7 @@ import { writable, get } from 'svelte/store';
 import { updateFactor, intervals } from './intervals';
 let isFirstSubscribe = true;
 const defaultSettings = {
-  // isUserOnPage: true,
+  isUserOnPage: true,
   // general interface
   showTimeInTitle: true,
   showTimeInFavicon: true,
