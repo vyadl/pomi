@@ -150,6 +150,7 @@
     }
     &.range {
       .input {
+        height: 0;
         width: 100%;
         -webkit-appearance: none;
         outline: none;
@@ -160,7 +161,6 @@
           width: 100%;
           height: 5px;
           cursor: pointer;
-          animate: .2s;
           box-shadow: 0px 0px 0px #999;
           background-color: var(--color-main-bg-softest);
           border-radius: 1px;
