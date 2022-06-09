@@ -4,7 +4,7 @@
   import CustomButton from './../form-elements/CustomButton.svelte';
 
   function changeLanguage(lang) {
-    changeSetting('language', lang);
+    changeSetting('language', lang, false);
     locale.set(lang);
   }
 </script>

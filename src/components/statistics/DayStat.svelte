@@ -184,9 +184,8 @@
 <style lang="scss">
 .day-stat {
   padding: 15px 0 35px;
-
   &.is-today {
-    .activity-sum:not(.inactive) {
+    .activity-sum:not(.inactive):not(.in-details) {
       opacity: .8;
       transition: opacity .2s;
       cursor: pointer;
@@ -195,7 +194,6 @@
       }
     }
   }
-
   .activity-sum {
     justify-content: space-between;
     transition: background-color .2s;
@@ -203,7 +201,6 @@
     color: var(--color-text);
     letter-spacing: 1px;
     padding: 15px 0 50px;
-    
     &.in-details {
       display: flex;
       cursor: default;
@@ -214,12 +211,10 @@
       border-radius: 5px;
       margin-bottom: 10px;
       background-color: var(--color-main-bg-soft);
-
       .activity-sum-inner {
         text-align: right;
         font-size: 14px;
       }
-
       .pure {
         font-size: 11px;
       }

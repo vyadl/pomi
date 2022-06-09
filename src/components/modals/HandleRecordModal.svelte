@@ -274,6 +274,7 @@
       text-align: left;
       color: var(--color-text-soft);
       font-size: 14px;
+      margin-bottom: 15px;
     }
     .section {
       margin-bottom: 20px;

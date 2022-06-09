@@ -1,8 +1,6 @@
 <script>
-  import { _, locale, locales } from 'svelte-i18n';
-  import { settings, changeSetting } from './../../store/settings.js';
+  import { _ } from 'svelte-i18n';
   import CustomButton from './../form-elements/CustomButton.svelte';
-  import CustomCheckbox from './../form-elements/CustomCheckbox.svelte';
   import BasicModal from './../modals/BasicModal.svelte';
   import ExpandBlock from './../ExpandBlock.svelte';
   import IntervalSettings from './IntervalSettings.svelte';
@@ -17,6 +15,41 @@
   export let active = false;
   let isExpand = false;
 
+  const settingsList = [
+    {
+      titleLocaleLabel: 'intervals',
+      component: IntervalSettings,
+    },
+    {
+      titleLocaleLabel: 'language',
+      component: LanguageSettings,
+    },
+    {
+      titleLocaleLabel: 'theme',
+      component: ThemeSettings,
+    },
+    {
+      titleLocaleLabel: 'settings.general_interface',
+      component: GeneralInterfaceSettings,
+    },
+    {
+      titleLocaleLabel: 'settings.main_screen',
+      component: MainScreenSettings,
+    },
+    {
+      titleLocaleLabel: 'settings.behaviour',
+      component: BehaviourSettings,
+    },
+    {
+      titleLocaleLabel: 'settings.activity_factor',
+      component: FactorSettings,
+    },
+    {
+      titleLocaleLabel: 'settings.reset',
+      component: ResetSettings,
+    },
+  ];
+
 </script>
 
 <BasicModal bind:active on:close>
@@ -29,71 +62,16 @@
         {isExpand ? $_('settings.hide_all') : $_('settings.expand_all')}
       </CustomButton>
     </div>
-    
-    <ExpandBlock
-      title="{$_('intervals')}"
-      active="{isExpand}"
-    >
-      <div class="setting-section">
-        <IntervalSettings />
-      </div>
-    </ExpandBlock>
-    <ExpandBlock
-      title="{$_('language')}"
-      active="{isExpand}"
-    >
-      <div class="setting-section">
-        <LanguageSettings />
-      </div>
-    </ExpandBlock>
-    <ExpandBlock
-      title="{$_('theme')}"
-      active="{isExpand}"
-    >
-      <div class="setting-section">
-        <ThemeSettings />
-      </div>
-    </ExpandBlock>
-    <ExpandBlock
-      title="{$_('settings.general_interface')}"
-      active="{isExpand}"
-    >
-      <div class="setting-section">
-        <GeneralInterfaceSettings />
-      </div>
-    </ExpandBlock>
-    <ExpandBlock
-      title="{$_('settings.main_screen')}"
-      active="{isExpand}"
-    >
-      <div class="setting-section">
-        <MainScreenSettings />
-      </div>
-    </ExpandBlock>
-    <ExpandBlock
-      title="{$_('settings.behaviour')}"
-      active="{isExpand}"
-    >
-      <div class="setting-section">
-        <BehaviourSettings />
-      </div>
-    </ExpandBlock>
-    <ExpandBlock
-      title="{$_('settings.activity_factor')}"
-      active="{isExpand}"
-    >
-      <div class="setting-section">
-        <FactorSettings />
-      </div>
-    </ExpandBlock>
-    <ExpandBlock
-      title="{$_('settings.reset')}"
-      active="{isExpand}"
-    >
-      <div class="setting-section">
-        <ResetSettings />
-      </div>
-    </ExpandBlock>
+    {#each settingsList as { titleLocaleLabel, component }}
+      <ExpandBlock
+        title="{$_(titleLocaleLabel)}"
+        active="{isExpand}"
+      >
+        <div class="setting-section">
+          <svelte:component this={component} />
+        </div>
+      </ExpandBlock>
+    {/each}
   </div>
 </BasicModal>
 
@@ -110,21 +88,6 @@
     .actions {
       text-align: right;
       margin-bottom: 20px;
-    }
-    .languages {
-      padding: 30px 0;
-    }
-    .setting-description {
-      padding-top: 10px;
-      padding-left: 15px;
-      font-size: 13px;
-      color: var(--color-text-soft);
-    }
-    .checkbox-setting {
-      padding: 7px 0;
-      &.nested {
-        margin-left: 15px;
-      }
     }
   }
 </style>

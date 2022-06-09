@@ -35,13 +35,6 @@
 
 <div class="behaviour-settings">
   <CustomCheckbox
-    label="{$_('settings.subtract_time')}"
-    checked="{$settings.subtractTimeWhenFinishing}"
-    on:change="{({ detail }) => {
-      changeSetting('subtractTimeWhenFinishing', detail);
-    }}"
-  />
-  <CustomCheckbox
     label="{$_('settings.show_notifications')}"
     disabled="{Notification.permission === 'denied'}"
     checked="{$settings.showNotifications}"

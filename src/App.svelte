@@ -38,12 +38,12 @@
   let mainTabs = [
     {
       id: 'activities',
-      title: $_('activities'),
+      titleLocaleLabel: 'activities',
       component: Activities,
     },
     {
       id: 'statistics',
-      title: $_('history'),
+      titleLocaleLabel: 'history',
       component: Statistics,
     },
   ];

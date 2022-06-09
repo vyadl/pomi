@@ -2,49 +2,56 @@ import { writable, get } from 'svelte/store';
 import { updateFactor, intervals } from './intervals';
 let isFirstSubscribe = true;
 const defaultSettings = {
-  isUserOnPage: true,
-  // shown in settings
-  subtractTimeWhenFinishing: true,
-  showPlannedDuration: true,
+  // isUserOnPage: true,
+  // general interface
   showTimeInTitle: true,
   showTimeInFavicon: true,
   showLastSecondsColorful: true,
+  showPlannedDuration: true,
+  // behaviour
+  showNotifications: false,
+  // language
   language: 'en',
+  // theme
+  theme: 'dark',
+  // factor settings
   useActivityFactor: true,
   useCustomActivityFactor: false,
-  customActivityFactor: true,
-  showActivityNearTimer: true,
-  showNotifications: false,
+  customActivityFactor: 1,
+  // main screen
   showMainTabs: true,
   showComment: true,
-  showCurrentPeriodAboveTimer: false,
   showActivityInTopCorner: false,
-  theme: 'dark',
-  // main screen
+  showActivityNearTimer: true,
   showCurrentActivityOnMainScreen: true,
   showCurrentActivityLabelOnMainScreen: true,
   showCurrentPeriodAboveTimer: true,
+  showDescriptionsForPeriods: true,
 };
 
 export const settings = writable(defaultSettings);
 
 export const initSettings = function() {
-  const localSettings = localStorage.getItem('settings') ? JSON.parse(localStorage.getItem('settings')) : false;
+  const localSettings = localStorage.getItem('settings')
+    ? JSON.parse(localStorage.getItem('settings'))
+    : false;
 
   if (localSettings) {
     settings.set(localSettings);
   }
 
-  //initCheckingPresence();
+  initCheckingPresence();
 };
 
 function initCheckingPresence() {
-  document.addEventListener('visibilitychange', () => {
-    settings.update(settings => {
-      settings.isUserOnPage = +!document.hidden;
+  let isFirstTime = true;
 
-      return settings;
-    });
+  document.addEventListener('visibilitychange', () => {
+    if (!isFirstTime) {
+      changeSetting('isUserOnPage', !document.hidden);
+    } else {
+      isFirstTime = false;
+    }
   });
 }
 
@@ -64,6 +71,16 @@ settings.subscribe(() => {
 
   localStorageUpdateSettings();
 });
+
+export const changeSetting = function(setting, value, isBoolean = true) {
+  settings.update(settings => {
+    settings[setting] = isBoolean ? !!value : value;
+
+    return settings;
+  });
+
+  localStorageUpdateSettings();
+}
 
 export const resetSettings = function(isReload = true) {
   localStorage.removeItem('settings');
@@ -89,15 +106,6 @@ export const resetActivities = function(isReload = true) {
   if (isReload) {
     window.location.reload();
   }
-}
-
-export const changeSetting = function(setting, value) {
-  console.log(setting, value);
-  settings.update(settings => {
-    settings[setting] = !!value;
-
-    return settings;
-  });
 }
 
 export const resetAll = function() {

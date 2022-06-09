@@ -1,4 +1,5 @@
 <script>
+import { _ } from 'svelte-i18n';
 import CustomButton from './form-elements/CustomButton.svelte';
 
 export let tabs = [];
@@ -10,21 +11,21 @@ export let activeTab = '';
   class:active={activeTab}
 >
   <div class="tabs-controls">
-    {#each tabs as tab}
+    {#each tabs as { titleLocaleLabel, id }}
       <CustomButton
         tabLike
-        active={activeTab === tab.id}
-        on:click="{() => {activeTab = activeTab === tab.id ? '' : tab.id}}"
+        active={activeTab === id}
+        on:click="{() => {activeTab = activeTab === id ? '' : id}}"
       >
-        {tab.title}
+        {$_(titleLocaleLabel)}
       </CustomButton>
     {/each}
   </div>
   <div class="components">
     <div class="components-inner">
-      {#each tabs as tab}
-        {#if activeTab === tab.id}
-          <svelte:component this={tab.component} {...tab.props} />
+      {#each tabs as { id, component, props }}
+        {#if activeTab === id}
+          <svelte:component this={component} {...props} />
         {/if}
       {/each}
     </div>

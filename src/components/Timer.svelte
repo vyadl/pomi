@@ -191,12 +191,7 @@
           <CustomButton
             onlyText
             big
-            title="{
-              ($settings.subtractTimeWhenFinishing
-                ? $_('tooltip_add')
-                : $_('tooltip_add_all'))
-              + $_('tooltip_about_settings')
-            }"
+            title="{$_('tooltip_add')}"
             on:click="{finishPeriod}"
           >
             {$_('finish_earlier')}
@@ -221,6 +216,14 @@
           >
             {options.title || options.duration}
           </CustomButton>
+          {#if $settings.showDescriptionsForPeriods}
+            <div
+              class="period-description"
+              title="{$_('tooltips.period_description')}"
+            >
+              {$_(`interval_labels.${intervalId}`)}
+            </div>
+          {/if}
         </div>
       {/each}
     </div>
@@ -331,6 +334,14 @@
       font-size: 12px;
       letter-spacing: 1px;
       margin-bottom: 5px;
+      color: var(--color-text-softest-2);
+    }
+    .period-description {
+      position: absolute;
+      font-size: 12px;
+      bottom: 10px;
+      left: 50%;
+      transform: translateX(-50%);
       color: var(--color-text-softest-2);
     }
   }

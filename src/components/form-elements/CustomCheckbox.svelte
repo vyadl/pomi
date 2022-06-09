@@ -23,8 +23,6 @@
     {disabled}
     {checked}
     on:change="{event => {
-      console.log(event.target.value);
-      console.log(event.target.checked);
       dispatch('change', event.target.checked);
     }}"
   />

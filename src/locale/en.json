@@ -44,8 +44,6 @@
   "tooltip_add_extra": "It will add an extra-time to the last interval in statistics.",
   "tooltip_reset": "It will reset timer, without adding anything in statistics.",
   "tooltip_add": "It will add passed time into statistics (rounded to minutes).",
-  "tooltip_add_all": "It will add all planed time for this interval into statistics.",
-  "tooltip_about_settings": "You can change this behaviour in settings.",
   "now": "Сейчас",
   "removed": "removed",
   "save": "Save",
@@ -82,9 +80,8 @@
   "settings": {
     "title": "settings",
     "show_planned_duration": "Show planned duration",
-    "subtract_time": "Subtract time when finishing mannualy",
-    "time_title": "Show time in the title",
-    "time_favicon": "Show time in the favicon",
+    "time_title": "Time in title",
+    "time_favicon": "Time in favicon",
     "colorful_favicon": "Show last time seconds in the favicon in color",
     "use_activity_factor": "Show activity using factor",
     "use_custom_activity_factor": "Use custom activity factor",
@@ -109,11 +106,12 @@
     "reset_all": "Reset all",
     "reset": "Reset",
     "reset_warning": "After each reset action the page will reload",
-    "show_main_tabs": "Show main tabs",
+    "show_main_tabs": "Show main tabs (Activities and History)",
     "show_comment": "Show comment",
     "show_current_activity_main_screen": "Current activity in top right corner",
     "show_current_activity_label_main_screen": "Show label 'current activity' above",
-    "show_current_period_above_timer": "Current period above timer"
+    "show_current_period_above_timer": "Current period above timer",
+    "period_description": "Descriptions near periods"
   },
   "sounds": {
     "market": "Market atmoshpere",
@@ -186,5 +184,8 @@
   "themes": {
     "dark": "Dark",
     "light": "Light"
+  },
+  "tooltips": {
+    "period_description": "You can hide this descriptions in Settings -> Main screen -> Descriptions near periods"
   }
 }

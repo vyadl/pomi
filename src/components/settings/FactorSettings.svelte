@@ -24,11 +24,12 @@
     }}"
   />
   {#if $settings.useActivityFactor}
-    <SettingDescription>
+    <SettingDescription
+      title="{$_('settings.current_counted_factor')}: {$calculatedActivityFactor}"
+    >
       {$_('settings.basic_factor')} <br>
-      {$_('settings.formula_factor_sentence')} <br>
-      {$_('settings.formula_factor')} <br>
-      {$_('settings.current_counted_factor')}: {$calculatedActivityFactor}
+      {$_('settings.formula_factor_sentence')}: <br><br>
+      <b>{$_('settings.formula_factor')}</b>
     </SettingDescription>
     <CustomCheckbox
       label="{$_('settings.use_custom_activity_factor')}"
@@ -50,8 +51,8 @@
           }
         }"
         on:input="{({ detail }) => {
-            changeSetting('customActivityFactor', detail);
-          }}"
+          changeSetting('customActivityFactor', detail, false);
+        }}"
       />
     {/if}
   {/if}

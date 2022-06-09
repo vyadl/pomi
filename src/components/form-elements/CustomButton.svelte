@@ -49,6 +49,7 @@
     cursor: pointer;
     transition: transform .2s, color .2s, background-color .2s, border .2s;
     &:disabled {
+      color: currentColor;
       &:hover {
         color: currentColor;
         cursor: default;

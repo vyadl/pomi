@@ -9,8 +9,6 @@
     label="{$_('settings.show_activity_near_timer')}"
     checked="{$settings.showActivityNearTimer}"
     on:change="{({ detail }) => {
-      console.log(666);
-      console.log(detail);
       changeSetting('showActivityNearTimer', detail);
     }}"
   />
@@ -18,8 +16,6 @@
     label="{$_('settings.show_main_tabs')}"
     checked="{$settings.showMainTabs}"
     on:change="{({ detail }) => {
-      console.log(111);
-      console.log(detail);
       changeSetting('showMainTabs', detail);
     }}"
   />
@@ -27,8 +23,6 @@
     label="{$_('settings.show_comment')}"
     checked="{$settings.showComment}"
     on:change="{({ detail }) => {
-      console.log(222);
-      console.log(detail);
       changeSetting('showComment', detail);
     }}"
   />
@@ -36,9 +30,14 @@
     label="{$_('settings.show_current_activity_main_screen')}"
     checked="{$settings.showCurrentActivityOnMainScreen}"
     on:change="{({ detail }) => {
-      console.log(333);
-      console.log(detail);
       changeSetting('showCurrentActivityOnMainScreen', detail);
+    }}"
+  />
+  <CustomCheckbox
+    label="{$_('settings.period_description')}"
+    checked="{$settings.showDescriptionsForPeriods}"
+    on:change="{({ detail }) => {
+      changeSetting('showDescriptionsForPeriods', detail);
     }}"
   />
   {#if $settings.showCurrentActivityOnMainScreen}
@@ -46,8 +45,6 @@
       label="{$_('settings.show_current_activity_label_main_screen')}"
       checked="{$settings.showCurrentActivityLabelOnMainScreen}"
       on:change="{({ detail }) => {
-        console.log(444);
-      console.log(detail);
         changeSetting('showCurrentActivityLabelOnMainScreen', detail);
       }}"
     />
@@ -56,8 +53,6 @@
     label="{$_('settings.show_current_period_above_timer')}"
     checked="{$settings.showCurrentPeriodAboveTimer}"
     on:change="{({ detail }) => {
-      console.log(555);
-      console.log(detail);
       changeSetting('showCurrentPeriodAboveTimer', detail);
     }}"
   />

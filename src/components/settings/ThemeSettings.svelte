@@ -6,7 +6,7 @@
   let themes = ['dark', 'light'];
 
   function changeTheme(theme) {
-    changeSetting('theme', theme);
+    changeSetting('theme', theme, false);
 
     document.body.className = '';
     document.body.classList.add(theme);
