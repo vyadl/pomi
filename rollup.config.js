@@ -3,6 +3,7 @@ import commonjs from '@rollup/plugin-commonjs';
 import resolve from '@rollup/plugin-node-resolve';
 import livereload from 'rollup-plugin-livereload';
 import css from 'rollup-plugin-css-only';
+import scss from 'rollup-plugin-scss';
 import json from '@rollup/plugin-json';
 import sveltePreprocess from 'svelte-preprocess';
 
@@ -14,7 +15,7 @@ const preprocess = sveltePreprocess({
   postcss: {
     plugins: [require('autoprefixer')],
   },
-  });
+});
 
 function serve() {
   let server;
@@ -46,6 +47,7 @@ export default {
     file: 'public/build/bundle.js'
   },
   plugins: [
+    scss(),
     svelte({
       compilerOptions: {
         // enable run-time checks when not in production

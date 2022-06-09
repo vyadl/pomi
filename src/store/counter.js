@@ -3,9 +3,9 @@ import { stat } from './statistics.js';
 import { extraCounter } from './extraCounter.js';
 import { settings } from './settings.js';
 import { currentActivityTitle } from './activities.js';
-import { makeTwoDigitsCifer } from './../utils.js';
+import { makeTwoDigitsCifer } from './../utils/generalUtils.js';
 import { currentInterval, intervals, playAudio } from './intervals.js';
-import { _ } from './../lang-utils.js';
+import { _ } from './../utils/langUtils.js';
 
 function createCounter() {
   const { subscribe, set, update } = writable(0);

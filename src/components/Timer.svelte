@@ -20,8 +20,9 @@
   import { stat, lastTime } from './../store/statistics.js';
   import { settings } from './../store/settings.js';
   import { currentActivityTitle } from '../store/activities.js';
-  import { makeTwoDigitsCifer, getRandomColor } from './../utils.js';
+  import { makeTwoDigitsCifer, getRandomColor } from './../utils/generalUtils.js';
   import { initActivities } from '../store/activities.js';
+  import CustomButton from './form-elements/CustomButton.svelte';
   import Comment from './Comment.svelte';
 
   const faviconEl = document.querySelector('link[rel="icon"]');
@@ -145,21 +146,25 @@
     <div class="timer-controls">
       {#if $extraCounter}
         <div class="extra-counter-wrapper" transition:fade>
-          <button
-            class="button control reset"
-            title="{$_('tooltip_reset_extra')}"
-            on:click="{resetExtraTime}"
-          >
-            {$_('reset')}
-          </button>
           <div class="extra-counter-buttons">
-            <button
-              class="button control"
+            <CustomButton
+              underline
+              dimmed
+              small
+              onlyText
+              title="{$_('tooltip_reset_extra')}"
+              on:click="{resetExtraTime}"
+            >
+              {$_('reset')}
+            </CustomButton>
+            <CustomButton
+              onlyText
+              big
               title="{$_('tooltip_add_extra')}"
               on:click="{addExtraTime}"
             >
-            {$_('add_time')}
-            </button>
+              {$_('add_time')}
+            </CustomButton>
           </div>
           <div class="extra-counter">
             <div class="extra-counter-desc">
@@ -168,29 +173,29 @@
             {$extraCounterFormattedTime.mins}:{$extraCounterFormattedTime.secs}
           </div>
         </div>
-      {:else}
-        <div class="counter-buttons-wrapper" transition:fade>
-          <button
-            class="button control reset"
-            class:unactive="{!$counter}"
+      {:else if ($counter)}
+        <div
+          class="counter-buttons-wrapper"
+          transition:fade
+        >
+          <CustomButton
+            underline
+            dimmed
+            small
+            onlyText
             title="{$_('tooltip_reset')}"
             on:click="{resetPeriod}"
           >
             {$_('reset')}
-          </button>
-          <button
-            class="button control"
-            class:unactive="{!$counter}"
-            title="{
-              ($settings.subtractTimeWhenFinishing
-                ? $_('tooltip_add')
-                : $_('tooltip_add_all'))
-              + $_('tooltip_about_settings')
-            }"
+          </CustomButton>
+          <CustomButton
+            onlyText
+            big
+            title="{$_('tooltip_add')}"
             on:click="{finishPeriod}"
           >
             {$_('finish_earlier')}
-          </button>
+          </CustomButton>
         </div>
       {/if}
     </div>
@@ -198,17 +203,27 @@
     <div class="buttons">
       {#each $activeIntervals as [intervalId, options]}
         <div class="button-wrapper">
-          <button
-            class="button"
-            class:active="{intervalId === $currentInterval}"
-            class:blocked="{($counter || $extraCounter)}"
+          <CustomButton
+            onlyText
+            big
+            activeBigger
+            active="{intervalId === $currentInterval}"
+            disabled="{($counter || $extraCounter)}"
             title="{`${options.duration}${$_('minutes_short')} - ${$_('interval_labels.' + intervalId)}`}"
             on:click="{() => {
               startPeriod(intervalId, options);
             }}"
           >
             {options.title || options.duration}
-          </button>
+          </CustomButton>
+          {#if $settings.showDescriptionsForPeriods}
+            <div
+              class="period-description"
+              title="{$_('tooltips.period_description')}"
+            >
+              {$_(`interval_labels.${intervalId}`)}
+            </div>
+          {/if}
         </div>
       {/each}
     </div>
@@ -233,14 +248,14 @@
       width: 100%;
     }
     .cifers {
-      color: #eee;
+      color: var(--color-text);
       font: 70px Monaco, 'Courier New', monospace;
       letter-spacing: 5px;
       display: flex;
       justify-content: center;
       transition: color 1s;
       &.summed {
-        color: #222;
+        color: var(--color-text-softest-2);
       }
     }
     .cifers-desc {
@@ -250,7 +265,7 @@
       top: 50px;
       font-size: 14px;
       letter-spacing: 1px;
-      color: #333;
+      color: var(--color-main-bg-soft);
     }
     .cifers-divider {
       position: relative;
@@ -271,74 +286,32 @@
       min-width: 80px;
       padding: 0 15px;
     }
-    .button {
-      padding: 10px 15px;
-      background-color: transparent;
-      color: #bbb;
-      opacity: .7;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      text-align: center;
-      font-size: 22px;
-      letter-spacing: 1px;
-      transition: opacity .1s, transform .1s;
-      word-wrap: break-word;
-      &.control {
-        color: #aaa;
-        font-size: 16px;
-        min-width: 100px;
-        text-align: center;
-      }
-      &.reset {
-        font-size: 11px;
-        color: #777;
-        text-decoration: underline;
-        margin-right: 20px;
-        padding-left: 0;
-      }
-      &.unactive {
-        pointer-events: none;
-        opacity: 0;
-      }
-
-      &:hover,
-      &:active,
-      &.active {
-        opacity: 1;
-        background-color: transparent;
-      }
-      &.blocked {
-        pointer-events: none;
-      }
-      &.active {
-        transform: scale(1.3);
-      }
-    }
     .timer-controls {
       position: relative;
       width: 100%;
       height: 80px;
       padding: 20px 0;
-      margin-bottom: 15px;
+      margin-bottom: 30px;
     }
     .counter-buttons-wrapper {
       display: flex;
       justify-content: center;
       align-items: center;
       position: absolute;
+      gap: 20px;
       width: 100%;
       height: 100%;
     }
     .extra-counter-buttons {
       display: flex;
       justify-content: space-between;
-      align-items: flex-start;
+      align-items: center;
       margin-right: 40px;
+      gap: 20px;
     }
     .extra-counter-wrapper {
       display: flex;
-      justify-content: space-between;
+      justify-content: flex-end;
       align-items: center;
       font-size: 12px;
       position: absolute;
@@ -349,9 +322,8 @@
       position: relative;
       font-size: 22px;
       width: 80px;
-
       text-align: right;
-      color: #aaa;
+      color: var(--color-text-soft);
     }
     .extra-counter-desc {
       position: absolute;
@@ -362,7 +334,15 @@
       font-size: 12px;
       letter-spacing: 1px;
       margin-bottom: 5px;
-      color: #333;
+      color: var(--color-text-softest-2);
+    }
+    .period-description {
+      position: absolute;
+      font-size: 12px;
+      bottom: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      color: var(--color-text-softest-2);
     }
   }
 </style>

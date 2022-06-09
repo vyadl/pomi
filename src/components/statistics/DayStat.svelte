@@ -5,27 +5,33 @@
     statTotal,
     stat,
     getDateString,
+    changeActivityTitlesForDay,
   } from './../../store/statistics.js';
   import { activityFactor } from './../../store/intervals.js';
   import { settings } from './../../store/settings.js';
   import { activities } from '../../store/activities';
-  import { changeActivityTitlesForDay } from './../../store/statistics';
   import ExpandBlock from './../ExpandBlock.svelte';
   import AllDayRecords from './AllDayRecords.svelte';
-  import { getHoursAndMinutesFromMinutes } from './../../utils.js';
+  import TitleLine from './../decorative/TitleLine.svelte';
+  import { getHoursAndMinutesFromMinutes } from './../../utils/timeUtils.js';
 
   export let isToday = false;
   export let expanded = false;
-  export let dayStatTitle = getDateString();
+  export let dayStatTitle = getDateString(new Date());
 
   let isDetailsActive = expanded;
+  let formattedTime;
+  let formattedTimeWithFactor;
 
   initStat();
+
   $: currentStat = $statTotal[dayStatTitle];
   $: formattedTimeWithFactor = $settings &&
     $locale &&
     currentStat?.sum?.activities &&
-    getHoursAndMinutesFromMinutes(currentStat.sum.activities * $activityFactor);
+    getHoursAndMinutesFromMinutes(
+      currentStat.sum.activities * $activityFactor
+    );
 
   $: formattedTime = $settings &&
     $locale &&
@@ -48,52 +54,66 @@
   }
 </script>
 
-<div class="day-stat">
+<div
+  class="day-stat"
+  class:is-today="{isToday}"
+>
   <div
     class="activity-sum"
-    on:click="{ () => { isDetailsActive = !isDetailsActive } }"
+    class:inactive="{!currentStat?.sum?.activities}"
+    title="{currentStat?.sum?.activities ? $_('click_for_details') : ''}"
+    on:click="{ () => { isDetailsActive = isToday ? !isDetailsActive : true } }"
   >
-    <div>{$_(isToday ? 'done_today' : 'activity')}</div>
     <div class="activity-sum-inner">
       {#if currentStat?.sum?.activities}
-      <div>
-        { formattedTimeWithFactor }
-      </div>
-      <div class={$activityFactor ? 'pure' : ''}>
-        {#if $activityFactor}
-          {$_('pure_time')} -
+        {#if $settings.useActivityFactor}
+          <div class="factor-time" >
+            { formattedTimeWithFactor }
+          </div>
         {/if}
-        { formattedTime }
-      </div>
+        <div class:pure-time={$activityFactor}>
+          {#if $settings.useActivityFactor}
+            {$_('pure_time')} -
+          {/if}
+          { formattedTime }
+        </div>
       {:else}
         {$_('nothing_yet')}
       {/if}
     </div>
   </div>
-  {#if $settings.showDetailsOnMainScreen && currentStat}
+  {#if currentStat}
     <ExpandBlock
-      title="{isToday ? '' : $_('details')}"
+      title="{isToday ? '' : $_('details').toLowerCase() }"
+      noLine="{isToday}"
+      fixedOpen="{!isToday}"
       bind:active="{isDetailsActive}"
-      center
+      wider
     >
       <div class="details">
         <div class="total">
           {#if currentStat?.global && Object.keys(currentStat.global).length}
-            <div class="details-title">{$_('global_activities')}:</div>
+            <TitleLine
+              bigFont="{isToday}"
+              wider="{!isToday}"
+              title="{$_('global_activities').toLowerCase()}"
+            />
             {#each Object.keys(currentStat.global) as activityKey}
               <div class="activity-sum in-details">
                 <div>{`${activityKey}`}</div>
                 <div class="activity-sum-inner">
-                  <div>
-                    { 
-                      $locale &&
-                      getHoursAndMinutesFromMinutes(
-                        currentStat.global[activityKey].totalTime * $activityFactor
-                      )
-                    }
-                  </div>
-                  <div class={$activityFactor ? 'pure' : ''}>
-                    {#if $activityFactor}
+                  {#if $settings.useActivityFactor}
+                    <div>
+                      { 
+                        $locale &&
+                        getHoursAndMinutesFromMinutes(
+                          currentStat.global[activityKey].totalTime * $activityFactor
+                        )
+                      }
+                    </div>
+                  {/if}
+                  <div class:pure={$settings.useActivityFactor}>
+                    {#if $settings.useActivityFactor}
                       {$_('pure_time')} -
                     {/if}
                     {
@@ -107,23 +127,29 @@
               </div>
             {/each}
             <br />
-            <div class="details-title">{$_('all_activities')}:</div>
+            <TitleLine
+              bigFont="{isToday}"
+              wider="{!isToday}"
+              title="{$_('all_activities').toLowerCase()}"
+            />
           {/if}
           {#if currentStat?.all}
             {#each Object.keys(currentStat.all) as activityKey}
               <div class="activity-sum in-details">
                 <div>{`${activityKey}`}</div>
                 <div class="activity-sum-inner">
-                  <div>
-                    { 
-                      $locale &&
-                      getHoursAndMinutesFromMinutes(
-                        currentStat.all[activityKey].totalTime * $activityFactor
-                      )
-                    }
-                  </div>
-                  <div class={$activityFactor ? 'pure' : ''}>
-                    {#if $activityFactor}
+                  {#if $settings.useActivityFactor}
+                    <div>
+                      { 
+                        $locale &&
+                        getHoursAndMinutesFromMinutes(
+                          currentStat.all[activityKey].totalTime * $activityFactor
+                        )
+                      }
+                    </div>
+                  {/if}
+                  <div class:pure="{$settings.useActivityFactor}">
+                    {#if $settings.useActivityFactor}
                       {$_('pure_time')} -
                     {/if}
                     {
@@ -142,11 +168,12 @@
       <ExpandBlock
         title="{$_('all_day_records')}"
         active="{expanded}"
-        small
-        center
+        fixedOpen="{!isToday}"
+        wider="{!isToday}"
       >
         <AllDayRecords
           dayStat="{$stat[dayStatTitle]}"
+          isToday
           date="{dayStatTitle}"
         />
       </ExpandBlock>
@@ -157,32 +184,51 @@
 <style lang="scss">
 .day-stat {
   padding: 15px 0 35px;
-
+  &.is-today {
+    .activity-sum:not(.inactive):not(.in-details) {
+      opacity: .8;
+      transition: opacity .2s;
+      cursor: pointer;
+      &:hover {
+        opacity: 1;
+      }
+    }
+  }
   .activity-sum {
-    display: flex;
-    cursor: pointer;
     justify-content: space-between;
     transition: background-color .2s;
-    font-size: 17px;
-    color: #aaa;
+    font-size: 22px;
+    color: var(--color-text);
     letter-spacing: 1px;
-    padding: 10px 0 15px;
+    padding: 15px 0 50px;
     &.in-details {
+      display: flex;
       cursor: default;
       font-size: 13px;
-      border-bottom: 1px dashed #444;
+      border: 2px solid var(--color-main-bg-softest);
+      padding: 10px;
+      align-items: center;
+      border-radius: 5px;
+      margin-bottom: 10px;
+      background-color: var(--color-main-bg-soft);
+      .activity-sum-inner {
+        text-align: right;
+        font-size: 14px;
+      }
+      .pure {
+        font-size: 11px;
+      }
     }
   }
   .activity-sum-inner {
-    text-align: right;
+    text-align: center;
   }
-  .pure {
+  .factor-time {
+    margin-bottom: 20px;
+  }
+  .pure-time {
     font-size: 12px;
-    color: #555;
-  }
-  .details-title {
-    color: #888;
-    font-size: 15px;
+    color: var(--color-text-soft);
   }
   .total {
     margin-bottom: 20px;

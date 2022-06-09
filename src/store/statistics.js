@@ -6,7 +6,7 @@ import { settings } from './../store/settings.js';
 import { startedAt } from './counter.js';
 import { extraCounter } from './extraCounter.js';
 import { addMessage } from './appNotifications.js';
-import { _ } from './../lang-utils.js';
+import { _ } from './../utils/langUtils.js';
 const MAXIMUM_TIME_FOR_ONE_ACTIVITY = 1000 * 60 * 60 * 24; // 24 hours
 
 export const getDateString = (dateObj = new Date) => {
@@ -35,10 +35,6 @@ function createStat() {
       update(stat => {
         const day = getDateString();
         const plannedDuration = get(intervals)[intervalId].duration;
-
-        if (!get(settings).subtractTimeWhenFinishing) {
-          endDate = +startDate + +plannedDuration * (1000 * 60);
-        }
 
         if (+endDate - +startDate > MAXIMUM_TIME_FOR_ONE_ACTIVITY) {
           endDate = new Date(+startDate + MAXIMUM_TIME_FOR_ONE_ACTIVITY);
@@ -142,6 +138,16 @@ function createStat() {
 
         return stat;
       });
+
+      localStorageUpdateStat();
+    },
+    removeDay: (day) => {
+      update(stat => {
+        delete stat[day];
+
+        return stat;
+      });
+
       localStorageUpdateStat();
     },
     changeRecord: (dayTitle, recordIndex, record, withUpdatingLocal = true) => {
@@ -186,33 +192,33 @@ export const localStorageUpdateStat = function() {
 export const statArr = derived(stat, $stat => {
   return Object.keys($stat).reduce((result, day) => {
     result.push({
-      name: day,
-      data: $stat[day],
+      title: day,
+      list: $stat[day],
     });
 
     return result;
   }, []).sort((a, b) => {
-    return parseInt(b.name.split('.').reverse().join(''))
-      - parseInt(a.name.split('.').reverse().join(''));
+    return parseInt(a.title.split('.').reverse().join(''))
+      - parseInt(b.title.split('.').reverse().join(''));
   });
 });
 
-export const statArrByMonth = derived(statArr, $statArr => {
+export const statByMonth = derived(statArr, $statArr => {
   return $statArr.reduce((result, day) => {
-    const monthYear = day.name.slice(3);
+    const monthYear = day.title.slice(3);
     
 
-    if (!(result[result.length - 1]?.title === monthYear)) {
-      result.push({
+    if (!result[monthYear]) {
+      result[monthYear] = {
         title: monthYear,
         list: [],
-      });
+      };
     } 
 
-    result[result.length - 1].list.push(day);
+    result[monthYear].list.push(day);
 
     return result;
-  }, []);
+  }, {});
 });
 
 export const dayRanges = derived(stat, $stat => {
@@ -233,7 +239,7 @@ export const activityDivider = writable(' - ');
 
 export const statTotal = derived(statArr, $statArr => {
   return $statArr.reduce((result, day) => {
-    result[day.name] = day.data.reduce((dayResult, record) => {
+    result[day.title] = day.list.reduce((dayResult, record) => {
       if (!dayResult.all) {
         dayResult = {
           global: {},

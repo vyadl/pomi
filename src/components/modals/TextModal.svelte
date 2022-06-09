@@ -1,28 +1,29 @@
 <script>
-  export let buttontext;
-  export let title;
-  export let inputmessage;
-  export let errormessage;
-  export let active = false;
-  export let customclose = false;
-  export let wide = true;
-  export let inputType = 'text';
   import { createEventDispatcher } from 'svelte';
-  import DefaultButton from './../form-elements/DefaultButton.svelte';
-  import TextInput from './../form-elements/TextInput.svelte';
+  import CustomButton from './../form-elements/CustomButton.svelte';
+  import CustomInput from './../form-elements/CustomInput.svelte';
   import BasicModal from './../modals/BasicModal.svelte';
+
+  export let active = false;
+  export let customClose = false;
+  export let wide = true;
+  export let buttonText = '';
+  export let title = '';
+  export let inputMessage = '';
+  export let errorMessage = '';
+  export let inputType = 'text';
 
   const dispatch = createEventDispatcher();
   let value = '';
 
-  $: if (inputmessage && active) { value = inputmessage; };
+  $: if (inputMessage && active) { value = inputMessage; };
 
   $: if (!active) closeModal();
 
   function sendValue() {
     dispatch('message', value);
 
-    if (!customclose) {
+    if (!customClose) {
       closeModal();
     }
   }
@@ -30,7 +31,7 @@
   function closeModal() {
     dispatch('close');
     value = '';
-    errormessage = ''; 
+    errorMessage = ''; 
   }
 </script>
 
@@ -40,22 +41,22 @@
   title="{title}"
 >
   <div class="inner">
-    <slot>
-      <form class="form" on:submit|preventDefault="{sendValue}">
-        <div class="input-wrapper">
-          <TextInput
-            type="{inputType}"
-            bind:value
-            autofocus
-            wide="{wide}"
-            bind:errormessage
-          />
-        </div>
-        <div class="buttons">
-          <DefaultButton type="submit">{buttontext}</DefaultButton>
-        </div>
-      </form>
-    </slot>
+    <form class="form" on:submit|preventDefault="{sendValue}">
+      <div class="input-wrapper">
+        <CustomInput
+          type="{inputType}"
+          bind:value
+          autofocus
+          wide="{wide}"
+          bind:errorMessage
+        />
+      </div>
+      <div class="buttons">
+        <CustomButton type="submit">
+          {buttonText}
+        </CustomButton>
+      </div>
+    </form>
   </div>
 </BasicModal>
 

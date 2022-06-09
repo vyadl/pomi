@@ -1,7 +1,7 @@
 <script>
   import { _ } from 'svelte-i18n';
   import TextModal from './modals/TextModal.svelte';
-  import DefaultButton from './form-elements/DefaultButton.svelte';
+  import CustomButton from './form-elements/CustomButton.svelte';
   import {
     activitiesArr,
     currentActivityId,
@@ -13,11 +13,12 @@
     editActivity,
   } from './../store/activities.js';
   import { fly } from 'svelte/transition';
+  import { askConfirmation } from '../store/confirmation.js';
 
   let isAddingModalActive = false;
   let isEditingModalActive = false;
   let activityActiveId = '';
-  let errormessage = '';
+  let errorMessage = '';
   initActivities();
 
   function add(event) {
@@ -27,7 +28,7 @@
       setCurrentActivityIdLocal(activity.id);
       isAddingModalActive = false;
     } else {
-      errormessage = 'This activity is already exist';
+      errorMessage = 'This activity is already exist';
     }
   }
 
@@ -43,7 +44,7 @@
       editActivity($currentActivityId, activityTitle);
       isEditingModalActive = false;
     } else {
-      errormessage = 'This activity is already exist';
+      errorMessage = 'This activity is already exist';
     }
   }
   
@@ -84,20 +85,20 @@
         activityActiveId = '';
       }}"
     >
-      <DefaultButton
+      <CustomButton
         on:click="{() => {
           handleActivityClick(activity);
         }}"
         active="{$currentActivityId === activity.id}"
       >
         {activity.title}
-      </DefaultButton>
+      </CustomButton>
       {#if activityActiveId === activity.id && activity.id !== $currentActivityId}
         <div
           class="remove"
-          transition:fly="{{ y: -50, duration: 400 }}"
-          on:click="{() => {
-            removeActivity(activity.id);
+          transition:fly="{{ y: -10, duration: 200 }}"
+          on:click="{ async () => {
+            if (await askConfirmation()) removeActivity(activity.id);
           }}"
         >
           {$_('remove')}
@@ -106,36 +107,36 @@
     </div>
   {/each}
   <div class="button-wrapper">
-    <DefaultButton
+    <CustomButton
       on:click="{() => {
         isAddingModalActive = true;
       }}"
     >
       +
-    </DefaultButton>
+    </CustomButton>
   </div>
 </div>
 <TextModal
-  buttontext="{$_('add')}"
+  buttonText="{$_('add')}"
   active="{isAddingModalActive}"
-  customclose
+  customClose
   on:message="{add}"
   on:close="{() => {
     isAddingModalActive = false;
   }}"
-  bind:errormessage
+  bind:errorMessage
   title="{$_('adding_activity')}"
 />
 <TextModal
-  buttontext="{$_('edit')}"
+  buttonText="{$_('edit')}"
   active="{isEditingModalActive}"
-  customclose
+  customClose
   on:message="{edit}"
   on:close="{() => {
     isEditingModalActive = false;
   }}"
-  bind:errormessage
-  inputmessage="{$currentActivityTitle}"
+  bind:errorMessage
+  inputMessage="{$currentActivityTitle}"
   title="{$_('editing_activity')}"
 />
 
@@ -144,6 +145,7 @@
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
+    padding-bottom: 50px;
   }
 
   .button-wrapper {
@@ -160,7 +162,7 @@
     top: 2px;
     font-size: 10px;
     transform: translateX(-50%);
-    color: #ccc;
+    color: var(--color-text-soft);
     transition: .8 opacity;
     &:hover {
       opacity: 1;
