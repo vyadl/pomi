@@ -3,9 +3,9 @@
   import en from './locale/en.json';
   import ru from './locale/ru.json';
   import ua from './locale/ua.json';
-  import DefaultSelect from './components/form-elements/DefaultSelect.svelte';
+  import CustomSelect from './components/form-elements/CustomSelect.svelte';
   import Timer from './components/Timer.svelte';
-  import Settings from './components/Settings.svelte';
+  import Settings from './components/settings/Settings.svelte';
   import { initSettings, settings } from './store/settings';
   import { counter, timerFormattedTime } from './store/counter.js';
   import { extraCounter, extraCounterFormattedTime } from './store/extraCounter.js';
@@ -16,10 +16,14 @@
   } from './store/activities.js';
   import DayStat from './components/statistics/DayStat.svelte';
   import Tabs from './components/Tabs.svelte';
+  import Activities from './components/Activities.svelte';
+  import Statistics from './components/statistics/Statistics.svelte';
   import Messages from './components/Messages.svelte';
+  import ConfirmModal from './components/modals/ConfirmModal.svelte';
 
   initSettings();
 
+  document.body.classList.add($settings.theme);
   addMessages('en', en);
   addMessages('ua', ua);
   addMessages('ru', ru);
@@ -30,6 +34,19 @@
   });
 
   let activeSettings = false;
+
+  let mainTabs = [
+    {
+      id: 'activities',
+      titleLocaleLabel: 'activities',
+      component: Activities,
+    },
+    {
+      id: 'statistics',
+      titleLocaleLabel: 'history',
+      component: Statistics,
+    },
+  ];
 </script>
 
 <svelte:head>
@@ -49,13 +66,13 @@
           {$_('current_activity').toLowerCase()}
         </div>
       {/if}
-      <DefaultSelect
+      <CustomSelect
         pure
-        nomargin
+        noMargin
         right
         options="{$activityOptionsForSelect}"
         value={$currentActivityId}
-        fontinherit
+        fontInherit
         on:change="{event => {
           setCurrentActivityId(event.detail);
         }}"
@@ -73,10 +90,14 @@
   <section class="central-wrapper">
     <Timer />
     {#if $settings.showActivityNearTimer}
-      <DayStat isToday />
+      <div class="day-stat-wrapper">
+        <DayStat isToday />
+      </div>
     {/if}
     {#if $settings.showMainTabs}
-      <Tabs />
+      <div class="day-stat-wrapper">
+        <Tabs tabs="{mainTabs}" />
+      </div>
     {/if}
   </section>
   <Settings
@@ -86,6 +107,7 @@
     }}"
   />
   <Messages />
+  <ConfirmModal />
 </main>
 
 <style lang="scss">
@@ -96,6 +118,9 @@
     min-height: 100vh;
     padding: 0;
     margin: 0;
+  }
+  .day-stat-wrapper {
+    margin-bottom: 50px;
   }
 
   .current-activity,

@@ -3,17 +3,18 @@
   import { intervalsArr } from './../../store/intervals.js';
   import { createEventDispatcher } from 'svelte';
   import BasicModal from './BasicModal.svelte';
-  import TextInput from './../form-elements/TextInput.svelte';
-  import DefaultSelect from './../form-elements/DefaultSelect.svelte';
-  import DefaultButton from './../form-elements/DefaultButton.svelte';
+  import CustomInput from './../form-elements/CustomInput.svelte';
+  import CustomSelect from './../form-elements/CustomSelect.svelte';
+  import CustomButton from './../form-elements/CustomButton.svelte';
   import { activities, activityOptionsForSelect } from '../../store/activities.js';
   import { stat, dayRanges } from '../../store/statistics.js';
+  import { askConfirmation } from '../../store/confirmation.js';
+  import { isRangeIntersectRanges } from './../../utils/generalUtils.js';
   import {
-    isRangeIntersectRanges,
     getDateStampByDayTitleAndTime,
     getHoursAndMinutesFromMinutes,
-    getHoursAndMinutesFromDateStamp,
-  } from '../../utils.js';
+    getHoursAndMinutesFromTimestamp,
+  } from './../../utils/timeUtils.js';
 
   const dispatch = createEventDispatcher();
   export let dayTitle = null;
@@ -22,8 +23,7 @@
   export let editingRecord = null;
   export let recordIndex = null;
 
-  let errorMessage = '';
-  let recordTemplate = {
+  const recordTemplate = {
     intervalId: 'main',
     startTime: '',
     endTime: '',
@@ -32,20 +32,21 @@
     duration: '',
     comment: '',
   };
+  let errorMessage = '';
   let record = {...recordTemplate};
 
   $: isAdding && active && prefillForAdding();
   $: convertRecordForEditing(editingRecord);
   $: calculatedDuration = dayTitle && record.startTime && record.endTime
     ? record.endTime >= record.startTime
-      ? getHoursAndMinutesFromMinutes(Math.ceil((endTimeStamp - startTimeStamp) / (1000 * 60)))
+      ? getHoursAndMinutesFromMinutes(Math.ceil((endTimestamp - startTimestamp) / (1000 * 60)))
       : $_('not_correct')
     : '';
   $: intervalOptions = $intervalsArr.map(item => ({ value: item[0], text: $_('interval_labels.' + item[0]) }));
-  $: startTimeStamp = dayTitle &&
+  $: startTimestamp = dayTitle &&
     record.startTime[2] !== '.' &&
     getDateStampByDayTitleAndTime(dayTitle, record.startTime);
-  $: endTimeStamp = dayTitle &&
+  $: endTimestamp = dayTitle &&
     record.startTime[2] !== '.' &&
     getDateStampByDayTitleAndTime(dayTitle, record.endTime);
   $: activitiesOptions = isAdding
@@ -69,8 +70,8 @@
         activityId: copiedRecord.activityId,
         activityTitle: copiedRecord.activityTitle,
         comment: copiedRecord.comment,
-        startTime: getHoursAndMinutesFromDateStamp(copiedRecord.startedAt),
-        endTime: getHoursAndMinutesFromDateStamp(copiedRecord.finishedAt),
+        startTime: getHoursAndMinutesFromTimestamp(copiedRecord.startedAt),
+        endTime: getHoursAndMinutesFromTimestamp(copiedRecord.finishedAt),
       };
     } else {
       resetRecord();
@@ -95,26 +96,28 @@
       activityId: record.activityId,
       activityTitle: $activities[record.activityId] || record.activityTitle,
       comment: record.comment,
-      duration: Math.ceil((endTimeStamp - startTimeStamp) / (1000 * 60)),
-      startedAt: startTimeStamp,
-      finishedAt: endTimeStamp,
+      duration: Math.ceil((endTimestamp - startTimestamp) / (1000 * 60)),
+      startedAt: startTimestamp,
+      finishedAt: endTimestamp,
     };
   }
 
   function validate() {
-    if (startTimeStamp > endTimeStamp) {
+    errorMessage = '';
+
+    if (startTimestamp > endTimestamp) {
       errorMessage = $_('validation.duration_negative_error');
 
       return false;
     }
 
-    if (endTimeStamp > +new Date()) {
+    if (endTimestamp > +new Date()) {
       errorMessage = $_('validation.duration_more_than_current');
 
       return false;
     }
 
-    if (isRangeIntersectRanges([startTimeStamp, endTimeStamp], ranges)) {
+    if (isRangeIntersectRanges([startTimestamp, endTimestamp], ranges)) {
       errorMessage = $_('validation.intersect_error');
 
       return false;
@@ -126,8 +129,6 @@
   function addRecord(event) {
     event.preventDefault();
 
-    errorMessage = '';
-
     if (validate()) {
       stat.addRecordManually(dayTitle, getRecordForSaving());
 
@@ -138,8 +139,6 @@
   function editRecord(event) {
     event.preventDefault();
 
-    errorMessage = '';
-
     if (validate()) {
       stat.changeRecord(dayTitle, recordIndex, getRecordForSaving());
 
@@ -148,14 +147,16 @@
   }
 
   async function removeRecord() {
-    const day = dayTitle;
-    const startedAt = editingRecord.startedAt;
-    
-    setTimeout(() => {
-      stat.removeStat(day, startedAt);
-    }, 500);
+    if (await askConfirmation()) {
+      const day = dayTitle;
+      const startedAt = editingRecord.startedAt;
+      
+      setTimeout(() => {
+        stat.removeStat(day, startedAt);
+      }, 500);
 
-    close();
+      close();
+    }
   }
 
   function close() {
@@ -173,7 +174,7 @@
   >
     <h3 class="day">{$_('day').toLowerCase()}: {dayTitle}</h3>
     <section class="section">
-      <DefaultSelect
+      <CustomSelect
         wide
         required
         label="{$_('activity')}"
@@ -187,7 +188,7 @@
       {/if}
     </section>
     <section class="section">
-      <DefaultSelect
+      <CustomSelect
         wide
         required
         label="{$_('type')}"
@@ -197,7 +198,7 @@
     </section>
     <section class="section time">
       <div class="time-block">
-        <TextInput
+        <CustomInput
           wide
           required
           type="time"
@@ -206,7 +207,7 @@
         />
       </div>
       <div class="time-block">
-        <TextInput
+        <CustomInput
           wide
           required
           type="time"
@@ -216,7 +217,7 @@
       </div>
     </section>
     <section class="section">
-      <TextInput
+      <CustomInput
         wide
         readonly
         central
@@ -226,7 +227,7 @@
       />
     </section>
     <section class="section">
-      <TextInput
+      <CustomInput
         wide
         bind:value="{record.comment}"
         label="{$_('comment')}"
@@ -239,26 +240,26 @@
     {/if}
     <footer class="footer">
       {#if isAdding}
-        <DefaultButton
+        <CustomButton
           on:click="{close}"
           small
         >
           {$_('cancel').toLowerCase()}
-        </DefaultButton>
+        </CustomButton>
       {:else}
-        <DefaultButton
+        <CustomButton
           on:click="{removeRecord}"
           small
         >
           {$_('modals.delete_record').toLowerCase()}
-        </DefaultButton>
+        </CustomButton>
       {/if}
-      <DefaultButton
+      <CustomButton
         type="submit"
         bordered
       >
         {$_('save')}
-      </DefaultButton>
+      </CustomButton>
     </footer>
   </form>
 </BasicModal>
@@ -273,6 +274,7 @@
       text-align: left;
       color: var(--color-text-soft);
       font-size: 14px;
+      margin-bottom: 15px;
     }
     .section {
       margin-bottom: 20px;

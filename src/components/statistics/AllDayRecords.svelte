@@ -1,9 +1,12 @@
 <script>
   import { _ } from 'svelte-i18n';
-  import { makeAbsoluteTimeString, getHoursAndMinutesFromMinutes } from './../../utils.js';
+  import {
+    getFullTimeFromTimestamp,
+    getHoursAndMinutesFromMinutes,
+  } from './../../utils/timeUtils.js';
   import { settings } from './../../store/settings.js';
   import HandleRecordModal from './../modals/HandleRecordModal.svelte';
-  import DefaultButton from './../form-elements/DefaultButton.svelte';
+  import CustomButton from './../form-elements/CustomButton.svelte';
 
   export let dayStat = [];
   export let date = '';
@@ -34,6 +37,28 @@
     dayTitle = null;
     currentRecord = null;
   }
+
+  function getActivityString(record) {
+    let activityString = `${record.activityTitle}
+      (${getHoursAndMinutesFromMinutes(record.duration)}`;
+
+    if (
+      $settings.showPlannedDuration &&
+      record.plannedDuration &&
+      record.plannedDuration !== record.duration
+    ) {
+      activityString += `, ${getHoursAndMinutesFromMinutes(record.plannedDuration)}
+        ${$_('planned')}`;
+    }
+
+    activityString += ')';
+
+    if (record.intervalId !== 'main') {
+      activityString += ' ' + $_('interval_labels.' + record.intervalId);
+    }
+
+    return activityString;
+  }
 </script>
 
 <div class="all-day-records">
@@ -42,47 +67,36 @@
       class="record"
       class:activity="{record.intervalId === 'main'}"
       on:click="{() => { openEditModal(record, recordIndex) }}"
+      title="edit"
     >
       <div class="record-main">
         <div class="activity-part">
-          {record.activityTitle} ({getHoursAndMinutesFromMinutes(record.duration)}{
-            $settings.showPlannedDuration &&
-            record.plannedDuration &&
-            record.plannedDuration !== record.duration
-                ? `, ${getHoursAndMinutesFromMinutes(record.plannedDuration)} ${$_('planned')}`
-                : ''})
-          {record.intervalId !== 'main' ? $_('interval_labels.' + record.intervalId) : ''}
+          {getActivityString(record)}
         </div>
         <div class="time">
-          {#if record.startedAt}
-            <div>
-              {$_('started_at')}
-              <span>
-                {makeAbsoluteTimeString(record.startedAt, true)}
-              </span>
-            </div>
-          {/if}
-          {#if record.finishedAt}
-            <div>
-              {$_('finished_at')}
-              <span>
-                {makeAbsoluteTimeString(record.finishedAt, true)}
-              </span>
-            </div>
-          {/if}
+          <div>
+            {$_('started_at')}
+            {getFullTimeFromTimestamp(record.startedAt)}
+          </div>
+          <div>
+            {$_('finished_at')}
+            {getFullTimeFromTimestamp(record.finishedAt)}
+          </div>
         </div>
       </div>
       {#if record.comment}
-        <div class="record-comment">{$_('comment')}: {record.comment}</div>
+        <div class="record-comment">
+          {$_('comment')}: {record.comment}
+        </div>
       {/if}
     </div>
   {/each}
   <div class="add-record">
-    <DefaultButton
-      on:click="{ openAddModal }"
+    <CustomButton
+      on:click="{openAddModal}"
     >
       {$_('add_record')}
-    </DefaultButton>
+    </CustomButton>
   </div>
   <HandleRecordModal
     bind:isAdding="{isAdding}"
@@ -90,7 +104,7 @@
     bind:editingRecord="{currentRecord}"
     bind:recordIndex="{currentRecordIndex}"
     bind:dayTitle="{dayTitle}"
-    on:close={resetEditing}
+    on:close="{resetEditing}"
   />
 </div>
 
@@ -99,40 +113,42 @@
 .all-day-records {
   .record {
     padding: 4px 0;
-    transition: background-color .2s;
+    transition: background-color .2s, transform .2s .03s;
     position: relative;
-    font-size: 12px;
+    font-size: 11px;
     cursor: pointer;
+    border: 1px solid var(--color-main-bg-softest);
+    padding: 5px 10px;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    background-color: var(--color-main-bg-soft);
     &.activity {
-      color: #555;
+      color: var(--color-text-softer);
     }
     &:hover {
-      background-color: rgba(255, 255, 255, .03);
+      background-color: var(--color-main-bg-soft-2);
+      transform: scale(1.02);
     }
   }
-
   .record-main {
     display: flex;
     align-items: center;
     justify-content: space-between;
   }
-
   .record-comment {
     padding-top: 5px;
   }
-
   .activity-part {
     width: 50%;
     margin-right: 15px;
   }
-
   .time {
     text-align: right;
   }
-
   .add-record {
     text-align: center;
-    font-size: 12px;
+    padding: 15px;
+    font-size: 14px;
   }
 }
 </style>

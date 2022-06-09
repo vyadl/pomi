@@ -2,49 +2,56 @@ import { writable, get } from 'svelte/store';
 import { updateFactor, intervals } from './intervals';
 let isFirstSubscribe = true;
 const defaultSettings = {
-  isUserOnPage: 1,
-  // shown in settings
-  subtractTimeWhenFinishing: 1,
-  showPlannedDuration: 1,
-  showTimeInTitle: 1,
-  showTimeInFavicon: 1,
-  showLastSecondsColorful: 1,
+  isUserOnPage: true,
+  // general interface
+  showTimeInTitle: true,
+  showTimeInFavicon: true,
+  showLastSecondsColorful: true,
+  showPlannedDuration: true,
+  // behaviour
+  showNotifications: false,
+  // language
   language: 'en',
-  useActivityFactor: 1,
-  useCustomActivityFactor: 0,
+  // theme
+  theme: 'dark',
+  // factor settings
+  useActivityFactor: true,
+  useCustomActivityFactor: false,
   customActivityFactor: 1,
-  showActivityNearTimer: 1,
-  showNotifications: 0,
-  showDetailsOnMainScreen: 1,
-  showMainTabs: 1,
-  showComment: 1,
-  showCurrentPeriodAboveTimer: 0,
-  showActivityInTopCorner: 0,
   // main screen
-  showCurrentActivityOnMainScreen: 1,
-  showCurrentActivityLabelOnMainScreen: 1,
-  showCurrentPeriodAboveTimer: 1,
+  showMainTabs: true,
+  showComment: true,
+  showActivityInTopCorner: false,
+  showActivityNearTimer: true,
+  showCurrentActivityOnMainScreen: true,
+  showCurrentActivityLabelOnMainScreen: true,
+  showCurrentPeriodAboveTimer: true,
+  showDescriptionsForPeriods: true,
 };
 
 export const settings = writable(defaultSettings);
 
 export const initSettings = function() {
-  const localSettings = localStorage.getItem('settings') ? JSON.parse(localStorage.getItem('settings')) : false;
+  const localSettings = localStorage.getItem('settings')
+    ? JSON.parse(localStorage.getItem('settings'))
+    : false;
 
   if (localSettings) {
     settings.set(localSettings);
   }
 
-  //initCheckingPresence();
+  initCheckingPresence();
 };
 
 function initCheckingPresence() {
-  document.addEventListener('visibilitychange', () => {
-    settings.update(settings => {
-      settings.isUserOnPage = +!document.hidden;
+  let isFirstTime = true;
 
-      return settings;
-    });
+  document.addEventListener('visibilitychange', () => {
+    if (!isFirstTime) {
+      changeSetting('isUserOnPage', !document.hidden);
+    } else {
+      isFirstTime = false;
+    }
   });
 }
 
@@ -64,6 +71,16 @@ settings.subscribe(() => {
 
   localStorageUpdateSettings();
 });
+
+export const changeSetting = function(setting, value, isBoolean = true) {
+  settings.update(settings => {
+    settings[setting] = isBoolean ? !!value : value;
+
+    return settings;
+  });
+
+  localStorageUpdateSettings();
+}
 
 export const resetSettings = function(isReload = true) {
   localStorage.removeItem('settings');

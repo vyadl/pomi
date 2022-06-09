@@ -1,6 +1,10 @@
 node_modules
 /public/build/
+.DS_Store
+
+// server things
 /public/.htaccess
+/public/.well-known/
+stderr.log
 app.js
 tmp
-.DS_Store
