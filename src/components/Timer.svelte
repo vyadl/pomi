@@ -159,7 +159,7 @@
             <div class="extra-counter-desc">
               {$_('extra_time')}
             </div>
-            {$extraTimerFormattedTime.mins}:{$extraTimerFormattedTime.secs}
+            {$extraTimerFormattedTime}
           </div>
         </div>
       {:else if ($timer > 0)}
