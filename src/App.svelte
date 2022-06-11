@@ -7,8 +7,13 @@
   import Timer from './components/Timer.svelte';
   import Settings from './components/settings/Settings.svelte';
   import { initSettings, settings } from './store/settings';
-  import { counter, timerFormattedTime } from './store/counter.js';
-  import { extraCounter, extraCounterFormattedTime } from './store/extraCounter.js';
+  import {
+    counter,
+    timerFormattedTime,
+    timer,
+    extraTimer,
+    extraTimerFormattedTime,
+  } from './store/counter.js';
   import {
     setCurrentActivityId,
     activityOptionsForSelect,
@@ -51,11 +56,13 @@
 
 <svelte:head>
   <title>
-    {$counter || $extraCounter && $settings.showTimeInTitle
-      ? $counter
-        ? `${$timerFormattedTime.mins}:${$timerFormattedTime.secs}`
-        : `${$extraCounterFormattedTime.mins}:${$extraCounterFormattedTime.secs}`
-      : 'pomi'}
+    {
+      $counter && $settings.showTimeInTitle
+      ? $extraTimer
+        ? `${$extraTimerFormattedTime.mins}:${$extraTimerFormattedTime.secs}`
+        : `${$timerFormattedTime.mins}:${$timerFormattedTime.secs}`
+      : 'pomi'
+    }
   </title>
 </svelte:head>
 <main class="wrapper">

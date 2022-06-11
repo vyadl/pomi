@@ -46,6 +46,7 @@
     border-radius: 5px;
     color: var(--color-text-softer);
     text-align: center;
+    letter-spacing: 1px;
     cursor: pointer;
     transition: transform .2s, color .2s, background-color .2s, border .2s;
     &:disabled {

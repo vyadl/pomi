@@ -1,10 +1,9 @@
+import { nanoid } from 'nanoid'
 import { writable, derived, get } from 'svelte/store';
 import { currentActivityId, currentActivityTitle, activities } from './activities.js';
 import { comment } from './../store/counter.js';
-import { intervals, currentInterval } from './intervals.js';
-import { settings } from './../store/settings.js';
-import { startedAt } from './counter.js';
-import { extraCounter } from './extraCounter.js';
+import { intervals } from './intervals.js';
+import { startTimestamp } from './counter.js';
 import { addMessage } from './appNotifications.js';
 import { _ } from './../utils/langUtils.js';
 const MAXIMUM_TIME_FOR_ONE_ACTIVITY = 1000 * 60 * 60 * 24; // 24 hours
@@ -29,7 +28,7 @@ function createStat() {
     update,
     addStat: (
       intervalId,
-      startDate = new Date(get(startedAt)),
+      startDate = new Date(get(startTimestamp)),
       endDate = new Date()
     ) => {
       update(stat => {
@@ -60,6 +59,7 @@ function createStat() {
             duration: finalDuration,
             plannedDuration,
             comment: get(comment),
+            id: nanoid(),
           });
         } else {
           const firstDay = startDate;
@@ -86,6 +86,7 @@ function createStat() {
             duration: Math.ceil((firstDayFinishedAt - firstDayStartedAt) / (1000 * 60)),
             plannedDuration,
             comment: get(comment),
+            id: nanoid(),
           });
 
           stat[nextDayStr].push({
@@ -97,6 +98,7 @@ function createStat() {
             duration: Math.ceil((nextDayFinishedAt - nextDayStartedAt) / (1000 * 60)),
             plannedDuration,
             comment: get(comment),
+            id: nanoid(),
           });
         }
 
@@ -105,13 +107,9 @@ function createStat() {
 
       localStorageUpdateStat();
     },
-    removeStat: (day, startedAt) => {
+    removeStat: (day, id) => {
       update(stat => {
-        if (stat[day][stat[day].length - 1].startedAt === startedAt) {
-          extraCounter.finish();
-        }
-
-        stat[day] = stat[day].filter(record => record.startedAt !== startedAt);
+        stat[day] = stat[day].filter(record => record.id !== id);
 
         return stat;
       });
@@ -119,13 +117,10 @@ function createStat() {
       localStorageUpdateStat();
     },
     addTime: () => {
-      extraCounter.finish();
-      currentInterval.set('');
-
       const lastDayStat = get(stat)[lastDay];
       const lastRecordCopied = {...lastDayStat[lastDayStat.length - 1]};
 
-      stat.removeStat(lastDay, lastRecordCopied.startedAt);
+      stat.removeStat(lastDay, lastRecordCopied.id);
 
       stat.addStat(
         lastRecordCopied.intervalId,
@@ -150,8 +145,10 @@ function createStat() {
 
       localStorageUpdateStat();
     },
-    changeRecord: (dayTitle, recordIndex, record, withUpdatingLocal = true) => {
+    changeRecord: (dayTitle, record, withUpdatingLocal = true) => {
       update(stat => {
+        const recordIndex = stat[dayTitle].findIndex(item => item.id === record.id);
+
         stat[dayTitle][recordIndex] = {
           ...stat[dayTitle][recordIndex],
           ...record,
@@ -222,9 +219,9 @@ export const statByMonth = derived(statArr, $statArr => {
 });
 
 export const dayRanges = derived(stat, $stat => {
-  return (dayTitle, excludeStartedAt = null) => {
+  return (dayTitle, excludeId = null) => {
     return $stat[dayTitle]?.reduce((result, record) => {
-      if (excludeStartedAt && record.startedAt === excludeStartedAt) {
+      if (excludeId && record.id === excludeId) {
         return result;
       }
 
@@ -314,9 +311,9 @@ export const lastTime = derived(stat, $stat => {
 });
 
 export const changeActivityTitlesForDay = function(date) {
-  get(stat)[date].forEach((record, recordIndex) => {
+  get(stat)[date].forEach((record) => {
     if (get(activities)[record.activityId] && record.activityTitle !== get(activities)[record.activityId]) {
-      stat.changeRecord(date, recordIndex, {
+      stat.changeRecord(date, {
         activityTitle: get(activities)[record.activityId],
       }, false);
     }
