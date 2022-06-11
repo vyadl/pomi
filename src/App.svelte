@@ -59,8 +59,8 @@
     {
       $counter && $settings.showTimeInTitle
       ? $extraTimer
-        ? `${$extraTimerFormattedTime.mins}:${$extraTimerFormattedTime.secs}`
-        : `${$timerFormattedTime.mins}:${$timerFormattedTime.secs}`
+        ? $extraTimerFormattedTime
+        : $timerFormattedTime
       : 'pomi'
     }
   </title>
