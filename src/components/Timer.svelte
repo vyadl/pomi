@@ -3,21 +3,19 @@
   import { fade } from 'svelte/transition';
   import {
     counter,
+    counterFormattedTime,
+    timer,
     timerFormattedTime,
-    timerTime,
+    extraTimer,
+    extraTimerFormattedTime
   } from './../store/counter.js';
-  import {
-    extraCounter,
-    extraCounterFormattedTime,
-    timerTime as extraTimerTime,
-  } from './../store/extraCounter.js';
   import {
     activeIntervals,
     currentInterval,
     initIntervals,
     stopAudio,
   } from './../store/intervals.js';
-  import { stat, lastTime } from './../store/statistics.js';
+  import { stat } from './../store/statistics.js';
   import { settings } from './../store/settings.js';
   import { currentActivityTitle } from '../store/activities.js';
   import { makeTwoDigitsCifer, getRandomColor } from './../utils/generalUtils.js';
@@ -31,7 +29,6 @@
 
   let isCommentActive = false;
 
-  counter.set(0);
   initActivities();
   initIntervals();
   initAnimateFavicon();
@@ -46,33 +43,32 @@
     context.fillStyle = '#fff';
 
     faviconTimer = setInterval(() => {
-      const currentCounter = $counter
-        ? $timerTime.mins > 0
-          ? $timerTime.mins 
-          : $timerTime.secs
-        : $extraCounter
-          ? $extraTimerTime.mins > 0
-            ? $extraTimerTime.mins
-            : $extraTimerTime.secs + 1
+      const currentCounter = $timer > 0
+        ? +$timerFormattedTime.mins > 0
+          ? $timerFormattedTime.mins
+          : $timerFormattedTime.secs
+        : $extraTimer
+          ? +$extraTimerFormattedTime.mins > 0
+            ? $extraTimerFormattedTime.mins
+            : $extraTimerFormattedTime.secs
           : 0;
-
 
       if ((currentCifer !== currentCounter && $settings.showTimeInFavicon)
         || ($settings.showTimeInFavicon && faviconEl.getAttribute('href') === faviconHref)) {
-        const currentTime = $counter ? $timerTime : $extraTimerTime + 5;
+        const currentTime = $timer > 0 ? $timerFormattedTime : $extraTimerFormattedTime + 5;
         const bgcolor =
           currentTime.mins < 1 && currentTime.secs < 10 && $settings.showLastSecondsColorful
             ? getRandomColor()
-            : $counter
-              ? '#000'
-              : '#fff';
+            : $extraTimer
+              ? '#fff'
+              : '#000';
 
         currentCifer = currentCounter;
 
         context.clearRect(0, 0, 64, 64);
         context.fillStyle = bgcolor;
         context.fillRect(0, 0, 64, 64);
-        context.fillStyle = $counter ? '#fff' : '#000';
+        context.fillStyle = $extraTimer ? '#000' : '#fff';
         context.fillText(makeTwoDigitsCifer(currentCifer), 8, 48, 48);    
         faviconEl.setAttribute('href', canvas.toDataURL('image/png'));
       }
@@ -81,7 +77,7 @@
         faviconEl.setAttribute('href', faviconHref);
       }
 
-      if (!currentCounter) {
+      if (!$counter) {
         clearInterval(faviconTimer);
       }
     }, 1000);
@@ -90,8 +86,7 @@
   function startPeriod(intervalId, options) {
     isCommentActive = false;
     clearInterval(faviconTimer);
-    counter.set(options.duration * 60);
-    counter.start(intervalId);
+    counter.start(intervalId, options.duration * 60);
     currentInterval.set(intervalId);
     initAnimateFavicon();
   }
@@ -101,19 +96,13 @@
   }
 
   function resetPeriod() {
-    counter.resetPeriod($currentInterval);
+    counter.resetPeriod();
     stopAudio();
   }
 
   function addExtraTime() {
     stat.addTime();
-    resetExtraTime();
-    stopAudio();
-  }
-
-  function resetExtraTime() {
-    extraCounter.finish();
-    currentInterval.set('');
+    resetPeriod();
     stopAudio();
   }
 </script>
@@ -122,21 +111,21 @@
   <div class="inner">
     <div
       class="cifers"
-      class:summed="{$extraCounter}"
+      class:summed="{$extraTimer}"
     >
       <div class="cifers-desc">
-        {#if $counter && $settings.showCurrentPeriodAboveTimer}
+        {#if $counter || $timer && $settings.showCurrentPeriodAboveTimer}
           {$_('now').toLowerCase()}:
           {$_(`interval_labels.${$currentInterval}`).toLowerCase()}
           {$currentInterval === 'main' ? $currentActivityTitle : ''}
-        {:else if $extraCounter}
+        {:else if $extraTimer}
           {$_('last')} {$_(`interval_labels.${$currentInterval}`).toLowerCase()} + {$_('extra_time')}
         {/if}
       </div>
-      {#if $extraCounter}
-        {makeTwoDigitsCifer(+$lastTime.duration + $extraTimerTime.mins)}
+      {#if $extraTimer}
+        {$counterFormattedTime.mins}
         <span class="cifers-divider">:</span>
-        {makeTwoDigitsCifer($timerTime.secs + $extraTimerTime.secs)}
+        {$counterFormattedTime.secs}
       {:else}
         {$timerFormattedTime.mins }
         <span class="cifers-divider">:</span>
@@ -144,7 +133,7 @@
       {/if}
     </div>
     <div class="timer-controls">
-      {#if $extraCounter}
+      {#if $extraTimer}
         <div class="extra-counter-wrapper" transition:fade>
           <div class="extra-counter-buttons">
             <CustomButton
@@ -153,7 +142,7 @@
               small
               onlyText
               title="{$_('tooltip_reset_extra')}"
-              on:click="{resetExtraTime}"
+              on:click="{resetPeriod}"
             >
               {$_('reset')}
             </CustomButton>
@@ -170,10 +159,10 @@
             <div class="extra-counter-desc">
               {$_('extra_time')}
             </div>
-            {$extraCounterFormattedTime.mins}:{$extraCounterFormattedTime.secs}
+            {$extraTimerFormattedTime}
           </div>
         </div>
-      {:else if ($counter)}
+      {:else if ($timer > 0)}
         <div
           class="counter-buttons-wrapper"
           transition:fade
@@ -208,7 +197,7 @@
             big
             activeBigger
             active="{intervalId === $currentInterval}"
-            disabled="{($counter || $extraCounter)}"
+            disabled="{($counter || $timer)}"
             title="{`${options.duration}${$_('minutes_short')} - ${$_('interval_labels.' + intervalId)}`}"
             on:click="{() => {
               startPeriod(intervalId, options);
@@ -265,7 +254,7 @@
       top: 50px;
       font-size: 14px;
       letter-spacing: 1px;
-      color: var(--color-main-bg-soft);
+      color: var(--color-text-softest);
     }
     .cifers-divider {
       position: relative;
