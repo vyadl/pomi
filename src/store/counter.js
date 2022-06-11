@@ -1,69 +1,58 @@
 import { writable, derived, get } from 'svelte/store';
 import { stat } from './statistics.js';
-import { extraCounter } from './extraCounter.js';
 import { settings } from './settings.js';
-import { currentActivityTitle } from './activities.js';
 import { makeTwoDigitsCifer } from './../utils/generalUtils.js';
+import { getMinutesSecondsObjFromSeconds } from './../utils/timeUtils.js';
 import { currentInterval, intervals, playAudio } from './intervals.js';
 import { _ } from './../utils/langUtils.js';
 
 function createCounter() {
   const { subscribe, set, update } = writable(0);
-  let timerId;
+  let counterId;
 
   return {
     subscribe,
     set: (number) => {
-      clearInterval(timerId);
+      clearInterval(counterId);
       set(number);
     },
-    start: (intervalId) => {
-      const start = +new Date;
-      const endTime = +new Date(start + get(counter) * 1000);
+    start: (intervalId, durationInSeconds) => {
+      const nowTimestamp = +new Date();
+      const endTimestamp = +new Date(nowTimestamp + durationInSeconds * 1000);
+      let isStatAdded = false;
 
-      extraCounter.finish();
-      startedAt.set(start);
-      comment.set('');
+      plannedFinishTimestamp.set(endTimestamp);
+      startTimestamp.set(nowTimestamp);
+      counter.set(0);
 
-      timerId = setInterval(() => {
-        update(counter => {
-          const newCounter = Math.ceil((endTime - +new Date) / 1000);
+      counterId = setInterval(() => {
+        update(() => {
+          const nowTimestamp = +new Date();
 
-          if (counter > 1) {
-            return newCounter;
+          const newCounter = Math.floor((nowTimestamp - get(startTimestamp)) / 1000);
+
+          if (!isStatAdded && nowTimestamp > endTimestamp) {
+            stat.addStat(intervalId);
+            playAudio(intervalId);
+            handleFinishPeriodNotification();
+            isStatAdded = true;
           }
 
-          if (counter === 1 || counter === 0) {
-            extraCounter.start();
-          } else if (counter < 0) {
-            extraCounter.start(+new Date - Math.abs(newCounter) * 1000);
-          }
-
-          playAudio(intervalId);
-
-          stat.addStat(intervalId);
-          clearInterval(timerId);
-          handleNotification();
-          
-          return 0;
+          return newCounter;
         });
-
       }, 1000);
     },
     finishPeriod: (intervalId) => {
-      update(() => {
-        clearInterval(timerId);
-        stat.addStat(intervalId);
-        currentInterval.set('');
-
-        return 0;
-      });
+      stat.addStat(intervalId);
+      counter.resetPeriod();
+      playAudio(intervalId);
     },
     resetPeriod: () => {
       update(() => {
-        clearInterval(timerId);
-
-        currentInterval.set('');
+        clearInterval(counterId);
+        currentInterval.set(null);
+        startTimestamp.set(null);
+        plannedFinishTimestamp.set(null);
 
         return 0;
       });
@@ -71,30 +60,49 @@ function createCounter() {
   };
 }
 
-export const startedAt = writable(0);
+export const plannedFinishTimestamp = writable(0);
+export const startTimestamp = writable(0);
 export const comment = writable('');
 export const counter = createCounter();
-export const timerTime = derived(
+
+export const timer = derived(
+  [counter, plannedFinishTimestamp, startTimestamp],
+  ([$counter, $plannedFinishTimestamp, $startTimestamp]) => {
+    return $plannedFinishTimestamp && $startTimestamp
+      ? Math.floor(($plannedFinishTimestamp - ($startTimestamp + $counter * 1000)) / 1000)
+      : 0;
+  }
+);
+
+export const extraTimer = derived(
+  timer,
+  $timer => {
+    return $timer >= 0 ? 0 : -$timer;
+  }
+);
+
+export const counterFormattedTime = derived(
   counter,
   $counter => {
-    return {
-      mins: Math.floor($counter / 60),
-      secs: $counter % 60
-    }
+    return getMinutesSecondsObjFromSeconds($counter);
   }
 )
 
 export const timerFormattedTime = derived(
-  timerTime,
-  $timerTime => {
-    return {
-      mins: makeTwoDigitsCifer($timerTime.mins),
-      secs: makeTwoDigitsCifer($timerTime.secs)
-    };
+  timer,
+  $timer => {
+    return getMinutesSecondsObjFromSeconds($timer);
   }
 );
 
-function handleNotification() {
+export const extraTimerFormattedTime = derived(
+  extraTimer,
+  $extraTimer => {
+    return getMinutesSecondsObjFromSeconds($extraTimer);
+  }
+);
+
+function handleFinishPeriodNotification() {
   if (get(settings).showNotifications) {
     const currentIntervalDuration = get(intervals)[get(currentInterval)].duration + _('minutes_short')
     const title = `${get(currentActivityTitle)} ${_('notifications.is_end')} (${currentIntervalDuration})`;

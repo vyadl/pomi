@@ -11,7 +11,7 @@ html, body {
 }
 
 body {
-  color: --color-text;
+  color: var(--color-text-soft);
   margin: 0;
   padding: 0;
   font-family: Verdana, Tahoma, sans-serif;
@@ -84,9 +84,4 @@ label {
 input, button, select, textarea {
   font-family: inherit;
   font-size: inherit;
-  padding: .4em;
-  margin: 0 0 .5em 0;
-  box-sizing: border-box;
-  border: 1px solid #ccc;
-  border-radius: 2px;
 }

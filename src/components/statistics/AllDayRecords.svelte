@@ -10,6 +10,10 @@
 
   export let dayStat = [];
   export let date = '';
+
+  $: sortedDayStat = [...dayStat].sort((a, b) => {
+    return b.startedAt - a.startedAt;
+  })
   
   let currentRecord = null;
   let currentRecordIndex = null;
@@ -19,7 +23,6 @@
   
   function openEditModal(record, recordIndex) {
     currentRecord = JSON.parse(JSON.stringify(record));
-    currentRecordIndex = recordIndex;
     dayTitle = date;
     isAdding = false;
     isHandleRecordActive = true;
@@ -62,11 +65,11 @@
 </script>
 
 <div class="all-day-records">
-  {#each dayStat as record, recordIndex}
+  {#each sortedDayStat as record}
     <div
       class="record"
-      class:activity="{record.intervalId === 'main'}"
-      on:click="{() => { openEditModal(record, recordIndex) }}"
+      class:break="{record.intervalId !== 'main'}"
+      on:click="{() => { openEditModal(record) }}"
       title="edit"
     >
       <div class="record-main">
@@ -102,7 +105,6 @@
     bind:isAdding="{isAdding}"
     bind:active="{isHandleRecordActive}"
     bind:editingRecord="{currentRecord}"
-    bind:recordIndex="{currentRecordIndex}"
     bind:dayTitle="{dayTitle}"
     on:close="{resetEditing}"
   />
@@ -122,8 +124,8 @@
     border-radius: 5px;
     margin-bottom: 10px;
     background-color: var(--color-main-bg-soft);
-    &.activity {
-      color: var(--color-text-softer);
+    &.break {
+      color: var(--color-text-softest);
     }
     &:hover {
       background-color: var(--color-main-bg-soft-2);

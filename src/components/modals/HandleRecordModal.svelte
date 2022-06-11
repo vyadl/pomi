@@ -21,7 +21,6 @@
   export let active = false;
   export let isAdding = false;
   export let editingRecord = null;
-  export let recordIndex = null;
 
   const recordTemplate = {
     intervalId: 'main',
@@ -34,6 +33,7 @@
   };
   let errorMessage = '';
   let record = {...recordTemplate};
+  let isTimeChanged = false;
 
   $: isAdding && active && prefillForAdding();
   $: convertRecordForEditing(editingRecord);
@@ -58,7 +58,7 @@
       : [{ value: record?.activityId, text: record?.activityTitle + ` (${$_('removed')})` }]
   ];
 
-  $: ranges = dayTitle && $dayRanges(dayTitle, isAdding ? null : editingRecord.startedAt);
+  $: ranges = dayTitle && $dayRanges(dayTitle, isAdding ? null : editingRecord.id);
 
 
   function convertRecordForEditing() {
@@ -92,13 +92,14 @@
 
   function getRecordForSaving() {
     return {
+      id: editingRecord.id,
       intervalId: record.intervalId,
       activityId: record.activityId,
       activityTitle: $activities[record.activityId] || record.activityTitle,
       comment: record.comment,
       duration: Math.ceil((endTimestamp - startTimestamp) / (1000 * 60)),
-      startedAt: startTimestamp,
-      finishedAt: endTimestamp,
+      startedAt: isTimeChanged ? startTimestamp : editingRecord.startedAt,
+      finishedAt: isTimeChanged ? endTimestamp : editingRecord.finishedAt,
     };
   }
 
@@ -140,7 +141,7 @@
     event.preventDefault();
 
     if (validate()) {
-      stat.changeRecord(dayTitle, recordIndex, getRecordForSaving());
+      stat.changeRecord(dayTitle, getRecordForSaving());
 
       close();
     };
@@ -149,10 +150,10 @@
   async function removeRecord() {
     if (await askConfirmation()) {
       const day = dayTitle;
-      const startedAt = editingRecord.startedAt;
+      const id = editingRecord.id;
       
       setTimeout(() => {
-        stat.removeStat(day, startedAt);
+        stat.removeStat(day, id);
       }, 500);
 
       close();
@@ -203,6 +204,7 @@
           required
           type="time"
           bind:value="{record.startTime}"
+          on:input={() => { isTimeChanged = true }}
           label="{$_('start_time')}"
         />
       </div>
@@ -212,6 +214,7 @@
           required
           type="time"
           bind:value="{record.endTime}"
+          on:input={() => { isTimeChanged = true }}
           label="{$_('end_time')}"
         />
       </div>

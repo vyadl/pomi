@@ -13,6 +13,16 @@ export const getFullTimeFromTimestamp = (milliseconds) => {
   }`;
 };
 
+export const getMinutesSecondsObjFromSeconds = (seconds) => {
+  return {
+    mins: makeTwoDigitsCifer(Math.floor(seconds / 60)),
+    secs: makeTwoDigitsCifer(seconds % 60),
+    toString() {
+      return `${this.mins}:${this.secs}`;
+    }
+  }
+};
+
 export const getHoursAndMinutesFromMinutes = (minutes) => {
   const hours = Math.floor(minutes / 60);
   const resultMinutes = Math.ceil(minutes % 60);
