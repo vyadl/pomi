@@ -15,9 +15,11 @@
 
   let isIntervalSettingsExpand = true;
 
-  function changeDuration(intervalId, value, isRound = false) {
+  function changeDuration(intervalId, value, isRound = true) {
     const correctValue = +value
-      ? isRound ? Math.ceil(value) : value
+      ? isRound
+        ? Math.ceil(value)
+        : value
       : 1;
 
     intervals.changeIntervalProp(intervalId, 'duration', correctValue);
