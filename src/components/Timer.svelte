@@ -27,8 +27,6 @@
   const faviconHref = faviconEl.getAttribute('href');
   let faviconTimer;
 
-  let isCommentActive = false;
-
   initActivities();
   initIntervals();
   initAnimateFavicon();
@@ -84,7 +82,6 @@
   }
 
   function startPeriod(intervalId, options) {
-    isCommentActive = false;
     clearInterval(faviconTimer);
     counter.start(intervalId, options.duration * 60);
     currentInterval.set(intervalId);
@@ -217,13 +214,7 @@
       {/each}
     </div>
     {#if $settings.showComment}
-      <Comment
-        active="{isCommentActive}"
-        visible="{$currentInterval}"
-        on:switch="{() => {
-          isCommentActive = !isCommentActive;
-        }}"
-      />
+      <Comment />
     {/if}
   </div>
 </div>

@@ -1,62 +1,50 @@
 <script>
-  import { createEventDispatcher } from 'svelte';
   import { slide } from 'svelte/transition';
   import { _ } from 'svelte-i18n';
   import { comment } from './../store/counter.js';
+  import { currentInterval } from './../store/intervals.js';
   import CustomInput from './form-elements/CustomInput.svelte';
+  import CustomButton from './form-elements/CustomButton.svelte';
 
-  export let active = false;
-  export let visible = false;
-
-  const dispatch = createEventDispatcher();
+  let showComment = false;
 </script>
 
 <div class="comment">
-  <div class="top-line" class:visible>
+  {#if $currentInterval}
     <div
-      class="control"
-      class:active
-      on:click="{() => {
-        dispatch('switch');
-      }}"
+      class="top-line"
+      class:active="{$currentInterval}"
     >
-      {$_('comment_for_period')}
+      <CustomButton
+        on:click="{() => {
+          showComment = !showComment;
+        }}"
+      >
+        {$_('comment_for_period')}
+      </CustomButton>
     </div>
-  </div>
-  {#if active}
-    <div class="input-wrap" transition:slide>
-      <CustomInput
-        bind:value="{$comment}"
-        wide
-      />
-    </div>
+    {#if showComment}
+      <div class="input-wrap" transition:slide>
+        <CustomInput
+          on:input="{({ detail }) => {
+            comment.set(detail);
+          }}"
+          value="{$comment}"
+          wide
+        />
+      </div>
+    {/if}
   {/if}
 </div>
 
 <style lang="scss">
   .comment {
     margin-bottom: 15px;
-  }
-  .top-line {
-    font-size: 12px;
-    text-align: right;
-    margin-bottom: 10px;
-    pointer-events: none;
-    opacity: 0;
-    transition: opacity .2s;
-    &.visible {
-      pointer-events: all;
-      opacity: 1;
-    }
-  }
-  .control {
-    cursor: pointer;
-    opacity: .8;
-    color: var(--color-text-softer);
-    transition: opacity .2s;
-    &:hover,
-    &.active {
-      opacity: 1;
+    min-height: 40px;
+    .top-line {
+      font-size: 12px;
+      text-align: right;
+      margin-bottom: 10px;
     }
   }
 </style>
