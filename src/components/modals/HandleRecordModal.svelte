@@ -13,7 +13,7 @@
   import {
     getDateStampByDayTitleAndTime,
     getHoursAndMinutesFromMinutes,
-    getHoursAndMinutesFromTimestamp,
+    getFullTimeFromTimestamp,
   } from './../../utils/timeUtils.js';
 
   const dispatch = createEventDispatcher();
@@ -33,7 +33,6 @@
   };
   let errorMessage = '';
   let record = {...recordTemplate};
-  let isTimeChanged = false;
 
   $: isAdding && active && prefillForAdding();
   $: convertRecordForEditing(editingRecord);
@@ -70,8 +69,8 @@
         activityId: copiedRecord.activityId,
         activityTitle: copiedRecord.activityTitle,
         comment: copiedRecord.comment,
-        startTime: getHoursAndMinutesFromTimestamp(copiedRecord.startedAt),
-        endTime: getHoursAndMinutesFromTimestamp(copiedRecord.finishedAt),
+        startTime: getFullTimeFromTimestamp(copiedRecord.startedAt),
+        endTime: getFullTimeFromTimestamp(copiedRecord.finishedAt),
       };
     } else {
       resetRecord();
@@ -92,14 +91,14 @@
 
   function getRecordForSaving() {
     return {
-      id: editingRecord.id,
+      id: isAdding ? null : editingRecord.id,
       intervalId: record.intervalId,
       activityId: record.activityId,
       activityTitle: $activities[record.activityId] || record.activityTitle,
       comment: record.comment,
       duration: Math.ceil((endTimestamp - startTimestamp) / (1000 * 60)),
-      startedAt: isTimeChanged ? startTimestamp : editingRecord.startedAt,
-      finishedAt: isTimeChanged ? endTimestamp : editingRecord.finishedAt,
+      startedAt: startTimestamp,
+      finishedAt: endTimestamp,
     };
   }
 
@@ -161,6 +160,7 @@
   }
 
   function close() {
+    errorMessage = '';
     dispatch('close');
   }
 </script>
@@ -204,8 +204,10 @@
           required
           type="time"
           bind:value="{record.startTime}"
-          on:input={() => { isTimeChanged = true }}
           label="{$_('start_time')}"
+          optionalProps="{{
+            step: '1',
+          }}"
         />
       </div>
       <div class="time-block">
@@ -214,8 +216,10 @@
           required
           type="time"
           bind:value="{record.endTime}"
-          on:input={() => { isTimeChanged = true }}
           label="{$_('end_time')}"
+          optionalProps="{{
+            step: '1',
+          }}"
         />
       </div>
     </section>

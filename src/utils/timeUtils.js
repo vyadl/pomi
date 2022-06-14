@@ -32,12 +32,6 @@ export const getHoursAndMinutesFromMinutes = (minutes) => {
     : `${resultMinutes}${_('minutes_short')}`;
 };
 
-export const getHoursAndMinutesFromTimestamp = (dateStamp) => {
-  const date = new Date(dateStamp);
-
-  return `${makeTwoDigitsCifer(date.getHours())}:${makeTwoDigitsCifer(date.getMinutes())}`;
-};
-
 export const convertDate = (dateString, fromCustomToDate = true) => {
   if (fromCustomToDate) {
     return dateString.split('.').reverse().join('-');
