@@ -33,8 +33,6 @@
   };
   let errorMessage = '';
   let record = {...recordTemplate};
-  let isStartTimeChanged = false;
-  let isFinishTimeChanged = false;
 
   $: isAdding && active && prefillForAdding();
   $: convertRecordForEditing(editingRecord);
@@ -99,8 +97,8 @@
       activityTitle: $activities[record.activityId] || record.activityTitle,
       comment: record.comment,
       duration: Math.ceil((endTimestamp - startTimestamp) / (1000 * 60)),
-      startedAt: isStartTimeChanged ? startTimestamp : editingRecord.startedAt,
-      finishedAt: isFinishTimeChanged ? endTimestamp : editingRecord.finishedAt,
+      startedAt: startTimestamp,
+      finishedAt: endTimestamp,
     };
   }
 
@@ -163,8 +161,6 @@
 
   function close() {
     errorMessage = '';
-    isStartTimeChanged = false;
-    isFinishTimeChanged = false;
     dispatch('close');
   }
 </script>
@@ -208,7 +204,6 @@
           required
           type="time"
           bind:value="{record.startTime}"
-          on:input={() => { isStartTimeChanged = true }}
           label="{$_('start_time')}"
           optionalProps="{{
             step: '1',
@@ -221,7 +216,6 @@
           required
           type="time"
           bind:value="{record.endTime}"
-          on:input={() => { isFinishTimeChanged = true }}
           label="{$_('end_time')}"
           optionalProps="{{
             step: '1',
