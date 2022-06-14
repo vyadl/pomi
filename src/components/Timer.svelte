@@ -217,13 +217,7 @@
       {/each}
     </div>
     {#if $settings.showComment}
-      <Comment
-        active="{isCommentActive}"
-        visible="{$currentInterval}"
-        on:switch="{() => {
-          isCommentActive = !isCommentActive;
-        }}"
-      />
+      <Comment />
     {/if}
   </div>
 </div>
