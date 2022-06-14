@@ -17,15 +17,16 @@
 
   export let isToday = false;
   export let expanded = false;
-  export let dayStatTitle = getDateString(new Date());
+  export let dayStatTitle = '';
 
+  $: dayTitle = $settings && isToday ? getDateString(new Date()) : dayStatTitle;
   let isDetailsActive = expanded;
   let formattedTime;
   let formattedTimeWithFactor;
 
   initStat();
 
-  $: currentStat = $statTotal[dayStatTitle];
+  $: currentStat = $statTotal[dayTitle];
   $: formattedTimeWithFactor = $settings &&
     $locale &&
     currentStat?.sum?.activities &&
@@ -38,16 +39,16 @@
     currentStat?.sum?.activities &&
     getHoursAndMinutesFromMinutes(currentStat.sum.activities);
 
-  $: $activities, checkActivities(), currentStat = $statTotal[dayStatTitle];
+  $: $activities, checkActivities(), currentStat = $statTotal[dayTitle];
 
   function checkActivities() {
-    if ($stat[dayStatTitle]) {
-      $stat[dayStatTitle].some(record => {
+    if ($stat[dayTitle]) {
+      $stat[dayTitle].some(record => {
         if (
           $activities[record.activityId] &&
           record.activityTitle !== $activities[record.activityId]
         ) {
-          changeActivityTitlesForDay(dayStatTitle);
+          changeActivityTitlesForDay(dayTitle);
         }
       });
     }
@@ -172,9 +173,9 @@
         wider="{!isToday}"
       >
         <AllDayRecords
-          dayStat="{$stat[dayStatTitle]}"
+          dayStat="{$stat[dayTitle]}"
           isToday
-          date="{dayStatTitle}"
+          date="{dayTitle}"
         />
       </ExpandBlock>
     </ExpandBlock>
