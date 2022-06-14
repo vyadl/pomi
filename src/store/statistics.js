@@ -163,7 +163,10 @@ function createStat() {
     },
     addRecordManually: (dayTitle, record) => {
       update(stat => {
-        stat[dayTitle].push({...record});
+        stat[dayTitle].push({
+          ...record,
+          id: nanoid(),
+        });
 
         return stat;
       });
