@@ -314,6 +314,7 @@ export const changeActivityTitlesForDay = function(date) {
   get(stat)[date].forEach((record) => {
     if (get(activities)[record.activityId] && record.activityTitle !== get(activities)[record.activityId]) {
       stat.changeRecord(date, {
+        id: record.id,
         activityTitle: get(activities)[record.activityId],
       }, false);
     }
