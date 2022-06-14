@@ -56,6 +56,8 @@ function createCounter() {
 
         return 0;
       });
+      
+      comment.set('');
     },
   };
 }
