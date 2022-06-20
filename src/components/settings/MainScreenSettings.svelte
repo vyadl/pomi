@@ -33,15 +33,9 @@
       changeSetting('showCurrentActivityOnMainScreen', detail);
     }}"
   />
-  <CustomCheckbox
-    label="{$_('settings.period_description')}"
-    checked="{$settings.showDescriptionsForPeriods}"
-    on:change="{({ detail }) => {
-      changeSetting('showDescriptionsForPeriods', detail);
-    }}"
-  />
   {#if $settings.showCurrentActivityOnMainScreen}
     <CustomCheckbox
+      indented
       label="{$_('settings.show_current_activity_label_main_screen')}"
       checked="{$settings.showCurrentActivityLabelOnMainScreen}"
       on:change="{({ detail }) => {
@@ -49,6 +43,13 @@
       }}"
     />
   {/if}
+  <CustomCheckbox
+    label="{$_('settings.period_description')}"
+    checked="{$settings.showDescriptionsForPeriods}"
+    on:change="{({ detail }) => {
+      changeSetting('showDescriptionsForPeriods', detail);
+    }}"
+  />
   <CustomCheckbox
     label="{$_('settings.show_current_period_above_timer')}"
     checked="{$settings.showCurrentPeriodAboveTimer}"

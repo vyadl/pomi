@@ -29,6 +29,7 @@
     >
       {$_('settings.basic_factor')} <br>
       {$_('settings.formula_factor_sentence')}: <br><br>
+      {$_('settings.formula_factor_variables')}: <br><br>
       <b>{$_('settings.formula_factor')}</b>
     </SettingDescription>
     <CustomCheckbox

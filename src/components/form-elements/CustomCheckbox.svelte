@@ -5,6 +5,7 @@
   export let right = false;
   export let disabled = false;
   export let label = '';
+  export let indented = false;
 
   const dispatch = createEventDispatcher();
 </script>
@@ -13,6 +14,7 @@
 <label
   class="custom-checkbox"
   class:right
+  class:indented
 >
   {#if label}
     {label}
@@ -36,7 +38,6 @@
     color: var(--color-text-softer);
     cursor: pointer;
     min-height: 20px;
-    word-break: break-all;
     margin-bottom: 15px;
     &.right {
       padding-right: 45px;
@@ -46,12 +47,19 @@
         right: 5px;
       }
     }
+    &.indented {
+      padding-left: 60px;
+      .checkbox {
+        left: 15px;
+      }
+    }
     .checkbox {
       -webkit-appearance: none;
       position: absolute;
       left: 0;
       top: 50%;
       transform: translateY(-50%);
+      margin: 0;
       cursor: pointer;
       outline: none;
       height: 20px;

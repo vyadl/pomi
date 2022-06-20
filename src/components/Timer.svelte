@@ -319,7 +319,8 @@
     .period-description {
       position: absolute;
       font-size: 12px;
-      bottom: 10px;
+      text-align: center;
+      top: calc(100% - 30px);
       left: 50%;
       transform: translateX(-50%);
       color: var(--color-text-softest-2);
