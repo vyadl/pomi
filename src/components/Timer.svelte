@@ -111,7 +111,7 @@
       class:summed="{$extraTimer}"
     >
       <div class="cifers-desc">
-        {#if $counter || $timer && $settings.showCurrentPeriodAboveTimer}
+        {#if $settings.showCurrentPeriodAboveTimer && ($counter || $timer)}
           {$_('now').toLowerCase()}:
           {$_(`interval_labels.${$currentInterval}`).toLowerCase()}
           {$currentInterval === 'main' ? $currentActivityTitle : ''}

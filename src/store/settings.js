@@ -21,7 +21,6 @@ const defaultSettings = {
   // main screen
   showMainTabs: true,
   showComment: true,
-  showActivityInTopCorner: false,
   showActivityNearTimer: true,
   showCurrentActivityOnMainScreen: true,
   showCurrentActivityLabelOnMainScreen: true,
