@@ -12,6 +12,7 @@
   export let inputMessage = '';
   export let errorMessage = '';
   export let inputType = 'text';
+  export let secondaryButtonText = '';
 
   const dispatch = createEventDispatcher();
   let value = '';
@@ -40,7 +41,7 @@
   on:close="{closeModal}"
   title="{title}"
 >
-  <div class="inner">
+  <div class="text-modal">
     <form class="form" on:submit|preventDefault="{sendValue}">
       <div class="input-wrapper">
         <CustomInput
@@ -51,8 +52,22 @@
           bind:errorMessage
         />
       </div>
-      <div class="buttons">
-        <CustomButton type="submit">
+      <div
+        class="buttons"
+        class:double="{secondaryButtonText}"
+      >
+        {#if secondaryButtonText}
+          <CustomButton
+            small
+            on:click="{() => { dispatch('secondary') }}"
+          >
+            {secondaryButtonText}
+          </CustomButton>
+        {/if}
+        <CustomButton
+          bordered="{secondaryButtonText}"
+          type="submit"
+        >
           {buttonText}
         </CustomButton>
       </div>
@@ -61,19 +76,23 @@
 </BasicModal>
 
 <style lang="scss">
-  .inner {
+  .text-modal {
     padding: 15px;
     width: 300px;
     max-width: 100vw;
     margin: 0 auto;
-  }
+    .input-wrapper {
+      margin-bottom: 20px;
+    }
 
-  .input-wrapper {
-    margin-bottom: 20px;
-  }
-
-  .buttons {
-    display: flex;
-    justify-content: space-around;
+    .buttons {
+      display: flex;
+      justify-content: space-around;
+      &.double {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+      }
+    }
   }
 </style>
