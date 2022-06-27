@@ -18,7 +18,6 @@
 
   let isAddingModalActive = false;
   let isEditingModalActive = false;
-  let activityActiveId = '';
   let errorMessage = '';
   initActivities();
 
@@ -26,7 +25,7 @@
     const activity = addActivity(event.detail);
 
     if (activity) {
-      setCurrentActivityIdLocal(activity.id);
+      setCurrentActivityId(activity.id);
       isAddingModalActive = false;
     } else {
       errorMessage = 'This activity is already exist';
@@ -53,19 +52,8 @@
     if ($currentActivityId === activity.id) {
       isEditingModalActive = true;
     } else {
-      setCurrentActivityIdLocal(activity.id);
+      setCurrentActivityId(activity.id);
     }
-  }
-
-  function setCurrentActivityIdLocal(id) {
-    setCurrentActivityId(id);
-    activityActiveId = '';
-  }
-
-  function handleFocus(activity) {
-    $currentActivityId === activity.id
-      ? (activityActiveId = '')
-      : (activityActiveId = activity.id);
   }
 </script>
 
@@ -74,21 +62,7 @@
   class:list="{!$settings.showActivitiesAsCloud}"
 >
   {#each $activitiesArr as activity}
-    <div
-      class="button-wrapper"
-      on:mouseover="{() => {
-        handleFocus(activity);
-      }}"
-      on:focus="{() => {
-        handleFocus(activity);
-      }}"
-      on:mouseout="{() => {
-        activityActiveId = '';
-      }}"
-      on:blur="{() => {
-        activityActiveId = '';
-      }}"
-    >
+    <div class="button-wrapper">
       <CustomButton
         on:click="{() => {
           handleActivityClick(activity);
@@ -97,17 +71,6 @@
       >
         {activity.title}
       </CustomButton>
-      {#if activityActiveId === activity.id && activity.id !== $currentActivityId}
-        <div
-          class="remove"
-          transition:fly="{{ y: -10, duration: 200 }}"
-          on:click="{ async () => {
-            if (await askConfirmation()) removeActivity(activity.id);
-          }}"
-        >
-          {$_('remove')}
-        </div>
-      {/if}
     </div>
   {/each}
   <div class="button-wrapper">
@@ -139,8 +102,15 @@
   on:close="{() => {
     isEditingModalActive = false;
   }}"
+  on:secondary="{ async () => {
+    if (await askConfirmation()) {
+      removeActivity($currentActivityId);
+      isEditingModalActive = false;
+    };
+  }}"
   bind:errorMessage
   inputMessage="{$currentActivityTitle}"
+  secondaryButtonText="{$_('remove')}"
   title="{$_('editing_activity')}"
 />
 
@@ -157,22 +127,6 @@
     .button-wrapper {
       padding-top: 15px;
       position: relative;
-    }
-
-    .remove {
-      opacity: .5;
-      transition: .2 opacity;
-      cursor: pointer;
-      position: absolute;
-      left: 50%;
-      top: 2px;
-      font-size: 10px;
-      transform: translateX(-50%);
-      color: var(--color-text-soft);
-      transition: .8 opacity;
-      &:hover {
-        opacity: 1;
-      }
     }
   }
 </style>
