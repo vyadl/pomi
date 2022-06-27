@@ -2,6 +2,7 @@
   import { _ } from 'svelte-i18n';
   import { settings, changeSetting } from './../../store/settings.js';
   import CustomCheckbox from './../form-elements/CustomCheckbox.svelte';
+  import CustomInput from './../form-elements/CustomInput.svelte';
   import SettingDescription from './../decorative/SettingDescription.svelte';
 
   let showNotificationWarning = false;
@@ -51,5 +52,29 @@
     <SettingDescription>
       {$_('notifications.warning')}
     </SettingDescription>
+  {/if}
+  <CustomCheckbox
+    label="{$_('settings.remind_after_finish_activity')}"
+    checked="{$settings.remindAfterFinishActivity}"
+    on:change="{({ detail }) => {
+      changeSetting('remindAfterFinishActivity', detail);
+    }}"
+  />
+  {#if $settings.remindAfterFinishActivity}
+    <CustomInput
+      type="range"
+      label="{`${$_('settings.remind_every')} ${$settings.minutesForReminding} ${$_('minutes_short')}`}"
+      value="{$settings.minutesForReminding}"
+      optionalProps="{
+        {
+          min: '1',
+          max: '30',
+          step: '1',
+        }
+      }"
+      on:input="{({ detail }) => {
+        changeSetting('minutesForReminding', detail, false);
+      }}"
+    />
   {/if}
 </div>

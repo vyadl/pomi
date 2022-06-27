@@ -1,9 +1,9 @@
 import { writable, derived, get } from 'svelte/store';
 import { stat } from './statistics.js';
 import { settings } from './settings.js';
-import { makeTwoDigitsCifer } from './../utils/generalUtils.js';
 import { getMinutesSecondsObjFromSeconds } from './../utils/timeUtils.js';
 import { currentInterval, intervals, playAudio } from './intervals.js';
+import { currentActivityTitle } from './activities.js';
 import { _ } from './../utils/langUtils.js';
 
 function createCounter() {
@@ -20,6 +20,7 @@ function createCounter() {
       const nowTimestamp = +new Date();
       const endTimestamp = +new Date(nowTimestamp + durationInSeconds * 1000);
       let isStatAdded = false;
+      let reminders = 0;
 
       plannedFinishTimestamp.set(endTimestamp);
       startTimestamp.set(nowTimestamp);
@@ -31,11 +32,25 @@ function createCounter() {
 
           const newCounter = Math.floor((nowTimestamp - get(startTimestamp)) / 1000);
 
-          if (!isStatAdded && nowTimestamp > endTimestamp) {
-            stat.addStat(intervalId);
-            playAudio(intervalId);
-            handleFinishPeriodNotification();
-            isStatAdded = true;
+          if (nowTimestamp > endTimestamp) {
+            if (isStatAdded) {
+              if (get(settings).remindAfterFinishActivity) {
+                const currentLimitInSeconds = get(settings).minutesForReminding * 60 * (reminders + 1);
+                const isTimeToRemind = get(extraTimer) > currentLimitInSeconds;
+                
+                if (isTimeToRemind) {
+                  reminders++;
+
+                  playAudio(intervalId);
+                  handleFinishPeriodNotification(true);
+                }
+              }
+            } else {
+              stat.addStat(intervalId);
+              playAudio(intervalId);
+              handleFinishPeriodNotification();
+              isStatAdded = true;
+            }
           }
 
           return newCounter;
@@ -104,14 +119,22 @@ export const extraTimerFormattedTime = derived(
   }
 );
 
-function handleFinishPeriodNotification() {
+function handleFinishPeriodNotification(isReminder = false) {
   if (get(settings).showNotifications) {
     const currentIntervalDuration = get(intervals)[get(currentInterval)].duration + _('minutes_short')
-    const title = `${get(currentActivityTitle)} ${_('notifications.is_end')} (${currentIntervalDuration})`;
+    const title = `${get(currentActivityTitle)} ${_('notifications.is_end')}`;
 
     new Notification(title, {
       icon: '/favicon.png',
-      body: _('notifications.planned_period_ended'),
+      body: isReminder
+        ? `${
+            get(currentActivityTitle)
+          } ${
+            _('notifications.reminder_about_finish')
+          }: ${
+            +get(extraTimerFormattedTime).mins
+          }`
+        : _('notifications.planned_period_ended'),
     });
   }
 };

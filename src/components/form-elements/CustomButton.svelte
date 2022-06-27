@@ -40,7 +40,7 @@
 
 <style lang="scss">
   .custom-button {
-    padding: 10px 20px;
+    padding: 10px 18px;
     background-color: var(--color-main-bg);
     border: none;
     border-radius: 5px;
