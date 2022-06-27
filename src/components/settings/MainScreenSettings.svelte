@@ -57,4 +57,11 @@
       changeSetting('showCurrentPeriodAboveTimer', detail);
     }}"
   />
+  <CustomCheckbox
+    label="{$_('settings.show_activities_as_cloud')}"
+    checked="{$settings.showActivitiesAsCloud}"
+    on:change="{({ detail }) => {
+      changeSetting('showActivitiesAsCloud', detail);
+    }}"
+  />
 </div>

@@ -2,6 +2,7 @@
   import { _ } from 'svelte-i18n';
   import TextModal from './modals/TextModal.svelte';
   import CustomButton from './form-elements/CustomButton.svelte';
+  import { settings } from './../store/settings';
   import {
     activitiesArr,
     currentActivityId,
@@ -68,7 +69,10 @@
   }
 </script>
 
-<div class="activities">
+<div
+  class="activities"
+  class:list="{!$settings.showActivitiesAsCloud}"
+>
   {#each $activitiesArr as activity}
     <div
       class="button-wrapper"
@@ -146,26 +150,29 @@
     flex-wrap: wrap;
     justify-content: center;
     padding-bottom: 50px;
-  }
+    &.list {
+      display: block;
+      padding-left: 68px;
+    }
+    .button-wrapper {
+      padding-top: 15px;
+      position: relative;
+    }
 
-  .button-wrapper {
-    padding-top: 15px;
-    position: relative;
-  }
-
-  .remove {
-    opacity: .5;
-    transition: .2 opacity;
-    cursor: pointer;
-    position: absolute;
-    left: 50%;
-    top: 2px;
-    font-size: 10px;
-    transform: translateX(-50%);
-    color: var(--color-text-soft);
-    transition: .8 opacity;
-    &:hover {
-      opacity: 1;
+    .remove {
+      opacity: .5;
+      transition: .2 opacity;
+      cursor: pointer;
+      position: absolute;
+      left: 50%;
+      top: 2px;
+      font-size: 10px;
+      transform: translateX(-50%);
+      color: var(--color-text-soft);
+      transition: .8 opacity;
+      &:hover {
+        opacity: 1;
+      }
     }
   }
 </style>
