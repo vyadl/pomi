@@ -10,6 +10,8 @@ const defaultSettings = {
   showPlannedDuration: true,
   // behaviour
   showNotifications: false,
+  remindAfterFinishActivity: false,
+  minutesForReminding: 5,
   // language
   language: 'en',
   // theme
@@ -26,6 +28,7 @@ const defaultSettings = {
   showCurrentActivityLabelOnMainScreen: true,
   showCurrentPeriodAboveTimer: true,
   showDescriptionsForPeriods: true,
+  showActivitiesAsCloud: true,
 };
 
 export const settings = writable(defaultSettings);

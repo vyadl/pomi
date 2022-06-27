@@ -44,7 +44,7 @@
   "tooltip_add_extra": "It will add an extra-time to the last interval in statistics.",
   "tooltip_reset": "It will reset timer, without adding anything in statistics.",
   "tooltip_add": "It will add passed time into statistics (rounded to minutes).",
-  "now": "Сейчас",
+  "now": "Now",
   "removed": "removed",
   "save": "Save",
   "type": "Type",
@@ -112,7 +112,10 @@
     "show_current_activity_main_screen": "Current activity in top right corner",
     "show_current_activity_label_main_screen": "Show label 'current activity' above",
     "show_current_period_above_timer": "Current period above timer",
-    "period_description": "Descriptions near periods"
+    "period_description": "Descriptions near periods",
+    "show_activities_as_cloud": "Activities as cloud (opposite as list)",
+    "remind_after_finish_activity": "Remind after finishing activity time",
+    "remind_every": "Remind every"
   },
   "sounds": {
     "market": "Market atmoshpere",
@@ -152,7 +155,8 @@
     "planned_period_ended": "Planned period has ended",
     "test": "Test notification",
     "test_body": "There is body of test notification",
-    "warning": "If you don't see the test notification – check your browser or/and system settings – they need to allow them for this site and browser at all"
+    "warning": "If you don't see the test notification – check your browser or/and system settings – they need to allow them for this site and browser at all",
+    "reminder_about_finish": "There is reminding that planned period is ended. Extra time in minutes is"
   },
   "validation": {
     "deprecated_activity": "This activity is removed. You can keep it like that or choose the existed one",
