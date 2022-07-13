@@ -1,4 +1,12 @@
 import { writable, derived, get } from 'svelte/store';
+import { settings } from './settings.js';
+import {
+  LOCAL_STORAGE_ACTIVITIES_KEY,
+  LOCAL_STORAGE_CURRENT_ACTIVITY_ID_KEY,
+  LOCAL_STORAGE_ORDER_ACTIVITY_KEY,
+} from './../localStorageConfig.js';
+
+// stores
 
 export const activities = writable({});
 export const currentActivityId = writable('');
@@ -33,6 +41,25 @@ export const activityOptionsForSelect = derived(
   $activitiesArr => {
     return $activitiesArr.map(item => ({ value: item.id, text: item.title }));
 });
+export const orderActivity = writable([]);
+export const sortedActivitiesArr = derived(orderActivity,
+  $orderActivity => get(settings).activitySortType === 'name'
+    ? get(activitiesArr)
+    : $orderActivity.map(id => ({
+      id,
+      title: get(activities)[id]
+    }))
+  );
+export const makeActivityFirst = function (activityId) {
+  if (get(activities)[activityId]) {
+    let activityArr = [...get(orderActivity)];
+    
+    activityArr.unshift(activityId);
+    activityArr = activityArr.filter((item, i) =>  i === 0 || item !== activityId);
+    
+    orderActivity.update(() => activityArr);
+  }
+}
 export const addActivity = function(activityName) {
   const activitiesNames = Object.values(get(activities));
   const id = getNewId();
@@ -54,7 +81,6 @@ export const addActivity = function(activityName) {
     return false;
   }
 };
-
 export const removeActivity = function(activityKey) {
   const resultArray = Object.keys(get(activities)).filter(key => key !== activityKey);
   const newActivities = resultArray.reduce((result, key) => {
@@ -81,29 +107,45 @@ export const editActivity = function(activityId, activityTitle) {
 
 export const setCurrentActivityId = function(id) {
   currentActivityId.update(() => id);
+  makeActivityFirst(id);
+
+  localStorageUpdateActivityOrder();
   localStorageUpdateCurrentActivityId();
 };
 
 export const initActivities = function() {
-  const localActivities = localStorage.getItem('activities');
-  const localCurrentActivityId = localStorage.getItem('currentActivityId');
+  const localActivities = localStorage.getItem(LOCAL_STORAGE_ACTIVITIES_KEY);
+  const localCurrentActivityId = localStorage.getItem(LOCAL_STORAGE_CURRENT_ACTIVITY_ID_KEY);
+  const localActivityOrder = localStorage.getItem(LOCAL_STORAGE_ORDER_ACTIVITY_KEY);
   const idForDefault = getNewId();
 
   activities.update(() => localActivities ? JSON.parse(localActivities) : { [idForDefault]: 'default' });
   currentActivityId.update(() => localCurrentActivityId || idForDefault);
+  orderActivity.update(() => localActivityOrder
+    ? JSON.parse(localActivityOrder)
+    : get(activitiesArr).map(item => item.id)
+  );
+
+  if (!localActivityOrder && get(currentActivityId)) {
+    makeActivityFirst(get(currentActivityId));
+  }
 
   localStorageUpdateActivities();
   localStorageUpdateCurrentActivityId();
 };
 
 export const localStorageUpdateActivities = function() {
-  localStorage.setItem('activities', JSON.stringify(get(activities)));
+  localStorage.setItem(LOCAL_STORAGE_ACTIVITIES_KEY, JSON.stringify(get(activities)));
 };
 
 export const localStorageUpdateCurrentActivityId = function() {
-  localStorage.setItem('currentActivityId', get(currentActivityId));
+  localStorage.setItem(LOCAL_STORAGE_CURRENT_ACTIVITY_ID_KEY, get(currentActivityId));
+};
+
+export const localStorageUpdateActivityOrder = function() {
+  localStorage.setItem(LOCAL_STORAGE_ORDER_ACTIVITY_KEY, JSON.stringify(get(orderActivity)));
 };
 
 function getNewId() {
   return String(+(new Date()));
-}
+};

@@ -3,9 +3,11 @@ import { writable, derived, get } from 'svelte/store';
 import { currentActivityId, currentActivityTitle, activities } from './activities.js';
 import { comment } from './../store/counter.js';
 import { intervals } from './intervals.js';
-import { startTimestamp } from './counter.js';
+import { startTimestamp, counter } from './counter.js';
 import { addMessage } from './appNotifications.js';
 import { _ } from './../utils/langUtils.js';
+import { LOCAL_STORAGE_STATISTICS_KEY } from './../localStorageConfig.js';
+
 const MAXIMUM_TIME_FOR_ONE_ACTIVITY = 1000 * 60 * 60 * 24; // 24 hours
 
 export const getDateString = (dateObj = new Date) => {
@@ -129,6 +131,8 @@ function createStat() {
         lastRecordCopied.intervalId,
         new Date(lastRecordCopied.startedAt),
       );
+
+      counter.handleRunningNextPeriod(lastRecordCopied.intervalId);
     },
     addDay: (day) => {
       update(stat => {
@@ -182,13 +186,13 @@ function createStat() {
 export const stat = createStat();
 
 export const initStat = function() {
-  const localStat = localStorage.getItem('stat');
+  const localStat = localStorage.getItem(LOCAL_STORAGE_STATISTICS_KEY);
 
   stat.update(() => (localStat ? JSON.parse(localStat) : {}));
 };
 
 export const localStorageUpdateStat = function() {
-  localStorage.setItem('stat', JSON.stringify(get(stat)));
+  localStorage.setItem(LOCAL_STORAGE_STATISTICS_KEY, JSON.stringify(get(stat)));
 };
 
 

@@ -2,7 +2,7 @@ import { writable, derived, get } from 'svelte/store';
 import { stat } from './statistics.js';
 import { settings } from './settings.js';
 import { getMinutesSecondsObjFromSeconds } from './../utils/timeUtils.js';
-import { currentInterval, intervals, playAudio } from './intervals.js';
+import { currentInterval, intervals, playAudio, INTERVAL_LABELS } from './intervals.js';
 import { currentActivityTitle } from './activities.js';
 import { _ } from './../utils/langUtils.js';
 
@@ -21,6 +21,8 @@ function createCounter() {
       const endTimestamp = +new Date(nowTimestamp + durationInSeconds * 1000);
       let isStatAdded = false;
       let reminders = 0;
+
+      currentInterval.set(intervalId);
 
       plannedFinishTimestamp.set(endTimestamp);
       startTimestamp.set(nowTimestamp);
@@ -60,7 +62,18 @@ function createCounter() {
     finishPeriod: (intervalId) => {
       stat.addStat(intervalId);
       counter.resetPeriod();
+      counter.handleRunningNextPeriod(intervalId);
       playAudio(intervalId);
+    },
+    handleRunningNextPeriod: (intervalId) => {
+      if (get(settings).runNextTypeIntervalAfterFinishing) {
+        const nextInterval =
+          [INTERVAL_LABELS.BREAK, INTERVAL_LABELS.LONG_BREAK].includes(intervalId)
+            ? INTERVAL_LABELS.MAIN
+            : INTERVAL_LABELS.BREAK;
+
+        counter.start(nextInterval, get(intervals)[nextInterval].duration * 60);
+      }
     },
     resetPeriod: () => {
       update(() => {
