@@ -1,5 +1,14 @@
 import { writable, get } from 'svelte/store';
 import { updateFactor, intervals } from './intervals';
+import {
+  LOCAL_STORAGE_ACTIVITIES_KEY,
+  LOCAL_STORAGE_CURRENT_ACTIVITY_ID_KEY,
+  LOCAL_STORAGE_INTERVALS_KEY,
+  LOCAL_STORAGE_ORDER_ACTIVITY_KEY,
+  LOCAL_STORAGE_SETTINGS_KEY,
+  LOCAL_STORAGE_STATISTICS_KEY,
+} from './../localStorageConfig.js';
+
 let isFirstSubscribe = true;
 const defaultSettings = {
   isUserOnPage: true,
@@ -12,6 +21,7 @@ const defaultSettings = {
   showNotifications: false,
   remindAfterFinishActivity: false,
   minutesForReminding: 5,
+  runNextTypeIntervalAfterFinishing: false,
   // language
   language: 'en',
   // theme
@@ -29,13 +39,14 @@ const defaultSettings = {
   showCurrentPeriodAboveTimer: true,
   showDescriptionsForPeriods: true,
   showActivitiesAsCloud: true,
+  activitySortType: 'name',
 };
 
 export const settings = writable(defaultSettings);
 
 export const initSettings = function() {
-  const localSettings = localStorage.getItem('settings')
-    ? JSON.parse(localStorage.getItem('settings'))
+  const localSettings = localStorage.getItem(LOCAL_STORAGE_SETTINGS_KEY)
+    ? JSON.parse(localStorage.getItem(LOCAL_STORAGE_SETTINGS_KEY))
     : false;
 
   if (localSettings) {
@@ -58,7 +69,7 @@ function initCheckingPresence() {
 }
 
 export const localStorageUpdateSettings = function() {
-  localStorage.setItem('settings', JSON.stringify(get(settings)));
+  localStorage.setItem(LOCAL_STORAGE_SETTINGS_KEY, JSON.stringify(get(settings)));
 }
 
 settings.subscribe(() => {
@@ -78,15 +89,15 @@ export const changeSetting = function(setting, value, isBoolean = true) {
   settings.update(settings => {
     settings[setting] = isBoolean ? !!value : value;
 
-    return settings;
+    return {...settings};
   });
 
   localStorageUpdateSettings();
 }
 
 export const resetSettings = function(isReload = true) {
-  localStorage.removeItem('settings');
-  localStorage.removeItem('intervals');
+  localStorage.removeItem(LOCAL_STORAGE_SETTINGS_KEY);
+  localStorage.removeItem(LOCAL_STORAGE_INTERVALS_KEY);
 
   if (isReload) {
     window.location.reload();
@@ -94,7 +105,7 @@ export const resetSettings = function(isReload = true) {
 }
 
 export const resetHistory = function(isReload = true) {
-  localStorage.removeItem('stat');
+  localStorage.removeItem(LOCAL_STORAGE_STATISTICS_KEY);
 
   if (isReload) {
     window.location.reload();
@@ -102,8 +113,9 @@ export const resetHistory = function(isReload = true) {
 }
 
 export const resetActivities = function(isReload = true) {
-  localStorage.removeItem('activities');
-  localStorage.removeItem('currentActivityId');
+  localStorage.removeItem(LOCAL_STORAGE_ACTIVITIES_KEY);
+  localStorage.removeItem(LOCAL_STORAGE_CURRENT_ACTIVITY_ID_KEY);
+  localStorage.removeItem(LOCAL_STORAGE_ORDER_ACTIVITY_KEY);
 
   if (isReload) {
     window.location.reload();

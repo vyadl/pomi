@@ -66,6 +66,12 @@
   "yes": "Yes",
   "no": "No",
   "editing_activity": "Editing activity",
+  "sort": "Sort",
+  "view": "View",
+  "cloud": "Cloud",
+  "list": "List",
+  "last_first": "Last chosen",
+  "abc": "Alphabetical",
   "languages": {
     "en": "English",
     "ua": "Українська",
@@ -116,7 +122,8 @@
     "period_description": "Descriptions near periods",
     "show_activities_as_cloud": "Activities as cloud (opposite as list)",
     "remind_after_finish_activity": "Remind after finishing activity time",
-    "remind_every": "Remind every"
+    "remind_every": "Remind every",
+    "run_next_interval": "Automatically start break after finishing activity and opposite"
   },
   "sounds": {
     "market": "Market atmoshpere",

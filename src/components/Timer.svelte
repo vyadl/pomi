@@ -84,7 +84,6 @@
   function startPeriod(intervalId, options) {
     clearInterval(faviconTimer);
     counter.start(intervalId, options.duration * 60);
-    currentInterval.set(intervalId);
     initAnimateFavicon();
   }
 
@@ -98,9 +97,9 @@
   }
 
   function addExtraTime() {
-    stat.addTime();
     resetPeriod();
     stopAudio();
+    stat.addTime();
   }
 </script>
 
