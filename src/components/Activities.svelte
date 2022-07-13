@@ -64,6 +64,15 @@
 
     updateSortedActivitiesArr();
   }
+
+  async function remove() {
+    if (await askConfirmation()) {
+      removeActivity($currentActivityId);
+      isEditingModalActive = false;
+    };
+
+    updateSortedActivitiesArr();
+  }
   
   function handleActivityClick(activity) {
     if ($currentActivityId === activity.id) {
@@ -170,12 +179,7 @@
   on:close="{() => {
     isEditingModalActive = false;
   }}"
-  on:secondary="{ async () => {
-    if (await askConfirmation()) {
-      removeActivity($currentActivityId);
-      isEditingModalActive = false;
-    };
-  }}"
+  on:secondary="{remove}"
   bind:errorMessage
   inputMessage="{$currentActivityTitle}"
   secondaryButtonText="{$_('remove')}"
