@@ -77,4 +77,11 @@
       }}"
     />
   {/if}
+  <CustomCheckbox
+    label="{$_('settings.run_next_interval')}"
+    checked="{$settings.runNextTypeIntervalAfterFinishing}"
+    on:change="{({ detail }) => {
+      changeSetting('runNextTypeIntervalAfterFinishing', detail);
+    }}"
+  />
 </div>

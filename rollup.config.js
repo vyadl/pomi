@@ -2,12 +2,31 @@ import svelte from 'rollup-plugin-svelte';
 import commonjs from '@rollup/plugin-commonjs';
 import resolve from '@rollup/plugin-node-resolve';
 import livereload from 'rollup-plugin-livereload';
+import copy from "rollup-plugin-copy";
 import css from 'rollup-plugin-css-only';
 import scss from 'rollup-plugin-scss';
 import json from '@rollup/plugin-json';
 import sveltePreprocess from 'svelte-preprocess';
+import fs from 'fs';
+import posthtml from 'posthtml';
+import { hash } from 'posthtml-hash';
+import rimraf from 'rimraf';
+import { terser } from "rollup-plugin-terser";
 
 const production = !process.env.ROLLUP_WATCH;
+const OUT_DIR = 'public';
+const OUT_FILE = `${OUT_DIR}/index.html`;
+
+const hashStatic = () => ({
+  name: 'hash-static',
+  writeBundle: () => {
+    posthtml()
+      .use(hash({ path: OUT_DIR }))
+      .process(fs.readFileSync(OUT_FILE, 'utf-8'))
+      .then(result => fs.writeFileSync(OUT_FILE, result.html));
+  },
+});
+
 const preprocess = sveltePreprocess({
   scss: {
     includePaths: ['src'],
@@ -41,43 +60,36 @@ function serve() {
 export default {
   input: 'src/main.js',
   output: {
-    sourcemap: true,
+    sourcemap: !production,
     format: 'iife',
     name: 'app',
-    file: 'public/build/bundle.js'
+    file: `${OUT_DIR}/bundle.[hash].js`,
   },
   plugins: [
+    rimraf.sync(OUT_DIR),
+    copy({ targets: [{ src: "static/*", dest: 'public' }] }),
     scss(),
     svelte({
       compilerOptions: {
-        // enable run-time checks when not in production
         dev: !production
       },
       preprocess,
     }),
-    // we'll extract any component CSS out into
-    // a separate file - better for performance
-    css({ output: 'bundle.css' }),
-
-    // If you have external dependencies installed from
-    // npm, you'll most likely need these plugins. In
-    // some cases you'll need additional configuration -
-    // consult the documentation for details:
-    // https://github.com/rollup/plugins/tree/master/packages/commonjs
+    css({ output: 'bundle.[hash].css' }),
+    json(),
+    commonjs(),
     resolve({
       browser: true,
       dedupe: ['svelte']
     }),
-    json(),
-    commonjs(),
-
-    // In dev mode, call `npm run start` once
-    // the bundle has been generated
-    !production && serve(),
-
-    // Watch the `public` directory and refresh the
-    // browser on changes when not in production
-    !production && livereload('public'),
+    !production &&
+      serve({
+        contentBase: [OUT_DIR],
+        port: 3000,
+      }),
+    !production && livereload({ watch: OUT_DIR }),
+    production && terser(),
+    production && hashStatic(),
   ],
   onwarn: function ({ message }) {
     if ( /Circular dependency/.test(message)) return;

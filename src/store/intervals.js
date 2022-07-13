@@ -1,6 +1,13 @@
 import { writable, derived, get } from 'svelte/store';
 import { settings } from './../store/settings.js'
 import { sounds } from './sounds.js';
+import { LOCAL_STORAGE_INTERVALS_KEY } from './../localStorageConfig.js';
+
+export const INTERVAL_LABELS = {
+  MAIN: 'main',
+  BREAK: 'break',
+  LONG_BREAK: 'longBreak',
+};
 
 let audios = {};
 
@@ -55,7 +62,7 @@ export const activeIntervals = derived(
 );
 
 export const initIntervals = function() {
-  const localIntervals = localStorage.getItem('intervals');
+  const localIntervals = localStorage.getItem(LOCAL_STORAGE_INTERVALS_KEY);
   let defaultIdForSound;
 
   if (!localIntervals) {
@@ -144,7 +151,7 @@ export const updateFactor = () => {
 }
 
 export const localStorageUpdateIntervals = function(obj) {
-  localStorage.setItem('intervals', JSON.stringify(obj));
+  localStorage.setItem(LOCAL_STORAGE_INTERVALS_KEY, JSON.stringify(obj));
 };
 
 // actions
