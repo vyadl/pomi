@@ -89,8 +89,13 @@ export const removeActivity = function(activityKey) {
     return result;
   }, {});
 
+  orderActivity.update($orderActivity => $orderActivity.filter(key => activityKey !== key));
   activities.update(() => newActivities);
+  currentActivityId.update(() => '');
+
   localStorageUpdateActivities();
+  localStorageUpdateActivityOrder();
+  localStorageUpdateCurrentActivityId();
 };
 
 export const editActivity = function(activityId, activityTitle) {
