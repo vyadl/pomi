@@ -11,7 +11,6 @@ import fs from 'fs';
 import posthtml from 'posthtml';
 import { hash } from 'posthtml-hash';
 import rimraf from 'rimraf';
-import { terser } from "rollup-plugin-terser";
 
 const production = !process.env.ROLLUP_WATCH;
 const OUT_DIR = 'public';
@@ -88,7 +87,6 @@ export default {
         port: 3000,
       }),
     !production && livereload({ watch: OUT_DIR }),
-    production && terser(),
     production && hashStatic(),
   ],
   onwarn: function ({ message }) {
