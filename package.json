@@ -12,7 +12,7 @@
     "@rollup/plugin-json": "^4.1.0",
     "@rollup/plugin-node-resolve": "^13.3.0",
     "autoprefixer": "^10.4.4",
-    "postcss": "^8.4.12",
+    "postcss": "^8.4.31",
     "posthtml": "^0.16.6",
     "posthtml-hash": "^1.2.2",
     "rollup": "^2.73.0",
