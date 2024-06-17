@@ -72,8 +72,8 @@
       position: absolute;
       top: 30px;
       right: 30px;
-      width: 30px;
-      height: 30px;
+      width: 40px;
+      height: 40px;
       user-select: none;
       color: var(--color-text-softer);
       transition: opacity .2s;
@@ -83,12 +83,11 @@
       &::after {
         content: '';
         position: absolute;
-        width: 100%;
+        width: 80%;
         height: 3px;
         left: 50%;
         top: 50%;
         transform: translate(-50%, -50%) rotate(45deg);
-        rotate: 45deg;
         background-color: var(--color-text);
       }
       &::after {
